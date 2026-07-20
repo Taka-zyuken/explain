@@ -181,6 +181,81 @@
             font-weight: bold;
             color: #4a5568;
         }
+        /* ==========================================
+           スマートフォン向けの表示最適化（サイズ縮小）
+           ========================================== */
+        @media screen and (max-width: 768px) {
+            body {
+                line-height: 1.6; /* 行間を少し詰めて視認性を上げる */
+            }
+
+            /* スライド全体の余白を削り、画面を広く使う */
+            .slide {
+                width: 95%;
+                height: 88vh;
+                padding: 20px 20px; /* 横余白を60pxから20pxに縮小 */
+            }
+
+            /* ヘッダーの文字を小さく */
+            .slide-header h2 {
+                font-size: 18pt;
+            }
+            .badge {
+                font-size: 10pt;
+                padding: 2px 8px;
+            }
+
+            /* 本文・問題文の文字サイズをひと回り小さく */
+            .content-box {
+                font-size: 12pt; /* 16ptから12ptに縮小 */
+                margin-bottom: 15px;
+            }
+            .problem-text {
+                padding: 15px;
+                font-size: 13pt;
+                margin-bottom: 15px;
+            }
+
+            /* 正解・結論ボックスの調整 */
+            .answer-box {
+                padding: 10px 15px;
+                margin-top: 15px;
+            }
+            .answer-box div[style*="font-size"] {
+                font-size: 14pt !important; /* スマホのみ大きな正解文字を14ptに抑制 */
+            }
+
+            /* 表（まとめスライド）の文字サイズと余白をスマホ用に最小化 */
+            table {
+                font-size: 11pt !important;
+            }
+            th, td {
+                padding: 8px !important;
+            }
+
+            /* MathJaxの数式全体がスマホ画面からはみ出さないように自動縮小 */
+            .mjx-chtml {
+                font-size: 90% !important; 
+            }
+            .math-block, mjx-container[display="true"] {
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 5px 0;
+            }
+
+            /* 下部ナビゲーションボタンを押しやすいサイズに微調整 */
+            .nav-controls {
+                bottom: 15px;
+                gap: 20px;
+            }
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 11pt;
+            }
+            .page-indicator {
+                font-size: 12pt;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1365,6 +1440,7 @@
     </div>
 
     <!-- スライドを制御するスクリプト -->
+        <!-- スライドを制御するスクリプト（スマホボタン限定版） -->
     <script>
         const slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
@@ -1387,7 +1463,7 @@
             updateSlide();
         }
 
-        // PC用のキーボード操作
+        // PC用のキーボード操作（←、→、スペース、Enter）は維持
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
@@ -1397,41 +1473,6 @@
                 changeSlide(-1);
             }
         });
-
-        // スマホ用の画面タップ操作（画面の右半分をタップで進む、左半分で戻る）
-        document.addEventListener('click', (e) => {
-            // 下部のナビゲーションボタン自体がクリックされた場合は処理をスキップ
-            if (e.target.closest('.nav-controls')) return;
-            
-            const halfWidth = window.innerWidth / 2;
-            if (e.clientX > halfWidth) {
-                changeSlide(1);  // 右半分タップで次へ
-            } else {
-                changeSlide(-1); // 左半分タップで前へ
-            }
-        });
-
-        // スマホ用のスワイプ操作（タッチイベント）
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
-        document.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, false);
-
-        document.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, false);
-
-        function handleSwipe() {
-            const swipeDistance = touchEndX - touchStartX;
-            if (swipeDistance < -50) {
-                changeSlide(1);  // 左スワイプで次へ
-            } else if (swipeDistance > 50) {
-                changeSlide(-1); // 右スワイプで前へ
-            }
-        }
     </script>
 </body>
 </html>
