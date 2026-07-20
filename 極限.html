@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅲ　極限</title>
+    
+    <!-- 数式を美しく表示するためのMathJaxライブラリ -->
+     <!-- 200行辺りまでテンプレ -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        /* 全体スタイルの定義（明朝体・である調の統一ベース） */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden; /* スライド全体のスクロールを抑止 */
+            line-height: 1.8;
+        }
+
+        /* スライドコンテナ */
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 各スライドの共通デザイン */
+        .slide {
+            display: none; /* 初期状態は非表示 */
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px 60px;
+            overflow-y: auto; /* コンテンツが多い場合はスライド内スクロール */
+        }
+
+        /* アクティブなスライドのみ表示 */
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ヘッダーデザイン */
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        /* コンテンツ部分のレイアウト */
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* 強調用の正解ボックス */
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        /* リストスタイル */
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        /* 操作用ナビゲーションUI */
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド1：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ　極限</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+         <!-- ここからいじる -->
+        <!-- スライド1：テーマ導入（分数関数と極限） -->
+        <div class="slide active">
+            <div class="slide-header">
+                <h2>関数の極限 ①</h2>
+                <span class="badge">数Ⅲ基礎：極限の導入</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【テーマ】分数関数 $\displaystyle f(x) = \frac{1}{x-2}$ において、$x$ を $2$ に限りなく近づけるときの挙動を考える。
+                </div>
+                <div style="margin-top: 20px;">
+                    初学者が最初に直面する疑問は、<strong>「分母が $0$ になるため、代入計算ができない」</strong>という点である。<br>
+                    極限（limit）の概念においては、$x=2$ そのものの値ではなく、<strong>「$2$ ではない値から、$2$ に限りなく近づく」</strong>というプロセスが重要となる。
+                    <br><br>
+                    接近の仕方には、以下の $2$ 通りのアプローチが存在する。
+                    <ul>
+                        <li><strong>右側極限</strong>：$2$ より大きい値（$2.1, 2.01, 2.001 \dots$）から近づく</li>
+                        <li><strong>左側極限</strong>：$2$ より小さい値（$1.9, 1.99, 1.999 \dots$）から近づく</li>
+                    </ul>
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 25px; color: #718096; border-radius: 6px;">
+                    [ここに右側・左側からのアプローチを示す数直線または概念図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2：右側極限の丁寧な解説 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>関数の極限 ②</h2>
+                <span class="badge">右側極限（プラス側からの接近）</span>
+            </div>
+            <div class="content-box">
+                <div>
+                    まずは $x \to 2 + 0$ （$2$ より大きい方から $2$ へ近づく）ケースを検証する。<br>
+                    具体的に数値を当てはめて考えると、分子と分母の挙動が視覚化される。
+                    <br><br>
+                    <ul>
+                        <li>$x = 2.1 \quad \Rightarrow \quad f(x) = \frac{1}{2.1 - 2} = \frac{1}{0.1} = 10$</li>
+                        <li>$x = 2.01 \quad \Rightarrow \quad f(x) = \frac{1}{2.01 - 2} = \frac{1}{0.01} = 100$</li>
+                        <li>$x = 2.001 \quad \Rightarrow \quad f(x) = \frac{1}{2.001 - 2} = \frac{1}{0.001} = 1000$</li>
+                    </ul>
+                    <br>
+                    このように、分母が「正の値を保ちながら $0$ に限りなく近づく」とき、分数全体の数値は正の方向に爆発的に大きくなる。
+                    この状態を<strong>正の無限大に発散する</strong>といい、記号 $\infty$ を用いて以下のように表す。
+                    $$ \lim_{x \to 2+0} \frac{1}{x-2} = \infty $$
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 25px; color: #718096; border-radius: 6px;">
+                    [ここに $x=2$ の右側でグラフが上に跳ね上がる部分グラフの図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド3：左側極限と結論 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>関数の極限 ③</h2>
+                <span class="badge">左側極限と最終的な結論</span>
+            </div>
+            <div class="content-box">
+                <div>
+                    次に $x \to 2 - 0$ （$2$ より小さい方から $2$ へ近づく）ケースを検証する。<br>
+                    同様に数値を想定すると、以下の通りとなる。
+                    <br><br>
+                    <ul>
+                        <li>$x = 1.9 \quad \Rightarrow \quad f(x) = \frac{1}{1.9 - 2} = \frac{1}{-0.1} = -10$</li>
+                        <li>$x = 1.99 \quad \Rightarrow \quad f(x) = \frac{1}{1.99 - 2} = \frac{1}{-0.01} = -100$</li>
+                    </ul>
+                    <br>
+                    今度は分母が「負の値を保ちながら $0$ に限りなく近づく」ため、分数全体の数値は負の方向に絶対値が大きくなる。
+                    この状態を<strong>負の無限大に発散する</strong>といい、以下のように表す。
+                    $$ \lim_{x \to 2-0} \frac{1}{x-2} = -\infty $$
+                    
+                    <div class="answer-box">
+                        <div class="answer-label">重要な結論</div>
+                        <div style="font-size: 14pt;">
+                            右側極限（$\infty$）と左側極限（$-\infty$）が一致しないため、単に $x \to 2$ としたときの<strong>「極限は存在しない」</strong>が正解となる。<br>
+                            また、このときにグラフが限りなく近づく直線 $x=2$ のことを<strong>漸近線（ぜんきんせん）</strong>と呼ぶ。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 25px; color: #718096; border-radius: 6px;">
+                    [ここに $x=2$ を漸近線とする分数関数全体の反比例に似たグラフの図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+        <!-- スライド4：不定形（0/0）との遭遇 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>関数の極限 ④</h2>
+                <span class="badge">不定形（0/0）の登場</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【例題】次の極限値を求めよ。
+                    $$ \lim_{x \to 3} \frac{x^2 - x - 6}{x - 3} $$
+                </div>
+                <div style="margin-top: 20px;">
+                    この問題において、愚直に $x = 3$ を代入しようとすると、以下の現象が起きる。
+                    <ul>
+                        <li>分母：$3 - 3 = 0$</li>
+                        <li>分子：$3^2 - 3 - 6 = 9 - 3 - 6 = 0$</li>
+                    </ul>
+                    <br>
+                    結果として $\frac{0}{0}$ という形になり、数学において $0$ で割ることは定義できないため、このままでは値を決定できない。
+                    このように、極限を考える上でそのままでは値が定まらない形を<strong>不定形（ふていけい）</strong>と呼ぶ。
+                    <br><br>
+                    しかし、前回の例（極限なし）とは異なり、今回は<strong>「分子も $0$ になっている」</strong>という点が最大のヒントとなる。
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 25px; color: #718096; border-radius: 6px;">
+                    [ここに「$x \to 3$ のとき分母も分子も $0$ へ向かう」ことを示す矢印やイメージ図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5：因数分解による不定形の解消 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>関数の極限 ⑤</h2>
+                <span class="badge">不定形の解消（因数分解）</span>
+            </div>
+            <div class="content-box">
+                <div>
+                    分子の $x^2 - x - 6$ が $x=3$ で $0$ になるということは、高校数Ⅱで学んだ「因数定理」より、分子は必ず <strong>$(x - 3)$ という因数を持っている</strong>ことになる。<br>
+                    実際に分子を因数分解して、式を整理する。
+                    $$\begin{aligned}
+                    \frac{x^2 - x - 6}{x - 3} &= \frac{(x - 3)(x + 2)}{x - 3}
+                    \end{aligned}$$
+                    ここで、極限 $x \to 3$ の定義は「$3$ に限りなく近づけるが、<strong>$x \neq 3$ である</strong>」ため、分母・分子の $(x - 3)$ を約分して消去することが可能となる。
+                    $$\begin{aligned}
+                    \lim_{x \to 3} \frac{(x - 3)(x + 2)}{x - 3} &= \lim_{x \to 3} (x + 2)
+                    \end{aligned}$$
+                    不定形の原因だった分母の $0$ が消えたため、ここでようやく $x = 3$ を代入できる状態となる。
+                    $$ 3 + 2 = 5 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 18pt; font-weight: bold;">
+                        $$ \lim_{x \to 3} \frac{x^2 - x - 6}{x - 3} = 5 $$
+                    </div>
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 25px; color: #718096; border-radius: 6px;">
+                    [ここに「$y = x + 2$ の直線だが、$x = 3$ の点だけ白丸（穴あき）になっており、穴の開いた場所の $y$ 座標が $5$ である」ことを示す関数のグラフを後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+       <!-- 修正版スライド6：不定形のパターンまとめ（発展型含む） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>関数の極限 ⑥［総整理］</h2>
+                <span class="badge">極限の最重要ロードマップ</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【重要】極限の計算で遭遇する「不定形」の一覧である。<strong>最初に覚えるべきは最初の $3$ つ（主役）のみで良い</strong>が、発展的な型も含めて全体像を押さえておくこと。
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <!-- 最初に覚えるべき3大パターン -->
+                    <h3 style="font-size: 16pt; color: #1a365d; margin-bottom: 10px;">① 最初にマスターすべき3大パターン（最優先）</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13pt;">
+                        <thead>
+                            <tr style="background-color: #1a365d; color: white;">
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 20%;">型</th>
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 40%;">状態・イメージ</th>
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 40%;">解消の鉄則（アプローチ）</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$$\frac{0}{0}$$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">「$0$ へ向かう速度」の勝負。<br>分母も分子も消え去ろうとしている状態。</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; color: #1a365d;">因数分解 や 有理化 を行い、<br>原因となる因数を約分して消去する。</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$$\frac{\infty}{\infty}$$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">「巨大化する速度」の勝負。<br>分母も分子も爆発的に大きくなっている状態。</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; color: #1a365d;">分母の最高次数 の項で、<br>分母・分子のすべての項を割る。</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$$\infty - \infty$$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">「無限大同士の引っ張り合い」の勝負。<br>引き算の結果が $0$ になるとは限らない状態。</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; color: #1a365d;">無理式（ルート）を伴う場合は、<br>分子の有理化 を行って分数型へ変形する。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 発展的なパターン -->
+                    <h3 style="font-size: 15pt; color: #4a5568; margin-bottom: 10px;">② その他の不定形（応用・発展レベル）</h3>
+                    <p style="font-size: 12pt; margin-bottom: 10px; color: #718096;">※これらは上の3大パターンに変形して解くか、数Ⅲの後半（対数微分法など）で扱うため、現時点では「こういう型もある」と認識するだけで良い。</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13pt;">
+                        <thead>
+                            <tr style="background-color: #4a5568; color: white;">
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 20%;">型</th>
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 80%;">状態と特徴</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$$0 \times \infty$$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">「$0$ に潰す力」と「無限に大きくする力」の勝負。通分などを経て $\frac{0}{0}$ や $\frac{\infty}{\infty}$ へ帰着させる。</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$$1^\infty$$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">「限りなく $1$ に近い数」を無限回掛け合わせる勝負。数Ⅲの超重要定数である<strong>ネイピア数 $e$ の定義</strong>に直結する。</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$$0^\infty$$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">「限りなく $0$ に近い正の数」の肩に、無限大が乗る形。（※底が完全に固定された $0$ ではなく、$0$ へ近づく関数の場合の挙動に注意を要する。）</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$$\infty^0$$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">「巨大化する底」を、「限りなく $0$ に近い乗数」で抑え込もうとする勝負。主に両辺の自然対数を取ることで解消を図る。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="answer-box" style="background-color: #ebf8ff; border-left-color: #2b6cb0; margin-top: 15px;">
+                        <div class="answer-label" style="color: #2b6cb0;">初学者へのアプローチ</div>
+                        <div style="font-size: 13pt;">
+                            たくさんの型があって難しく見えるが、入試やテストの基本計算で手を動かすのは<strong>最初の $3$ つ（$\frac{0}{0}, \frac{\infty}{\infty}, \infty-\infty$）がほぼ全て</strong>である。<br>
+                            まずはこの3つの『解消マニュアル』を確実に頭に叩き込ませることが、数Ⅲ極限を突破する最短ルートとなる。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- スライド7：不定形（∞/∞）とその解消 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>関数の極限 ⑥</h2>
+                <span class="badge">不定形（∞/∞）の解消</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【例題】次の極限値を求めよ。
+                    $$ \lim_{x \to \infty} \frac{2x^2 - 3}{x^2 + 4x} $$
+                </div>
+                <div style="margin-top: 20px;">
+                    今度は $x$ を正の無限大（$\infty$）へ飛ばすパターンである。<br>
+                    そのまま分母と分子を見ると、どちらも無限に大きくなるため $\displaystyle \frac{\infty}{\infty}$ という不定形になる。
+                    <br><br>
+                    <strong>【解消の鉄則】分母の「最高次数」の項で、分母・分子のすべての項を割る。</strong>
+                    <br><br>
+                    今回は分母の最高次数が $x^2$ であるため、すべての項を $x^2$ で割って変形を行う。
+                    $$\begin{aligned}
+                    \frac{2x^2 - 3}{x^2 + 4x} &= \frac{\frac{2x^2}{x^2} - \frac{3}{x^2}}{\frac{x^2}{x^2} + \frac{4x}{x^2}} = \frac{2 - \frac{3}{x^2}}{1 + \frac{4}{x}}
+                    \end{aligned}$$
+                    ここで $x \to \infty$ とすると、$\displaystyle \frac{3}{x^2}$ や $\displaystyle \frac{4}{x}$ のように「分母だけが無限に大きくなる分数」はすべて $0$ へ収束する。
+                    $$ \lim_{x \to \infty} \frac{2 - \frac{3}{x^2}}{1 + \frac{4}{x}} = \frac{2 - 0}{1 + 0} = 2 $$
+                </div>
+                <div class="answer-highlight" style="margin-top: 20px;">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">
+                        $$ \lim_{x \to \infty} \frac{2x^2 - 3}{x^2 + 4x} = 2 $$
+                    </div>
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに「$x$ が右側にいくにつれて、グラフが横一直線の漸近線 $y=2$ に限りなく近づいていく」様子を描いたグラフを後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8：不定形（∞-∞）とその解消 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>関数の極限 ⑦</h2>
+                <span class="badge">不定形（∞－∞）の解消（有理化）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【例題】次の極限値を求めよ。
+                    $$ \lim_{x \to \infty} \left( \sqrt{x^2 + 2x} - x \right) $$
+                </div>
+                <div style="margin-top: 20px;">
+                    一見すると「無限大から無限大を引くから $0$ になるのではないか」と勘違いしやすいが、これも速度の勝負となるため値が決まらない $\infty - \infty$ という不定形である。
+                    <br><br>
+                    <strong>【解消の鉄則】無理式（ルート）がある場合は、分子の有理化（無理やり分数化）を行う。</strong>
+                    <br><br>
+                    あえて分母を $1$ と見立てて、分子のルートを外すために「符号をプラスに変えたもの」を分母・分子に掛ける。
+                    $$\begin{aligned}
+                    \sqrt{x^2 + 2x} - x &= \frac{\left(\sqrt{x^2 + 2x} - x\right)\left(\sqrt{x^2 + 2x} + x\right)}{\sqrt{x^2 + 2x} + x} \\
+                    &= \frac{(x^2 + 2x) - x^2}{\sqrt{x^2 + 2x} + x} = \frac{2x}{\sqrt{x^2 + 2x} + x}
+                    \end{aligned}$$
+                    この変形により、式全体が先ほどの $\displaystyle \frac{\infty}{\infty}$ 型に変化した。分母の最高次数は $x$（$\sqrt{x^2}$ は $x$ と同次）であるため、すべての項を $x$ で割る。
+                    $$\begin{aligned}
+                    \lim_{x \to \infty} \frac{2}{\sqrt{1 + \frac{2}{x}} + 1} = \frac{2}{\sqrt{1 + 0} + 1} = \frac{2}{2} = 1
+                    \end{aligned}$$
+                </div>
+                <div class="answer-highlight" style="margin-top: 20px;">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">
+                        $$ \lim_{x \to \infty} \left( \sqrt{x^2 + 2x} - x \right) = 1 $$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">極限の公式</h1>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- スライド8：三角関数の極限の導入 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>三角関数の極限 ①</h2>
+                <span class="badge">重要公式の導入と直感イメージ</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【公式】三角関数の極限における最重要の基盤となる公式である。
+                    $$ \lim_{x \to 0} \frac{\sin x}{x} = 1 $$
+                </div>
+                <div style="margin-top: 20px;">
+                    この公式も、そのまま $x = 0$ を代入しようとすると $\displaystyle \frac{\sin 0}{0} = \frac{0}{0}$ となり、先ほど学んだ<strong>不定形</strong>の仲間であることがわかる。
+                    <br><br>
+                    初学者に対しては、厳密な証明（はさみうちの原理による円の面積比較）を行う前に、まず<strong>数値的な直感イメージ</strong>を持たせることが理解の近道となる。
+                    <br><br>
+                    角度 $x$（弧度法）を $0$ に限りなく近づけたとき、$\sin x$ の値がどうなるかを具体的に見てみる。
+                    <ul>
+                        <li>$x = 0.1 \text{ rad} \quad \Rightarrow \quad \sin 0.1 \approx 0.099833 \dots$</li>
+                        <li>$x = 0.01 \text{ rad} \quad \Rightarrow \quad \sin 0.01 \approx 0.0099998 \dots$</li>
+                    </ul>
+                    <br>
+                    このように、$x$ が $0$ に近づくとき、<strong>「角度 $x$ そのものの大きさ」と「$\sin x$ の大きさ」の減少スピードが完全に一致していく</strong>ため、割り算をした結果（比率）は限りなく $1$ に近づくこととなる。
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに、単位円における弧の長さ $x$ と 縦の長さ $\sin x$ が、$x \to 0$ で完全に一体化していく様子を示す幾何学的な図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9：公式の「型」の認識と変形テクニック -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>三角関数の極限 ②</h2>
+                <span class="badge">公式の「型」の認識と変形</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【例題】次の極限値を求めよ。
+                    $$ \lim_{x \to 0} \frac{\sin 3x}{2x} $$
+                </div>
+                <div style="margin-top: 20px;">
+                    初学者が公式を $\displaystyle \frac{\sin x}{x}$ という文字列だけで暗記していると、このように係数が変わった瞬間に手が出なくなる。<br>
+                    この公式の本質は、記号の文字ではなく<strong>「同じ塊（形）が揃っていること」</strong>である。
+                    <br><br>
+                    <div style="text-align: center; background-color: #f7fafc; padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 20px;">
+                        $$ \lim_{\blacksquare \to 0} \frac{\sin \blacksquare}{\blacksquare} = 1 $$
+                        <span style="font-size: 11pt; color: #4a5568;">※ $\sin$ の中身（分子）と、分母の「塊」が完全に一致していなければならない。</span>
+                    </div>
+                    
+                    例題では分子が $3x$ なので、分母にも無理やり $3x$ を作り出す式変形を行う。
+                    $$\begin{aligned}
+                    \frac{\sin 3x}{2x} &= \frac{\sin 3x}{3x} \times \frac{3}{2}
+                    \end{aligned}$$
+                    ここで $x \to 0$ のとき、当然 $3x \to 0$ も成り立つため、前半の塊部分は公式通り $1$ へ収束する。
+                    $$ \lim_{x \to 0} \left( \frac{\sin 3x}{3x} \times \frac{3}{2} \right) = 1 \times \frac{3}{2} = \frac{3}{2} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 18pt; font-weight: bold;">
+                        $$ \lim_{x \to 0} \frac{\sin 3x}{2x} = \frac{3}{2} $$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- スライド10：tan x / x の極限と証明 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>三角関数の極限 ③</h2>
+                <span class="badge">公式の拡張（tan の極限）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【公式】$\tan x$ を含む、もう一つの重要な三角関数の極限である。
+                    $$ \lim_{x \to 0} \frac{\tan x}{x} = 1 $$
+                </div>
+                <div style="margin-top: 20px;">
+                    一見すると新しい公式に見えるが、初学者に対しては<strong>「迷ったらすべての基本である $\sin$ と $\cos$ に分解する」</strong>という鉄則を伝える。
+                    <br><br>
+                    相互関係 $\displaystyle \tan x = \frac{\sin x}{\cos x}$ を用いて式を変形する。
+                    $$\begin{aligned}
+                    \frac{\tan x}{x} &= \frac{1}{x} \times \frac{\sin x}{\cos x} \\
+                    &= \frac{\sin x}{x} \times \frac{1}{\cos x}
+                    \end{aligned}$$
+                    ここで $x \to 0$ とすると、前半の $\displaystyle \frac{\sin x}{x} \to 1$ となり、後半の $\cos x \to \cos 0 = 1$ となる。
+                    $$\begin{aligned}
+                    \lim_{x \to 0} \left( \frac{\sin x}{x} \times \frac{1}{\cos x} \right) &= 1 \times \frac{1}{1} = 1
+                    \end{aligned}$$
+                    このように、基本公式の形を無理やり炙り出すことで簡単に証明が可能となる。
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- スライド11：log(1+x)/x の極限（指数の前準​​備） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>指数・対数の極限 ①</h2>
+                <span class="badge">対数関数の重要な極限</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【公式】次の指数関数の公式を導くための、非常に重要な足がかりとなる公式である。
+                    $$ \lim_{x \to 0} \frac{\log(1+x)}{x} = 1 $$
+                </div>
+                <div style="margin-top: 20px;">
+                    この公式の証明には、これから学ぶ<strong>ネイピア数 $e$ の定義</strong>を先取りして利用する。<br>
+                    ネイピア数 $e$ は、$\lim_{x \to 0} (1+x)^{\frac{1}{x}} = e$ と定義される定数（約 $2.71$）である。
+                    <br><br>
+                    対数の性質（前に出ている数字は中身の指数に乗せることができる）を利用して式変形を行う。
+                    $$\begin{aligned}
+                    \frac{\log(1+x)}{x} &= \frac{1}{x} \log(1+x) \\
+                    &= \log {(1+x)^{\frac{1}{x}}}
+                    \end{aligned}$$
+                    ここで $x \to 0$ とすると、下線部の塊がネイピア数の定義そのものにより $e$ に限りなく近づく。
+                    $$ \lim_{x \to 0} \log (1+x)^{\frac{1}{x}} = \log e = 1 $$
+                    ※底が省略されている対数は、数Ⅲでは自然対数（底が $e$）を意味するため、$\log_e e = 1$ となる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド12：(e^x-1)/x の極限と証明 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>指数・対数の極限 ②</h2>
+                <span class="badge">指数関数の重要な極限（置換による証明）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【公式】数Ⅲの微分法（$e^x$ の微分）において最も多用される超重要公式である。
+                    $$ \lim_{x \to 0} \frac{e^x - 1}{x} = 1 $$
+                </div>
+                <div style="margin-top: 20px;">
+                    そのまま $x=0$ を代入すると $\displaystyle \frac{e^0 - 1}{0} = \frac{0}{0}$ という<strong>不定形</strong>になる。<br>
+                    この証明の鉄則は、初学者が数Ⅲで何度もお世話になる技法である<strong>「文字の置き換え（置換）」</strong>である。
+                    <br><br>
+                    分子の塊を丸ごと $t$ と置く。すなわち、$e^x - 1 = t$ とする。<br>
+                    このとき、$e^x = 1 + t$ であり、両辺の自然対数を取ると <strong>$x = \log(1+t)$</strong> と変形できる。
+                    また、$x \to 0$ のとき、$e^0 - 1 = 1 - 1 = 0$ となるため、<strong>$t \to 0$</strong> も成り立つ。
+                    <br><br>
+                    これらの情報をすべて $t$ の式に翻訳（置換）する。
+                    $$ \lim_{x \to 0} \frac{e^x - 1}{x} = \lim_{t \to 0} \frac{t}{\log(1+t)} = \lim_{t \to 0} \frac{1}{\frac{\log(1+t)}{t}} $$
+                    分母の形は、先ほどスライド11で証明した「$\to 1$ になる公式」そのものである。
+                    $$ \frac{1}{1} = 1 $$
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに「$x$ の世界から $t$ の世界へ」の変数変換の対応表や、置換の矢印フロー図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+        <!-- スライド13：ネイピア数 e の定義 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>ネイピア数の本質 ①</h2>
+                <span class="badge">ネイピア数 $e$ の定義式</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【定義】数Ⅲで新しく登場する、数学界で最も重要な定数のひとつである。
+                    $$ e = \lim_{x \to 0} (1+x)^{\frac{1}{x}} \quad (\approx 2.71828 \dots) $$
+                </div>
+                <div style="margin-top: 20px;">
+                    この式も、そのまま $x = 0$ を代入しようとすると $1^{\frac{1}{0}} = 1^\infty$ という<strong>不定形</strong>になる。<br>
+                    初学者に対しては、まずこの式が「どのような勢力争いをしているか」を言語化して伝える。
+                    <br><br>
+                    <ul>
+                        <li><strong>カッコの中身 $(1+x)$</strong>：$x \to 0$ によって、限りなく <strong>$1$</strong> に近づこうとする。</li>
+                        <li><strong>肩の指数 $\frac{1}{x}$</strong>：$x \to 0$ によって、プラスマイナス無限大 <strong>$\pm\infty$</strong> に爆発しようとする。</li>
+                    </ul>
+                    <br>
+                    「何回掛けても $1$ のままにしたい力」と「無限回掛けて爆発させたい力」が絶妙に釣り合った結果、ただの $1$ にも無限大にもならず、<strong>$2.718\dots$ という中途半端な定数に収束する</strong>。この値を文字 $e$ と定義する。
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 25px; color: #718096; border-radius: 6px;">
+                    [ここに「$x$ に $0.1, 0.01, 0.001$ と具体的な数値を代入したとき、値が $2.59 \to 2.70 \to 2.716$ と $e$ へ近づいていく変化表」を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">ネイピア数</h1>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- スライド14：定義の「別形」と型の見極め -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>ネイピア数の本質 ②</h2>
+                <span class="badge">定義の別形（$\infty$ へ飛ばすパターン）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【別形】問題の設定によっては、次の形でも非常によく登場する。
+                    $$ e = \lim_{t \to \infty} \left(1 + \frac{1}{t}\right)^t $$
+                </div>
+                <div style="margin-top: 20px;">
+                    初学者が $2$ つの式を別々に暗記しようとすると混乱する。しかし、これは単に<strong>「文字の置き換え（置換）」をしただけ</strong>である。
+                    <br><br>
+                    先ほどの定義式において、$x = \frac{1}{t}$ と置く。<br>
+                    $x \to 0$（ここでは正の側 $x \to +0$ とする）のとき、分母が $0$ に近づくため <strong>$t \to \infty$</strong> となる。<br>
+                    これらを元の式に代入すると、上記の別形が自然に導かれる。
+                    <br><br>
+                    大切なのは、どちらの式であっても<strong>「( $1$ ＋ 超極小 ) の 超極大乗」</strong>という構造（型）が共通していることである。
+                    <div style="text-align: center; background-color: #f7fafc; padding: 12px; border-radius: 6px; font-weight: bold; margin-top: 20px;">
+                        $$ \left( 1 + \text{［ 0 へ向かう塊 ］} \right) ^ \text{［ その逆数の無限大 ］} \longrightarrow e $$
+                        <span style="font-size: 11pt; color: #4a5568; font-weight: normal;">※ カッコ内の中身と、指数の部分が「逆数の関係」で揃っていなければならない。</span>
+                    </div>
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに「$x \to 0$ の式」と「$t \to \infty$ の式」が、逆数関係の矢印で綺麗に結ばれている構造比較図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド15：なぜ e が必要なのか（微分への伏線） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>ネイピア数の本質 ③</h2>
+                <span class="badge">なぜ $e$ を学ぶのか（微分の視点）</span>
+            </div>
+            <div class="content-box">
+                <div style="font-size: 15pt;">
+                    最後に、初学者が最も納得する<strong>「なぜわざわざ $2.718\dots$ なんて数を定義したのか」</strong>という理由を説明する。<br>
+                    その答えは、この後に学ぶ<strong>「微分計算を圧倒的に楽にするため」</strong>である。
+                    <br><br>
+                    高校数Ⅱでは、あらゆる関数を微分（傾きを計算）してきた。当然、数Ⅲでは指数関数 $y = 2^x$ や $y = 3^x$ も微分したくなる。
+                    しかし、底を $2$ や $3$ にしたまま微分しようとすると、計算の途中で非常に不気味な定数のゴミが毎回出現してしまう。
+                    $$\begin{aligned}
+                    (2^x)' &= 2^x \times (0.6931\dotsの謎の数字) \\
+                    (3^x)' &= 3^x \times (1.0986\dotsの謎の数字)
+                    \end{aligned}$$
+                    数学者たちは考えた。<strong>「微分の結果が、綺麗に $(?^x)' = ?^x$ となるような、都合の良いベース（底）は存在しないだろうか？」</strong>と。
+                    <br><br>
+                    その探求の結果、ゴミが出ずに微分しても全く形が変わらない唯一無二の魔法の数字こそが、他ならぬ <strong>$e$ （約 $2.718$）</strong>であった。
+                    <div class="answer-box" style="background-color: #fffaf0; border-left-color: #dd6b20;">
+                        <div class="answer-label">数Ⅲの最大の武器</div>
+                        <div style="font-size: 16pt; font-weight: bold; text-align: center; margin: 10px 0;">
+                            $$ (e^x)' = e^x $$
+                        </div>
+                        この極めて美しい性質を実現するために、逆算して作られたのが先ほどの複雑なリミットの定義式である。
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数列の極限</h1>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- スライド19：数列の極限の基本と「振動」 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列の極限 ①</h2>
+                <span class="badge">数列の極限の基本と「振動」の概念</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【基本】数列の極限（$\lim_{n \to \infty} a_n$）は、項番号 $n$ を無限に大きくしたとき、一般項 $a_n$ がどのような値に近づくかを観察する分野である。
+                </div>
+                <div style="margin-top: 20px;">
+                    関数の極限（$x \to a$ や $x \to -\infty$ など）とは異なり、数列の極限は<strong>必ず $n \to \infty$（正の無限大へ飛ばす）の $1$ パターンしか存在しない</strong>。
+                    <br><br>
+                    また、初学者が最初につまずくのが、極限の結果を表す「状態の分類」である。
+                    <ul>
+                        <li><strong>収束（しゅうそく）</strong>：特定の一定の値（極限値）に限りなく近づく状態。</li>
+                        <li><strong>発散（はっさん）</strong>：特定の数字に落ち着かない状態。以下の $3$ パターンに分かれる。
+                            <ul>
+                                <li><strong>正の無限大に発散</strong>：$\infty$ （例：$a_n = n$）</li>
+                                <li><strong>負の無限大に発散</strong>：$-\infty$ （例：$a_n = -n$）</li>
+                                <li><strong>振動（しんどう）</strong>：正の無限大にも負の無限大にもいかず、値が激しく変化する状態（例：$a_n = (-1)^n \Rightarrow -1, 1, -1, 1 \dots$）</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <br>
+                    「発散＝無限に大きくなること」と誤解している初学者が多いため、<strong>「数字が一つに決まらないものは、すべて『発散』というグループに属し、その中に『振動』という特殊な状態がある」</strong>という包含関係を正しく認識させることが大切となる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド20：無限等比数列の極限と場合分け -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列の極限 ②</h2>
+                <span class="badge">最頻出：無限等比数列 $\{r^n\}$ の極限</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【超重要】数Ⅲの試験で最も狙われる、公比 $r$ の値によって結果が激変する無限等比数列の極限である。
+                    $$ \lim_{n \to \infty} r^n $$
+                </div>
+                <div style="margin-top: 20px;">
+                    初学者に対しては、数式として丸暗記させるのではなく、<strong>「$1$ より大きい数を掛け続けるか、小さい数を掛け続けるか」</strong>という直感的なイメージで $4$ つに場合分けをさせる。
+                    <br><br>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13pt;">
+                        <thead>
+                            <tr style="background-color: #1a365d; color: white;">
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 30%;">公比 $r$ の範囲</th>
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 30%;">極限の結果</th>
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 40%;">直感的イメージ（指導のポイント）</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$r > 1$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; color: #dd6b20; text-align: center;">$\infty$ （発散）</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">$1.1$ や $2$ など、$1$ より大きい数を無限に掛け算すれば爆発する。</td>
+                            </tr>
+                            <tr style="background-color: #fffaf0;">
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center;">$r = 1$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; color: #2b6cb0; text-align: center;">$1$ （収束）</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold;">$1$ は何回掛けても永遠に $1$ のままである。</td>
+                            </tr>
+                            <tr style="background-color: #fffaf0;">
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center;">$-1 < r < 1$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; color: #2b6cb0; text-align: center;">$0$ （収束）</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold;">$0.9$ や $-0.5$ など、絶対値が $1$ 未満の数は掛けるほど縮んで消滅する。</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">$r \le -1$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; color: #dd6b20; text-align: center;">振動 （発散）</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">$-1$ のときは $-1, 1, -1 \dots$ となり、$-2$ のときは符号を変えながら巨大化する。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="answer-box" style="background-color: #ebf8ff; border-left-color: #2b6cb0;">
+                        <div class="answer-label" style="color: #2b6cb0;">記述・応用問題への布石</div>
+                        <div style="font-size: 13pt;">
+                            この数列が<strong>「収束するための条件」</strong>を問う問題が頻出となる。その際、等号の有無（<strong>$-1 < r \le 1$</strong>）が合否を分ける境界線となるため、なぜ $r=1$ は良くて $r=-1$ はダメなのかを、上の表をもとに徹底的に区別させることが重要となる。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- スライド16：数列の極限と関数の極限の違い -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>極限の重要注意点 ①</h2>
+                <span class="badge">「数列の極限」と「関数の極限」の違い</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【落とし穴】数Ⅲでは、一見そっくりな $2$ つの極限を学ぶ。この違いを曖昧にしていると、記述試験で重大な誤りを犯すこととなる。
+                </div>
+                <div style="margin-top: 20px;">
+                    <ul>
+                        <li><strong>数列の極限（$\lim_{n \to \infty} a_n$）</strong>：変数 $n$ は「自然数（$1, 2, 3 \dots$）」である。そのため、$\infty$ への飛ばし方は<strong>「右側（プラス側）へ飛び飛びに進む」の $1$ 通りしか存在しない</strong>。</li>
+                        <li><strong>関数の極限（$\lim_{x \to \infty} f(x)$）</strong>：変数 $x$ は「実数（連続した値）」である。そのため、$\lim_{x \to 0}$ などの場合は、<strong>必ず右側極限（$+0$）と左側極限（$-0$）の双方向からの接近を検証しなければならない</strong>。</li>
+                    </ul>
+                    <br>
+                    初学者には、「数列は『点』の移動、関数は『線』の移動である」とイメージさせると、なぜ関数では近づき方のルート（右極限・左極限）を気にしなければならないのかが直感的に納得できる。
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに、数直線上で飛び飛びに動く $n$ の点と、連続した矢印で動く $x$ の対比図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド17：はさみうちの原理の本質 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>極限の重要注意点 ②</h2>
+                <span class="badge">はさみうちの原理と、忘れてはならない前提条件</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【定理】直接極限値を計算できない複雑な式を、単純な $2$ つの式で上下から挟み込んで外堀を埋める強力な武器である。
+                </div>
+                <div style="margin-top: 20px;">
+                    大小関係が $f(x) \le g(x) \le h(x)$ であり、かつ両端の極限が一致するとき、真ん中も同じ値へ向かう。
+                    $$ \lim_{x \to a} f(x) = \alpha \quad \text{かつ} \quad \lim_{x \to a} h(x) = \alpha \quad \Longrightarrow \quad \lim_{x \to a} g(x) = \alpha $$
+                    <br>
+                    <strong>【初学者への指導のポイント】</strong><br>
+                    記述試験において、この定理を使う動機（サイン）はほぼ $1$ つ、<strong>「式の中に $\sin \theta$ や $\cos \theta$ がポツンと残ってしまい、振動して消せないとき」</strong>である。<br>
+                    $-1 \le \sin \theta \le 1$ という三角関数の絶対的な境界線を利用して不等式を作る「型」を教え込む。
+                    <br><br>
+                    ⚠️ また、答案を書く際に<strong>「両端の極限が $\alpha$ になる」という事実を明記し忘れると大減点される</strong>ため、記述のテンプレートとして形を覚えさせることが大切となる。
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに、上下の綺麗な曲線に挟まれて、ウネウネと振動しながら $1$ 点へ収束していく関数のグラフを後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド18：極限の性質と「収束」の前提条件 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>極限の重要注意点 ③</h2>
+                <span class="badge">極限の性質（四則演算）と「収束」の罠</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【前提条件】教科書の最初に載っている「リミットは足し算・引き算・掛け算・割り算に分配できる」という性質には、初学者が完全に見落としがちな恐ろしい罠がある。
+                </div>
+                <div style="margin-top: 20px;">
+                    $$ \lim \{ f(x) + g(x) \} = \lim f(x) + \lim g(x) $$
+                    上記のようにリミットをバラバラに分けて計算して良いのは、<strong>「$f(x)$ と $g(x)$ が、それぞれ単体でどこかの値に『収束する』ことが分かっているときだけ」</strong>である。
+                    <br><br>
+                    例えば、$\infty$ に発散するような塊同士の引き算のときに、勝手にリミットを分配して「$\infty - \infty$ だから $\dots$」などと答案に書くと、数学的には完全に誤り（一発で不合格答案）となる。
+                    <br><br>
+                    <div class="answer-box" style="background-color: #f7fafc; border-left-color: #4a5568;">
+                        <div class="answer-label" style="color: #4a5568;">結論</div>
+                        「リミットは、お互いが無事に収束する（大人しく数字になる）と確信できるまで、絶対にバラバラにしてはならない」という教訓を、最初の段階で徹底して叩き込んでおく必要がある。
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">漸近線</h1>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- スライド21：漸近線の種類と「縦・横」の求め方 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>漸近線の本質 ①</h2>
+                <span class="badge">漸近線の種類と「縦・横」の求め方</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【定義】漸近線とは、曲線上の点が原点から限りなく遠ざかるとき、その曲線が限りなく近づく直線のことである。数Ⅲでは次の $3$ 種類に分類される。
+                </div>
+                <div style="margin-top: 20px;">
+                    <h3 style="font-size: 15pt; color: #1a365d; margin-bottom: 10px;">1. 縦の漸近線（$x = c$ 型）</h3>
+                    <ul>
+                        <li><strong>意味</strong>：グラフが上下（$\pm\infty$）に突き抜ける壁のような直線。</li>
+                        <li><strong>求め方</strong>：分数関数において、<strong>「分母 ＝ $0$」となる $x$ の値</strong>を調べる。その値に対して、右側・左側極限の少なくとも一方が $\pm\infty$ に発散すれば、それが漸近線となる。<br>
+                        <span style="font-size: 11pt; color: #718096;">※スライド1〜3で扱った $f(x) = \frac{1}{x-2}$ における $x=2$ がこれに該当する。</span></li>
+                    </ul>
+                    
+                    <h3 style="font-size: 15pt; color: #1a365d; margin-top: 20px; margin-bottom: 10px;">2. 横の漸近線（$y = k$ 型）</h3>
+                    <ul>
+                        <li><strong>意味</strong>：$x$ を無限の彼方へ飛ばしたとき、グラフが最終的に落ち着く水平な直線。</li>
+                        <li><strong>求め方</strong>：$x \to \infty$ または $x \to -\infty$ の極限を計算し、<strong>値が特定の定数 $k$ に収束すれば</strong>、直線 $y = k$ が漸近線となる。<br>
+                        <span style="font-size: 11pt; color: #718096;">※スライド7で扱った $\lim_{x\to\infty} f(x) = 2$ であれば、$y=2$ がこれに該当する。</span></li>
+                    </ul>
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 25px; color: #718096; border-radius: 6px;">
+                    [ここに、縦の漸近線 $x=c$ と 横の漸近線 $y=k$ に挟まれた分数関数の典型的なグラフ図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド22：最難関：斜めの漸近線の求め方 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>漸近線の本質 ②</h2>
+                <span class="badge">最重要：斜めの漸近線（$y = ax + b$）の求め方</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【公式】$x \to \infty$（または $-\infty$）のとき、曲線 $y = f(x)$ が直線 $y = ax + b$ （$a \neq 0$）に限りなく近づく場合、係数 $a, b$ は次のステップで機械的に求めることができる。
+                </div>
+                <div style="margin-top: 20px;">
+                    グラフが直線 $y = ax + b$ に近づくということは、極限の世界では $f(x) \approx ax + b$ とみなせることを意味する。ここから逆算して公式が作られている。
+                    
+                    <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 14pt;">
+                        <ol>
+                            <li style="margin-bottom: 15px;"><strong>ステップ1：傾き $a$ を求める</strong><br>
+                                $f(x) \approx ax$ とみなせるため、全体を $x$ で割った極限を取る。
+                                $$ a = \lim_{x \to \infty} \frac{f(x)}{x} $$
+                            </li>
+                            <li><strong>ステップ2：切片 $b$ を求める</strong><br>
+                                求めた $a$ を使い、引き算の残りカス（エラー成分）が $b$ に収束することを利用する。
+                                $$ b = \lim_{x \to \infty} \{ f(x) - ax \} $$
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="answer-box" style="background-color: #ebf8ff; border-left-color: #2b6cb0;">
+                        <div class="answer-label" style="color: #2b6cb0;">初学者へのアプローチ</div>
+                        <div style="font-size: 13pt;">
+                            一見すると難解な公式だが、分数関数の場合は<strong>「分子の次数 $\ge$ 分母の次数 $+ 1$」のときに斜めの漸近線が出現する</strong>という大原則（予兆）を教えておく。<br>
+                            多項式の割り算（筆算）を行い、$\text{（一次式）} + \frac{\text{定数}}{\text{分母}}$ の形に変形すれば、リミットの公式を使わずとも一次式の部分がそのまま漸近線 $y=ax+b$ になるという「裏技（本質）」をセットで教えると、初学者の負担は激減する。
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに、斜めの直線 $y=ax+b$ に沿って、無限の彼方でピタッと張り付いていく曲線のグラフ図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             大問・単元ごとの演習セクション（問題＆解説）
+             ========================================== -->
+
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">問題</h1>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+             <!-- 1. 不定形 0/0 型（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】① 不定形 $\frac{0}{0}$ 型</h2>
+                <span class="badge">基本例題：因数分解</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の極限値を求めよ。
+                    $$ \lim_{x \to 2} \frac{x^2 - 4x + 4}{x^2 - 2x} $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    まずはそのまま $x=2$ を代入してみて、どのような「不定形」になるかを確認する。その後、分母が $0$ になる原因となっている「塊」をどのように消去するかを考えよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 不定形 0/0 型（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】① 不定形 $\frac{0}{0}$ 型</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］型の見極め</strong><br>
+                    $x=2$ をそのまま代入すると、分子は $2^2 - 4(2) + 4 = 0$、分母は $2^2 - 2(2) = 0$ となり、$\frac{0}{0}$ の不定形となる。これは「消え去ろうとする因数の速度勝負」である。
+                    <br><br>
+                    <strong>［ステップ 2］因数分解による原因の炙り出し</strong><br>
+                    分母・分子がともに $x=2$ で $0$ になるということは、共通の因数 $(x-2)$ を持っている。それぞれ因数分解を行う。
+                    $$ \frac{x^2 - 4x + 4}{x^2 - 2x} = \frac{(x-2)^2}{x(x-2)} $$
+                    <br>
+                    <strong>［ステップ 3］約分と代入</strong><br>
+                    $x \to 2$ の世界では $x \neq 2$ であるため、不調の原因である $(x-2)$ を $1$ つずつ約分して消去できる。
+                    $$ \lim_{x \to 2} \frac{(x-2)^2}{x(x-2)} = \lim_{x \to 2} \frac{x-2}{x} $$
+                    分母が $0$ にならない形を作れたため、ここで $x=2$ を代入する。
+                    $$ \frac{2-2}{2} = \frac{0}{2} = 0 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \lim_{x \to 2} \frac{x^2 - 4x + 4}{x^2 - 2x} = 0 $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 不定形 ∞/∞ 型（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】② 不定形 $\frac{\infty}{\infty}$ 型</h2>
+                <span class="badge">基本例題：最高次数での割り算</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の極限値を求めよ。
+                    $$ \lim_{x \to \infty} \frac{3x^2 + 5x}{2x^2 - 1} $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    $x$ を無限に大きくすると、分母・分子ともに爆発的に巨大化する。この「巨大化するスピードの勝負」を判定するための鉄則を思い出せ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 不定形 ∞/∞ 型（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】② 不定形 $\frac{\infty}{\infty}$ 型</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］型の見極め</strong><br>
+                    $x \to \infty$ のとき、分子も分母も $x^2$ の効果で無限に大きくなるため、$\frac{\infty}{\infty}$ の不定形となる。
+                    <br><br>
+                    <strong>［ステップ 2］分母の最高次数で割る</strong><br>
+                    この型の鉄則は「分母の最高次数で分母・分子のすべての項を割る」ことである。今回の分母の最高次数は $x^2$ なので、すべての項を $x^2$ で割り算する。
+                    $$ \frac{3x^2 + 5x}{2x^2 - 1} = \frac{\frac{3x^2}{x^2} + \frac{5x}{x^2}}{\frac{2x^2}{x^2} - \frac{1}{x^2}} = \frac{3 + \frac{5}{x}}{2 - \frac{1}{x^2}} $$
+                    <br>
+                    <strong>［ステップ 3］極限の適用</strong><br>
+                    $x \to \infty$ とするとき、「分母だけに $x$ が残っている分数」は、すべて $0$ に収縮して消滅する（$\frac{5}{\infty} \to 0$、$\frac{1}{\infty} \to 0$）。
+                    $$ \lim_{x \to \infty} \frac{3 + \frac{5}{x}}{2 - \frac{1}{x^2}} = \frac{3 + 0}{2 - 0} = \frac{3}{2} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \lim_{x \to \infty} \frac{3x^2 + 5x}{2x^2 - 1} = \frac{3}{2} $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 不定形 ∞-∞ 型（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】③ 不定形 $\infty - \infty$ 型</h2>
+                <span class="badge">基本例題：分子の有理化</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の極限値を求めよ。
+                    $$ \lim_{x \to \infty} \left( \sqrt{x^2 + 4x} - x \right) $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    「無限引く無限だから $0$」と油断してはならない。ルートが含まれている引き算の不定形を、見慣れた分数型へ変形するための「新しい道具」を使え。
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 不定形 ∞-∞ 型（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】③ 不定形 $\infty - \infty$ 型</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］分子の有理化</strong><br>
+                    分母を $1$ と見立てて、分子のルートを外すために符号をプラスに変えた相棒（$\sqrt{x^2+4x} + x$）を分母と分子に掛け算する。
+                    $$ \sqrt{x^2 + 4x} - x = \frac{\left(\sqrt{x^2 + 4x} - x\right)\left(\sqrt{x^2 + 4x} + x\right)}{\sqrt{x^2 + 4x} + x} $$
+                    分子を展開して整理を行う。
+                    $$ \frac{(x^2 + 4x) - x^2}{\sqrt{x^2 + 4x} + x} = \frac{4x}{\sqrt{x^2 + 4x} + x} $$
+                    <br>
+                    <strong>［ステップ 2］分数型の不定形への帰着</strong><br>
+                    有理化によって、式が $\frac{\infty}{\infty}$ 型に変形された。分母の最高次数は $x$（$\sqrt{x^2}$ は $x$ と同じ強さ）であるため、すべての項を $x$ で割る。
+                    $$ \frac{\frac{4x}{x}}{\frac{\sqrt{x^2 + 4x}}{x} + \frac{x}{x}} = \frac{4}{\sqrt{\frac{x^2+4x}{x^2}} + 1} = \frac{4}{\sqrt{1 + \frac{4}{x}} + 1} $$
+                    <br>
+                    <strong>［ステップ 3］極限の適用</strong><br>
+                    $x \to \infty$ のとき $\frac{4}{x} \to 0$ となるため、残った数字を計算する。
+                    $$ \frac{4}{\sqrt{1 + 0} + 1} = \frac{4}{1 + 1} = \frac{4}{2} = 2 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \lim_{x \to \infty} \left( \sqrt{x^2 + 4x} - x \right) = 2 $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 三角関数の極限（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】④ 三角関数の極限</h2>
+                <span class="badge">基本例題：塊（形）を揃える</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の極限値を求めよ。
+                    $$ \lim_{x \to 0} \frac{\sin 4x}{3x} $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    基本公式 $\lim_{\blacksquare \to 0} \frac{\sin \blacksquare}{\blacksquare} = 1$ を使うためには、$\sin$ の中身（中身は変更できない）に合わせて、分母の形を無理やり「同じ塊」に補正する必要がある。
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 三角関数の極限（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】④ 三角関数の極限</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］ターゲットの確認</strong><br>
+                    分子が $\sin 4x$ であるため、公式を適用するために分母に必要な相棒は $4x$ である。現在ある分母の $3x$ を一度横へ除けて、無理やり $4x$ を作り出す。
+                    <br><br>
+                    <strong>［ステップ 2］形を揃える補正計算</strong><br>
+                    分母に $4x$ を置く代わりに、帳尻を合わせるために分子にも $4$ を掛け算する。
+                    $$ \frac{\sin 4x}{3x} = \frac{\sin 4x}{\color{red}4x} \times \frac{\color{red}4}{3} $$
+                    これで「$\sin$ の中身」と「分母の塊」が $4x$ で完全に一致した。
+                    <br><br>
+                    <strong>［ステップ 3］極限の適用</strong><br>
+                    $x \to 0$ のとき、当然 $4x \to 0$ も成り立つため、前半の塊部分は公式通り $1$ へ収束する。
+                    $$ \lim_{x \to 0} \left( \frac{\sin 4x}{4x} \times \frac{4}{3} \right) = 1 \times \frac{4}{3} = \frac{4}{3} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \lim_{x \to 0} \frac{\sin 4x}{3x} = \frac{4}{3} $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 指数・対数の極限（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑤ 指数・対数の極限</h2>
+                <span class="badge">基本例題：塊の変形</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の極限値を求めよ。
+                    $$ \lim_{x \to 0} \frac{e^{2x} - 1}{x} $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    基本公式 $\lim_{\blacksquare \to 0} \frac{e^{\blacksquare} - 1}{\blacksquare} = 1$ を利用する。これも三角関数と同様に、指数の上にある $2x$ という「塊」の形に分母の文字を合わせにいく。
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 指数・対数の極限（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑤ 指数・対数の極限</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］公式の型の確認</strong><br>
+                    指数関数の極限公式の本質は、指数の肩の塊と、分母の塊が一致していることである。
+                    $$ \lim_{\blacksquare \to 0} \frac{e^{\blacksquare} - 1}{\blacksquare} = 1 $$
+                    今回の問題では肩が $2x$ なので、分母にも $2x$ が必要となる。
+                    <br><br>
+                    <strong>［ステップ 2］係数の調整</strong><br>
+                    分母を $2x$ にするために、分母分子に $2$ を掛け算して形を整える。
+                    $$ \frac{e^{2x} - 1}{x} = \frac{e^{2x} - 1}{{\color{red}2}x} \times {\color{red}2} $$
+                    これで「肩の塊」と「分母の塊」が $2x$ で綺麗に揃った。
+                    <br><br>
+                    <strong>［ステップ 3］極限の適用</strong><br>
+                    $x \to 0$ のとき $2x \to 0$ であるため、塊の部分は公式通り $1$ になる。
+                    $$ \lim_{x \to 0} \left( \frac{\e^{2x} - 1}{2x} \times 2 \right) = 1 \times 2 = 2 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \lim_{x \to 0} \frac{e^{2x} - 1}{x} = 2 $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. ネイピア数 e の定義（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑥ ネイピア数の応用</h2>
+                <span class="badge">基本例題：逆数関係の構築</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の極限値を求めよ。
+                    $$ \lim_{x \to 0} (1 + 3x)^{\frac{1}{x}} $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    ネイピア数の定義は $\lim_{\blacksquare \to 0} (1+\blacksquare)^{\frac{1}{\blacksquare}} = e$ である。カッコの中身の「$3x$」に対して、指数に必要な「逆数の塊」が何であるかを見極めよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. ネピア数 e の定義（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑥ ネイピア数の応用</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］ターゲット（逆数）の発見</strong><br>
+                    ネイピア数 $e$ を炙り出す条件は、「カッコ内の足し算の相棒」と「指数」が完全に**逆数の関係**になっていることである。
+                    カッコ内が $1 + 3x$ なので、指数部分に本当に必要なのは $x$ ではなく $\frac{1}{3x}$ である。
+                    <br><br>
+                    <strong>［ステップ 2］指数の無理矢理な変形</strong><br>
+                    指数部分に $\frac{1}{3x}$ を強制的に配置し、元の $\frac{1}{x}$ と等しくなるように全体を $3$ 乗して調整を行う（指数の掛け算の性質：$(\blacksquare^a)^b = \blacksquare^{ab}$）。
+                    $$ (1 + 3x)^{\frac{1}{x}} = \left[ (1 + 3x)^{\color{red}\frac{1}{3x}} \right]^{\color{red}3} $$
+                    これによって、大カッコの中身がネイピア数の定義の形そのものになった。
+                    <br><br>
+                    <strong>［ステップ 3］極限の適用</strong><br>
+                    $x \to 0$ のとき $3x \to 0$ なので、大カッコの内部は綺麗に定数 $e$ に収束する。
+                    $$ \lim_{x \to 0} \left[ (1 + 3x)^{\frac{1}{3x}} \right]^3 = [e]^3 = e^3 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \lim_{x \to 0} (1 + 3x)^{\frac{1}{x}} = e^3 $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. 斜めの漸近線（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑦ 斜めの漸近線</h2>
+                <span class="badge">基本例題：直線の決定</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    関数 $\displaystyle f(x) = \frac{x^2 + 3x}{x + 1}$ の、$x \to \infty$ における斜めの漸近線の方程式を求めよ。
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    リミットの公式を使って傾き $a$ と切片 $b$ を求めても良いが、分数関数の場合は「多項式の割り算（筆算）」を行って、$\text{（一次式）} + \frac{\text{定数}}{\text{分母}}$ の形に変形する裏技が最も速くて確実である。
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. 斜めの漸近線（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑦ 斜めの漸近線</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］分数式の割り算（筆算）の実行</strong><br>
+                    分子の次数（$2$ 次）が分母の次数（$1$ 次）よりも高いため、割り算を行って「整式 ＋ 分数」の形へ引き算をバラす。
+                    分子の $x^2 + 3x$ を分母の $x + 1$ で割ると、商が $x + 2$ で、余りが $-2$ となる。
+                    $$ x^2 + 3x = (x + 1)(x + 2) - 2 $$
+                    これを元の分数関数に当てはめると、次のように変形できる。
+                    $$ f(x) = \frac{(x + 1)(x + 2) - 2}{x + 1} = (x + 2) - \frac{2}{x + 1} $$
+                    <br>
+                    <strong>［ステップ 2］無限大での挙動の観察</strong><br>
+                    この変形をした状態で、$x \to \infty$ の極限を考える。
+                    右端の分数部分である $\displaystyle \frac{2}{x + 1}$ は、分母が無限に大きくなるため $0$ に収束して消滅する。
+                    $$ \lim_{x \to \infty} \left\{ f(x) - (x + 2) \right\} = \lim_{x \to \infty} \left( - \frac{2}{x + 1} \right) = 0 $$
+                    これは、曲線 $y = f(x)$ と 直線 $y = x + 2$ の縦方向の距離が、無限の彼方で完全に $0$ になる（ピタッと張り付く）ことを意味する。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">漸近線の方程式：$$ y = x + 2 $$</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 画面下の操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 3</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- スライドを制御するスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        // PC用のキーボード操作
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        // スマホ用の画面タップ操作（画面の右半分をタップで進む、左半分で戻る）
+        document.addEventListener('click', (e) => {
+            // 下部のナビゲーションボタン自体がクリックされた場合は処理をスキップ
+            if (e.target.closest('.nav-controls')) return;
+            
+            const halfWidth = window.innerWidth / 2;
+            if (e.clientX > halfWidth) {
+                changeSlide(1);  // 右半分タップで次へ
+            } else {
+                changeSlide(-1); // 左半分タップで前へ
+            }
+        });
+
+        // スマホ用のスワイプ操作（タッチイベント）
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            const swipeDistance = touchEndX - touchStartX;
+            if (swipeDistance < -50) {
+                changeSlide(1);  // 左スワイプで次へ
+            } else if (swipeDistance > 50) {
+                changeSlide(-1); // 右スワイプで前へ
+            }
+        }
+    </script>
+</body>
+</html>
