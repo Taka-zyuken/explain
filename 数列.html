@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅲ　微分</title>
+    
+    <!-- 数式を美しく表示するためのMathJaxライブラリ -->
+     <!-- 200行辺りまでテンプレ -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        /* 全体スタイルの定義（明朝体・である調の統一ベース） */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden; /* スライド全体のスクロールを抑止 */
+            line-height: 1.8;
+        }
+
+        /* スライドコンテナ */
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 各スライドの共通デザイン */
+        .slide {
+            display: none; /* 初期状態は非表示 */
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px 60px;
+            overflow-y: auto; /* コンテンツが多い場合はスライド内スクロール */
+        }
+
+        /* アクティブなスライドのみ表示 */
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ヘッダーデザイン */
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        /* コンテンツ部分のレイアウト */
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* 強調用の正解ボックス */
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        /* リストスタイル */
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        /* 操作用ナビゲーションUI */
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        /* ==========================================
+           スマートフォン向けの表示最適化（サイズ縮小）
+           ========================================== */
+        @media screen and (max-width: 768px) {
+            body {
+                line-height: 1.6; /* 行間を少し詰めて視認性を上げる */
+            }
+
+            /* スライド全体の余白を削り、画面を広く使う */
+            .slide {
+                width: 95%;
+                height: 88vh;
+                padding: 20px 20px; /* 横余白を60pxから20pxに縮小 */
+            }
+
+            /* ヘッダーの文字を小さく */
+            .slide-header h2 {
+                font-size: 18pt;
+            }
+            .badge {
+                font-size: 10pt;
+                padding: 2px 8px;
+            }
+
+            /* 本文・問題文の文字サイズをひと回り小さく */
+            .content-box {
+                font-size: 12pt; /* 16ptから12ptに縮小 */
+                margin-bottom: 15px;
+            }
+            .problem-text {
+                padding: 15px;
+                font-size: 13pt;
+                margin-bottom: 15px;
+            }
+
+            /* 正解・結論ボックスの調整 */
+            .answer-box {
+                padding: 10px 15px;
+                margin-top: 15px;
+            }
+            .answer-box div[style*="font-size"] {
+                font-size: 14pt !important; /* スマホのみ大きな正解文字を14ptに抑制 */
+            }
+
+            /* 表（まとめスライド）の文字サイズと余白をスマホ用に最小化 */
+            table {
+                font-size: 11pt !important;
+            }
+            th, td {
+                padding: 8px !important;
+            }
+
+            /* MathJaxの数式全体がスマホ画面からはみ出さないように自動縮小 */
+            .mjx-chtml {
+                font-size: 90% !important; 
+            }
+            .math-block, mjx-container[display="true"] {
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 5px 0;
+            }
+
+            /* 下部ナビゲーションボタンを押しやすいサイズに微調整 */
+            .nav-controls {
+                bottom: 15px;
+                gap: 20px;
+            }
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 11pt;
+            }
+            .page-indicator {
+                font-size: 12pt;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド1：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅱ　数列</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+         <!-- ここからいじる -->
+       <!-- ==========================================
+             数B：数列（等差数列・等比数列）
+             ========================================== -->
+             <!-- スライド0：数列とは何か（本質と用語の整理） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⓪</h2>
+                <span class="badge">導入：数列の概念と記号の約束</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【数列の本質】<strong>「数を一定の規則にしたがって一列に並べたもの」</strong>。<br>
+                    バラバラに見える数の並びから<strong>「隠れたパターン（規則性）」</strong>を発見し、まだ見ぬ先の数（未来）を予測する数学的ツールである。
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <strong>［1. 用語の整理と表し方］</strong><br>
+                    並べられた1つ1つの数を<strong>「項（こう）」</strong>と呼ぶ。
+                    <ul style="margin-top: 4px; margin-bottom: 8px;">
+                        <li><strong>初項（しょこう）：</strong> 一番最初の項（第1項）</li>
+                        <li><strong>第 $n$ 項：</strong> 先頭から数えて $n$ 番目の項</li>
+                        <li><strong>末項（まっこう）：</strong> 一番最後の項</li>
+                    </ul>
+                    数列全体を表すときは、記号 $\{a_n\}$ を用いて以下のように並べる：
+                    <div style="background-color: #f8fafc; border: 1px solid #cbd5e0; padding: 8px; border-radius: 6px; text-align: center; font-size: 13pt; margin: 6px 0;">
+                        $\{a_n\} : \ a_1, \ a_2, \ a_3, \ \dots, \ a_n, \ \dots$
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <strong>［2. 一般項 $a_n$（ $n$ 番目の部屋）の重要性］</strong><br>
+                    $n$ 番目の項 $a_n$ を $n$ の式で表したものを<strong>「一般項（いっぱんこう）」</strong>と呼ぶ。<br>
+                    一般項 $a_n$ さえ分かれば、 $n = 100$ を代入するだけで「第100項」を直接叩き出すことができる（関数の $y = f(x)$ と同じ役割）。
+                </div>
+
+                <div style="margin-top: 10px; background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px;">
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「例えば $2, 4, 6, 8, \dots$ という並びがあったら、一般項は $a_n = 2n$ だよね。これさえあれば、わざわざ100回書き出さなくても『第100項は 200 だ！』と一瞬で特定できる。この一般項 $a_n$ を求めることが数列学習の第一ゴールなんだよ」と伝えると、学習の目的意識が明確になります。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド1：等差数列の基本（一般項と和） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ①</h2>
+                <span class="badge">講義：等差数列の一般項と和の公式</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【等差数列】隣り合う項の<strong>差が常に一定</strong>である数列。その一定の差を<strong>公差（$d$）</strong>と呼ぶ。
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［1. 一般項 $a_n$］</strong><br>
+                    初項を $a$、公差を $d$ とすると、第 $n$ 項（一般項）は「初項に公差 $d$ を $n-1$ 回足したもの」になるため、以下の式で表される。
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ a_n = a + (n-1)d $$
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［2. 等差数列の和 $S_n$］</strong><br>
+                    初項から第 $n$ 項までの和 $S_n$ は、「(初項 ＋ 末項) $\times$ 項数 $\div$ 2」という図形的なイメージ（台形の面積）で計算できる。<br>
+                    末項（第 $n$ 項）を $l$ とすると：
+                    <div style="background-color: #edf2f7; border-left: 4px solid #2b6cb0; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ S_n = \frac{1}{2}n(a + l) $$
+                    </div>
+                    末項 $l$ に一般項 $a_n = a + (n-1)d$ を代入して整理した以下の形も頻出である。
+                    <div style="background-color: #edf2f7; border-left: 4px solid #2b6cb0; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ S_n = \frac{1}{2}n\{2a + (n-1)d\} $$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2：等比数列の基本（一般項と和） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ②</h2>
+                <span class="badge">講義：等比数列の一般項と和の公式</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【等比数列】隣り合う項の<strong>比が常に一定</strong>である数列（常に同じ数を掛け合わせる数列）。その一定の比を<strong>公比（$r$）</strong>と呼ぶ。
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［1. 一般項 $a_n$］</strong><br>
+                    初項を $a$、公比を $r$ とすると、第 $n$ 項（一般項）は「初項に公比 $r$ を $n-1$ 回掛けたもの」になるため、以下の式で表される。
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ a_n = ar^{n-1} $$
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［2. 等比数列の和 $S_n$］</strong><br>
+                    初項 $a$、公比 $r$ の等比数列の初項から第 $n$ 項までの和 $S_n$ は、公比 $r$ が $1$ かどうかで式が分岐する。
+                    <div style="background-color: #edf2f7; border-left: 4px solid #2b6cb0; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12.5pt; font-weight: bold; text-align: center;">
+                        $r \neq 1$ のとき： $$ S_n = \frac{a(1 - r^n)}{1 - r} = \frac{a(r^n - 1)}{r - 1} $$
+                    </div>
+                    <div style="background-color: #edf2f7; border-left: 4px solid #2b6cb0; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12.5pt; font-weight: bold; text-align: center;">
+                        $r = 1$ のとき： $$ S_n = na $$
+                    </div>
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「和の公式で $r \neq 1$ のときは、$r$ が $1$ より大きいか小さいかで使い分けると、分母がマイナスにならず計算ミスを防げるよ」と補足すると実戦的です。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（等差数列・等比数列の演習）
+             ========================================== -->
+
+        <!-- 1. 等差数列の一般項と和（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】44 等差数列の一般項と和</h2>
+                <span class="badge">数列演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    第 5 項が 17、第 11 項が 41 である等差数列 $\{a_n\}$ について、以下の問いに答えよ。<br><br>
+                    (1) 一般項 $a_n$ を求めよ。<br>
+                    (2) 初項から第 $n$ 項までの和 $S_n$ を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    初項を $a$、公差を $d$ と置くと、一般項は $a_n = a + (n-1)d$ と表せる。<br>
+                    $a_5 = a + 4d = 17$、 $a_{11} = a + 10d = 41$ の連立方程式を解いて $a, d$ を特定せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 等差数列の一般項と和（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】44 等差数列の一般項と和</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［(1) 一般項 $a_n$ の決定］</strong><br>
+                    初項を $a$、公差を $d$ とおく。一般項の公式 $a_n = a + (n-1)d$ より：
+                    $$ a_5 = a + 4d = 17 \quad \cdots \text{①} $$
+                    $$ a_{11} = a + 10d = 41 \quad \cdots \text{②} $$
+                    ② － ① より、 $6d = 24 \implies d = 4$<br>
+                    これを ① に代入すると、 $a + 16 = 17 \implies a = 1$<br>
+                    したがって、一般項 $a_n$ は：
+                    $$ a_n = 1 + (n - 1) \cdot 4 = 4n - 3 $$
+                    <br>
+                    <strong>［(2) 和 $S_n$ の計算］</strong><br>
+                    等差数列の和の公式 $S_n = \frac{1}{2}n(a + l)$ において、初項 $a = 1$、末項 $l = a_n = 4n - 3$ を代入する：
+                    $$ S_n = \frac{1}{2}n \{1 + (4n - 3)\} = \frac{1}{2}n (4n - 2) = n(2n - 1) $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        (1) $a_n = 4n - 3$ (2) $S_n = n(2n - 1)$ （または $2n^2 - n$）
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 等比数列の一般項と和（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】45 等比数列の一般項と和</h2>
+                <span class="badge">数列演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    初項が 3、第 4 項が 24 である等比数列 $\{a_n\}$（公比は実数）について、以下の問いに答えよ。<br><br>
+                    (1) 一般項 $a_n$ を求めよ。<br>
+                    (2) 初項から第 $n$ 項までの和 $S_n$ を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    公比を $r$ と置くと、一般項は $a_n = 3 r^{n-1}$ と表せる。<br>
+                    $a_4 = 3 r^3 = 24$ から $r$ を求めよ。公比 $r \neq 1$ であるため、和の公式 $S_n = \frac{a(r^n - 1)}{r - 1}$ を適用せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 等比数列の一般項と和（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】45 等比数列の一般項と和</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［(1) 一般項 $a_n$ の決定］</strong><br>
+                    初項 $a = 3$、公比を $r$ とおく。一般項の公式 $a_n = ar^{n-1}$ より：
+                    $$ a_4 = 3 r^3 = 24 $$
+                    両辺を 3 で割ると $r^3 = 8$<br>
+                    $r$ は実数であるから、 $r = 2$<br>
+                    したがって、一般項 $a_n$ は：
+                    $$ a_n = 3 \cdot 2^{n-1} $$
+                    <br>
+                    <strong>［(2) 和 $S_n$ の計算］</strong><br>
+                    初項 $a = 3$、公比 $r = 2$ の等比数列の和の公式に代入する：
+                    $$ S_n = \frac{3(2^n - 1)}{2 - 1} = 3(2^n - 1) $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        (1) $a_n = 3 \cdot 2^{n-1}$ (2) $S_n = 3(2^n - 1)$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（階差数列と和 Sn からの一般項決定）
+             ========================================== -->
+
+        <!-- スライド3：階差数列の定義と一般項 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ③</h2>
+                <span class="badge">講義：階差数列と一般項の決定</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【階差数列】数列 $\{a_n\}$ の隣り合う項の差 $b_n = a_{n+1} - a_n$ を順に並べた数列 $\{b_n\}$ を、元の数列 $\{a_n\}$ の<strong>階差数列</strong>と呼ぶ。
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <strong>［階差数列を利用した一般項の公式］</strong><br>
+                    第 $n$ 項 $a_n$ は、「初項 $a_1$ に、階差数列の第 $1$ 項から第 $n-1$ 項までの和を足し合わせたもの」として求められる。
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 13.5pt; font-weight: bold; text-align: center;">
+                        $$ n \geqq 2 \text{ のとき} \quad a_n = a_1 + \sum_{k=1}^{n-1} b_k $$
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px;">
+                    <strong>［⚠️ 指導上の超重要注意点：なぜ $n \geqq 2$ なのか？］</strong><br>
+                    *   $n = 1$ を代入すると $\sum_{k=1}^{0} b_k$ となり、「第1項から第0項までの和」という無意味な式になってしまうため、公式の適用条件は <strong>$n \geqq 2$</strong> に限られる。<br>
+                    *   そのため、記述答案では<strong>「 $n \geqq 2$ で一般項を出したあと、最後に $n = 1$ を代入して成り立ちを確認する」</strong>ステップが必須となる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド4：和 Sn から一般項 an を求める手法 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ④</h2>
+                <span class="badge">講義：和 Sn と一般項 an の関係</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【和と一般項の関係】初項から第 $n$ 項までの和 $S_n$ の式が与えられているとき、「第 $n$ 項までの和から、手前の第 $n-1$ 項までの和を引き算する」ことで第 $n$ 項 $a_n$ だけを浮き彫りにできる。
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［和 $S_n$ から一般項 $a_n$ を求める関係式］</strong>
+                    <div style="background-color: #edf2f7; border-left: 5px solid #2b6cb0; padding: 10px 15px; border-radius: 4px; margin: 10px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ \begin{cases} a_1 = S_1 & (n = 1 \text{ のとき}) \\ a_n = S_n - S_{n-1} & (n \geqq 2 \text{ のとき}) \end{cases} $$
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［思考プロセスと答案の書き方］</strong><br>
+                    1. <strong>$n = 1$ のとき：</strong> $a_1 = S_1$ で初項を単独で求める（ $S_{n-1}$ が作れないため）。<br>
+                    2. <strong>$n \geqq 2$ のとき：</strong> $a_n = S_n - S_{n-1}$ を計算して $n$ の式を作る。<br>
+                    3. <strong>一致の確認：</strong> 2 で求めた式に $n = 1$ を代入し、1 で求めた $a_1$ と一致すれば「 $n = 1$ のときも成り立つ」と書いて式を統合する。
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（階差数列と和 Sn の演習）
+             ========================================== -->
+
+        <!-- 1. 階差数列を用いた一般項決定（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】46 階差数列と一般項</h2>
+                <span class="badge">数列演習：標準</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の数列 $\{a_n\}$ の一般項 $a_n$ を求めよ。<br><br>
+                    $$ 2, \ 3, \ 6, \ 11, \ 18, \ 27, \ \dots $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    隣り合う項の差をとると $1, 3, 5, 7, 9, \dots$ となり、階差数列 $\{b_n\}$ が公差 2 の等差数列（ $b_n = 2n - 1$ ）であることがわかる。<br>
+                    公式 <strong>$a_n = a_1 + \sum_{k=1}^{n-1} b_k \ (n \geqq 2)$</strong> を適用し、最後に $n = 1$ の確認を行え。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 階差数列を用いた一般項決定（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】46 階差数列と一般項</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］階差数列 $\{b_n\}$ の一般項を決定する］</strong><br>
+                    数列 $\{a_n\}$ の階差数列を $\{b_n\}$ とすると、その項は：
+                    $$ 1, \ 3, \ 5, \ 7, \ 9, \ \dots $$
+                    これは初項 $1$、公差 $2$ の等差数列であるから、 $b_n = 1 + (n-1)\cdot 2 = 2n - 1$
+                    <br><br>
+                    <strong>［ステップ 2］$n \geqq 2$ のとき公式を適用する］</strong><br>
+                    初項 $a_1 = 2$ より、 $n \geqq 2$ のとき：
+                    $$ a_n = a_1 + \sum_{k=1}^{n-1} b_k = 2 + \sum_{k=1}^{n-1} (2k - 1) $$
+                    $$ a_n = 2 + 2 \cdot \frac{1}{2}(n-1)n - (n-1) = 2 + (n^2 - n) - n + 1 = n^2 - 2n + 3 $$
+                    <br>
+                    <strong>［ステップ 3］$n = 1$ の成立確認］</strong><br>
+                    $n^2 - 2n + 3$ に $n = 1$ を代入すると、 $1^2 - 2(1) + 3 = 2$<br>
+                    これは実際の初項 $a_1 = 2$ と一致する。<br>
+                    したがって、すべての自然数 $n$ で $a_n = n^2 - 2n + 3$ が成り立つ。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        $a_n = n^2 - 2n + 3$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 和 Sn から一般項の決定（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】47 和 Sn から一般項の決定</h2>
+                <span class="badge">数列演習：標準</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    初項から第 $n$ 項までの和 $S_n$ が $S_n = 3n^2 - 2n$ で表される数列 $\{a_n\}$ の一般項 $a_n$ を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    ① $n = 1$ のときは $a_1 = S_1$ で直接計算する。<br>
+                    ② $n \geqq 2$ のときは $a_n = S_n - S_{n-1} = (3n^2 - 2n) - \{3(n-1)^2 - 2(n-1)\}$ を計算せよ。<br>
+                    最後に①と②の式が $n = 1$ で一致するか確かめよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 和 Sn から一般項の決定（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】47 和 Sn から一般項の決定</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］$n = 1$ のときの初項 $a_1$］</strong><br>
+                    $$ a_1 = S_1 = 3(1)^2 - 2(1) = 1 \quad \cdots \text{①} $$
+                    <br>
+                    <strong>［ステップ 2］$n \geqq 2$ のときの一般項 $a_n$］</strong><br>
+                    $a_n = S_n - S_{n-1}$ より：
+                    $$ a_n = (3n^2 - 2n) - \{3(n-1)^2 - 2(n-1)\} $$
+                    $$ a_n = (3n^2 - 2n) - \{3(n^2 - 2n + 1) - 2n + 2\} $$
+                    $$ a_n = (3n^2 - 2n) - (3n^2 - 8n + 5) = 6n - 5 \quad \cdots \text{②} $$
+                    <br>
+                    <strong>［ステップ 3］一致の確認と結論］</strong><br>
+                    ②の式に $n = 1$ を代入すると、 $6(1) - 5 = 1$ となり、①の $a_1 = 1$ に一致する。<br>
+                    したがって、すべての自然数 $n$ で一般項は $a_n = 6n - 5$ となる。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        $a_n = 6n - 5$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（Σ 記号の定義と公式）
+             ========================================== -->
+
+        <!-- スライド5：Σ 記号の定義と性質 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑤</h2>
+                <span class="badge">講義：Σ 記号の定義と線形性</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【Σ 記号の本質】ギリシャ文字の S (Sum = 和) に由来する。<strong>「 $k$ に $1$ から $n$ までの整数を順に代入して足し合わせる」</strong>という和の命令記号である。
+                </div>
+
+                <div style="margin-top: 12px; background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 10px 15px; border-radius: 4px; text-align: center; font-size: 14pt; font-weight: bold;">
+                    $$ \sum_{k=1}^{n} a_k = a_1 + a_2 + a_3 + \dots + a_n $$
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［Σ の計算性質（線形性）］</strong><br>
+                    $\Sigma$ は足し算と定数倍に対してバラバラに分解できる（積分記号 $\int$ や微分記号と同じ性質）。
+                    <ul>
+                        <li style="margin-bottom: 6px;">
+                            <strong>定数倍の外出し：</strong> $\sum_{k=1}^{n} p a_k = p \sum_{k=1}^{n} a_k$
+                        </li>
+                        <li style="margin-bottom: 6px;">
+                            <strong>和・差の分解：</strong> $\sum_{k=1}^{n} (a_k \pm b_k) = \sum_{k=1}^{n} a_k \pm \sum_{k=1}^{n} b_k$
+                        </li>
+                        <li>
+                            <strong>定数の和（最大の罠）：</strong> $\sum_{k=1}^{n} c = c + c + \dots + c = \mathbf{c n}$ （ $c$ を $n$ 回足すので $cn$ になる）
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6：Σ の 4大公式一覧 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑥</h2>
+                <span class="badge">講義：Σ の基本公式（1, k, k², k³ の和）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【必須暗記】以下の 4 つの基本公式は、手が自動で動くレベルまで体に叩き込むこと。
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5pt; text-align: center;">
+                        <thead>
+                            <tr style="background-color: #edf2f7; border-bottom: 2px solid #cbd5e0;">
+                                <th style="padding: 8px; color: #1a365d; width: 30%;">展開形</th>
+                                <th style="padding: 8px; color: #1a365d; width: 30%;">Σ 表示</th>
+                                <th style="padding: 8px; color: #1a365d; width: 40%;">計算公式</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px;">$1 + 1 + \dots + 1$</td>
+                                <td style="padding: 8px; font-weight: bold;">$\sum_{k=1}^{n} 1$</td>
+                                <td style="padding: 8px; font-weight: bold; font-size: 12.5pt; color: #2b6cb0;">$n$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 8px;">$1 + 2 + 3 + \dots + n$</td>
+                                <td style="padding: 8px; font-weight: bold;">$\sum_{k=1}^{n} k$</td>
+                                <td style="padding: 8px; font-weight: bold; font-size: 12.5pt; color: #2b6cb0;">$\frac{1}{2}n(n+1)$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px;">$1^2 + 2^2 + 3^2 + \dots + n^2$</td>
+                                <td style="padding: 8px; font-weight: bold;">$\sum_{k=1}^{n} k^2$</td>
+                                <td style="padding: 8px; font-weight: bold; font-size: 12.5pt; color: #e53e3e;">$\frac{1}{6}n(n+1)(2n+1)$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 8px;">$1^3 + 2^3 + 3^3 + \dots + n^3$</td>
+                                <td style="padding: 8px; font-weight: bold;">$\sum_{k=1}^{n} k^3$</td>
+                                <td style="padding: 8px; font-weight: bold; font-size: 12.5pt; color: #805ad5;">$\left\{\frac{1}{2}n(n+1)\right\}^2$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 12px; background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px;">
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>計算のコツ（因数分解でまとめる）：</strong><br>
+                        $\Sigma$ の計算結果を展開してバラバラにする生徒が多いですが、<strong>「共通因数（ $\frac{1}{6}n(n+1)$ など）で括り出す」</strong>のが鉄則です。最後は因数分解されたきれいな形で答えるよう指導しましょう。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- スライド6.5：Σ の 4大公式の証明（図解・代数証明） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑥.5</h2>
+                <span class="badge">講義：Σ 4大公式の証明と幾何学的理解</span>
+            </div>
+            <div class="content-box" style="font-size: 10.5pt;">
+                <div style="display: flex; gap: 10px;">
+                    <!-- 左列：1, k, k^3 の証明（代数・視覚解釈） -->
+                    <div style="flex: 1; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px;">
+                        <strong style="color: #1a365d; font-size: 11pt;">［1］$\sum k$ の証明（等差数列の和）</strong><br>
+                        逆順に並べて足す（ガウスの計算）：<br>
+                        $S = 1 + 2 + \dots + n$<br>
+                        $S = n + (n-1) + \dots + 1$<br>
+                        $2S = (n+1) \times n \implies \mathbf{S = \frac{1}{2}n(n+1)}$
+                        <hr style="margin: 6px 0; border: 0; border-top: 1px solid #cbd5e0;">
+
+                        <strong style="color: #805ad5; font-size: 11pt;">［2］$\sum k^3$ の証明（恒等式の代入）</strong><br>
+                        恒等式 $(k+1)^4 - k^4 = 4k^3 + 6k^2 + 4k + 1$ に $k=1 \sim n$ を代入して縦に足し合わせることで導かれる。<br>
+                        結果として **$\sum k^3 = \left(\sum k\right)^2$**（ $\sum k$ の2乗）という驚くべき美しい一致を示す。
+                    </div>
+
+                    <!-- 右列：k^2 の幾何学的証明（図解付き） -->
+                    <div style="flex: 1.2; background-color: #fffaf0; border: 1px solid #feebc8; padding: 8px; border-radius: 6px;">
+                        <strong style="color: #e53e3e; font-size: 11pt;">［3］$\sum k^2$ の視覚的証明（3つの三角形の合成）</strong><br>
+                        $1^2 + 2^2 + \dots + n^2$ をマスの配置として捉え、**3方向に回転させたものを重ね合わせる**。
+
+                        <!-- ピュアSVG図解エリア（k^2 の証明イメージ） -->
+                        <div style="display: flex; justify-content: center; align-items: center; margin: 4px 0;">
+                            <svg width="280" height="90" viewBox="0 0 280 90" style="background: white; border-radius: 4px; border: 1px solid #cbd5e0;">
+                                <!-- 1つ目の三角形 (頂点上) -->
+                                <g transform="translate(10, 10)">
+                                    <text x="25" y="12" font-size="8" text-anchor="middle" fill="#2b6cb0">1</text>
+                                    <text x="15" y="28" font-size="8" text-anchor="middle" fill="#2b6cb0">2</text>
+                                    <text x="35" y="28" font-size="8" text-anchor="middle" fill="#2b6cb0">2</text>
+                                    <text x="5" y="44" font-size="8" text-anchor="middle" fill="#2b6cb0">3</text>
+                                    <text x="25" y="44" font-size="8" text-anchor="middle" fill="#2b6cb0">3</text>
+                                    <text x="45" y="44" font-size="8" text-anchor="middle" fill="#2b6cb0">3</text>
+                                </g>
+
+                                <text x="75" y="38" font-size="12" font-weight="bold" fill="#718096">+</text>
+                                <text x="70" y="52" font-size="7" fill="#718096">回転×2</text>
+
+                                <text x="110" y="38" font-size="12" font-weight="bold" fill="#718096">=</text>
+
+                                <!-- 合成後の三角形 (全マス目が 2n+1 になる) -->
+                                <g transform="translate(130, 10)">
+                                    <text x="30" y="12" font-size="8" font-weight="bold" text-anchor="middle" fill="#e53e3e">2n+1</text>
+                                    <text x="18" y="28" font-size="8" font-weight="bold" text-anchor="middle" fill="#e53e3e">2n+1</text>
+                                    <text x="42" y="28" font-size="8" font-weight="bold" text-anchor="middle" fill="#e53e3e">2n+1</text>
+                                    <text x="6" y="44" font-size="8" font-weight="bold" text-anchor="middle" fill="#e53e3e">2n+1</text>
+                                    <text x="30" y="44" font-size="8" font-weight="bold" text-anchor="middle" fill="#e53e3e">2n+1</text>
+                                    <text x="54" y="44" font-size="8" font-weight="bold" text-anchor="middle" fill="#e53e3e">2n+1</text>
+                                </g>
+
+                                <text x="210" y="35" font-size="8" fill="#1a365d">全マス数：</text>
+                                <text x="210" y="48" font-size="8.5" font-weight="bold" fill="#2b6cb0">$\frac{1}{2}n(n+1)$ 個</text>
+                            </svg>
+                        </div>
+
+                        重ね合わせると、全てのマス目の値が **$(2n+1)$** に揃う。<br>
+                        マス目の総数は等差数列の和より $\frac{1}{2}n(n+1)$ 個であるから：
+                        $$ 3 \times \sum_{k=1}^{n} k^2 = \frac{1}{2}n(n+1) \times (2n+1) $$
+                        両辺を 3 で割ると、公式 **$\mathbf{\frac{1}{6}n(n+1)(2n+1)}$** が完成する。
+                    </div>
+                </div>
+
+                <div style="margin-top: 8px; background-color: #edf2f7; border-left: 4px solid #1a365d; padding: 6px 10px;">
+                    <span style="font-size: 10pt; color: #2d3748;">
+                        💡 <strong>指導のアドバイス：</strong>「 $k^2$ の公式の $\frac{1}{6}$ という不自然な数字は、<strong>“3つの三角形を重ね合わせて最後に3で割る”</strong> から出てくるんだよ」と視覚イメージを見せると、丸暗記から脱却して一気に記憶に定着します。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（Σ の計算演習）
+             ========================================== -->
+
+        <!-- 1. 多項式の Σ 計算（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】48 Σ の基本計算と因数分解</h2>
+                <span class="badge">数列演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の和を求めよ。<br><br>
+                    $$ \sum_{k=1}^{n} (k^2 - 3k + 2) $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    1. $\sum$ を各項に分配する： $\sum k^2 - 3 \sum k + \sum 2$<br>
+                    2. 4大公式を代入したあと、すべて展開するのではなく <strong>$\frac{1}{6}n$ などの共通因数で括り出す</strong>のが計算ミスの予防と因数分解の鉄則である！
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 多項式の Σ 計算（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】48 Σ の基本計算と因数分解</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］公式の代入と分解］</strong><br>
+                    $$ \sum_{k=1}^{n} (k^2 - 3k + 2) = \sum_{k=1}^{n} k^2 - 3 \sum_{k=1}^{n} k + \sum_{k=1}^{n} 2 $$
+                    $$ = \frac{1}{6}n(n+1)(2n+1) - 3 \cdot \frac{1}{2}n(n+1) + 2n $$
+                    <br>
+                    <strong>［ステップ 2］共通因数 $\frac{1}{6}n$ で括る］</strong><br>
+                    分数全体を消すために $\frac{1}{6}n$ を前に括り出す：
+                    $$ = \frac{1}{6}n \left\{ (n+1)(2n+1) - 9(n+1) + 12 \right\} $$
+                    カッコ内を展開して整理する：
+                    $$ = \frac{1}{6}n \left\{ (2n^2 + 3n + 1) - (9n + 9) + 12 \right\} $$
+                    $$ = \frac{1}{6}n (2n^2 - 6n + 4) $$
+                    さらにカッコ内から $2$ を括り出して約分する：
+                    $$ = \frac{1}{6}n \cdot 2(n^2 - 3n + 2) = \frac{1}{3}n(n-1)(n-2) $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        $\frac{1}{3}n(n-1)(n-2)$ （または $\frac{1}{3}n(n^2 - 3n + 2)$）
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 和の和（第 k 項が和の形）（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】49 和の和（第 k 項が数列の和）</h2>
+                <span class="badge">数列演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の数列の初項から第 $n$ 項までの和を求めよ。<br><br>
+                    $$ 1, \quad 1+2, \quad 1+2+3, \quad 1+2+3+4, \quad \dots $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    まずは「第 $k$ 項 $a_k$」の正体を突き止めよ。<br>
+                    第 $k$ 項は $a_k = 1 + 2 + \dots + k = \frac{1}{2}k(k+1)$ である。<br>
+                    求める和は $S_n = \sum_{k=1}^{n} a_k = \sum_{k=1}^{n} \frac{1}{2}k(k+1)$ となる。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 和の和（第 k 項が数列の和）（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】49 和の和（第 k 項が数列の和）</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］一般項（第 $k$ 項） $a_k$ を決定する］</strong><br>
+                    第 $k$ 項 $a_k$ は $1$ から $k$ までの和であるから：
+                    $$ a_k = \sum_{m=1}^{k} m = \frac{1}{2}k(k+1) = \frac{1}{2}(k^2 + k) $$
+                    <br>
+                    <strong>［ステップ 2］初項から第 $n$ 項までの和 $S_n$ を計算する］</strong><br>
+                    $$ S_n = \sum_{k=1}^{n} a_k = \sum_{k=1}^{n} \frac{1}{2}(k^2 + k) = \frac{1}{2} \sum_{k=1}^{n} k^2 + \frac{1}{2} \sum_{k=1}^{n} k $$
+                    $$ = \frac{1}{2} \cdot \frac{1}{6}n(n+1)(2n+1) + \frac{1}{2} \cdot \frac{1}{2}n(n+1) $$
+                    共通因数 <strong>$\frac{1}{12}n(n+1)$</strong> で括り出す：
+                    $$ = \frac{1}{12}n(n+1) \left\{ (2n+1) + 3 \right\} = \frac{1}{12}n(n+1)(2n+4) $$
+                    カッコ内から $2$ を括り出して約分する：
+                    $$ = \frac{1}{12}n(n+1) \cdot 2(n+2) = \frac{1}{6}n(n+1)(n+2) $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        $\frac{1}{6}n(n+1)(n+2)$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（Σ の応用技法）
+             ========================================== -->
+
+        <!-- スライド7：(等差) × (等比) 型の和 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑦</h2>
+                <span class="badge">講義：(等差) × (等比) 型の和（S - rS 法）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【解法の型】$S = \sum (\text{等差}) \times (\text{等比})$ の形の和は、<strong>「和 $S$ 全体に公比 $r$ を掛けた $rS$ を引き算する」</strong>ことで、途中の項をすべて等比数列の和へ変換できる。
+                </div>
+
+                <div style="margin-top: 15px; background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 10px; border-radius: 4px; font-size: 12pt;">
+                    <strong>［計算の手順： $S - rS$ の構造］</strong>
+                    $$\begin{array}{rccccccc}
+                    S & = & 1 \cdot 1 & + & 2 \cdot r & + & 3 \cdot r^2 & + \dots + & n \cdot r^{n-1} \\
+                    -) \ rS & = & & & 1 \cdot r & + & 2 \cdot r^2 & + \dots + & (n-1) \cdot r^{n-1} & + & n \cdot r^n \\
+                    \hline
+                    (1-r)S & = & 1 & + & r & + & r^2 & + \dots + & r^{n-1} & - & n \cdot r^n
+                    \end{array}$$
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［思考のポイント］</strong><br>
+                    *   引き算を行った結果、中央部分の $r + r^2 + \dots + r^{n-1}$ は**「公比 $r$ の普通の等比数列の和」**になる。<br>
+                    *   最後に両辺を $(1-r)$ で割れば $S$ が求まる（ $r = 1$ の場合はただの等差数列になる点に注意）。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8：部分分数分解を利用する和 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑧</h2>
+                <span class="badge">講義：部分分数分解による和（望遠鏡和・項の打ち消し）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【解法の型】分数形の数列の和は、各項を <strong>$a_k = f(k) - f(k+1)$ （差の形）</strong> に変形することで、和を計算したときに<strong>途中の項がバタバタと相殺して消える</strong>。
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <strong>［1. 基本公式（2分母の解体）］</strong>
+                    <div style="background-color: #edf2f7; border-left: 4px solid #2b6cb0; padding: 8px 12px; border-radius: 4px; margin: 6px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ \frac{1}{k(k+d)} = \frac{1}{d} \left( \frac{1}{k} - \frac{1}{k+d} \right) $$
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <strong>［2. 打ち消し（望遠鏡和）のイメージ（ $d=1$ の場合）］</strong><br>
+                    代入して具体的に並べると、隣り合う項が相殺される：
+                    $$\begin{aligned}
+                    S_n &= \left( \frac{1}{1} - \frac{1}{2} \right) + \left( \frac{1}{2} - \frac{1}{3} \right) + \dots + \left( \frac{1}{n} - \frac{1}{n+1} \right) \\
+                    &= 1 - \frac{1}{n+1} = \mathbf{\frac{n}{n+1}}
+                    \end{aligned}$$
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「消えずに残る項は左右対称になる（前に1つ残れば、後ろも1つ残る。前に2つ残れば後ろも2つ残る）」という構造的ルールを意識させると、書き出しミスの防止になります。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（Σ の応用演習）
+             ========================================== -->
+
+        <!-- 1. (等差) × (等比) 型の和（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】50 (等差) × (等比) 型の和</h2>
+                <span class="badge">数列演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の和 $S_n$ を求めよ。<br><br>
+                    $$ S_n = 1 \cdot 1 + 2 \cdot 3 + 3 \cdot 3^2 + 4 \cdot 3^3 + \dots + n \cdot 3^{n-1} $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    公比 $r = 3$ である。<br>
+                    $S_n$ の式と、全体に 3 を掛けた $3S_n$ の式を <strong>1 項ずらして引き算（ $S_n - 3S_n$ ）</strong>を行え。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. (等差) × (等比) 型の和（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】50 (等差) × (等比) 型の和</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div>
+                    <strong>［ステップ 1］$S_n - 3S_n$ を作って引き算する］</strong><br>
+                    $$\begin{array}{rccccccc}
+                    S_n & = & 1 \cdot 1 & + & 2 \cdot 3 & + & 3 \cdot 3^2 + \dots + & n \cdot 3^{n-1} \\
+                    -) \ 3S_n & = & & & 1 \cdot 3 & + & 2 \cdot 3^2 + \dots + & (n-1) \cdot 3^{n-1} & + & n \cdot 3^n \\
+                    \hline
+                    -2S_n & = & 1 & + & 3 & + & 3^2 + \dots + & 3^{n-1} & - & n \cdot 3^n
+                    \end{array}$$
+                    <br>
+                    <strong>［ステップ 2］中央の等比数列の和を計算する］</strong><br>
+                    $1 + 3 + 3^2 + \dots + 3^{n-1}$ は初項 $1$、公比 $3$、項数 $n$ の等比数列の和であるから：
+                    $$ -2S_n = \frac{1(3^n - 1)}{3 - 1} - n \cdot 3^n = \frac{3^n - 1}{2} - n \cdot 3^n $$
+                    <br>
+                    <strong>［ステップ 3］両辺を $-2$ で割って $S_n$ を整理する］</strong><br>
+                    通分して $3^n$ の項で括りまとめる：
+                    $$ -2S_n = \frac{(3^n - 1) - 2n \cdot 3^n}{2} = \frac{(1 - 2n)3^n - 1}{2} $$
+                    両辺を $-2$ で割ると：
+                    $$ S_n = \frac{(2n - 1)3^n + 1}{4} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        $S_n = \frac{(2n - 1)3^n + 1}{4}$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 部分分数分解を利用する和（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】51 部分分数分解を利用する和</h2>
+                <span class="badge">数列演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の和 $S_n$ を求めよ。<br><br>
+                    $$ S_n = \frac{1}{1 \cdot 3} + \frac{1}{3 \cdot 5} + \frac{1}{5 \cdot 7} + \dots + \frac{1}{(2n-1)(2n+1)} $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    分母の差が $2$ であるため、部分分数分解の公式 <strong>$\frac{1}{(2k-1)(2k+1)} = \frac{1}{2} \left( \frac{1}{2k-1} - \frac{1}{2k+1} \right)$</strong> を適用せよ。<br>
+                    全体を $\frac{1}{2}$ で括り、各項を代入して打ち消し合わせよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 部分分数分解を利用する和（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】51 部分分数分解を利用する和</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］第 $k$ 項を部分分数分解する］</strong><br>
+                    $$ a_k = \frac{1}{(2k-1)(2k+1)} = \frac{1}{2} \left( \frac{1}{2k-1} - \frac{1}{2k+1} \right) $$
+                    <br>
+                    <strong>［ステップ 2］$k = 1 \sim n$ を代入して縦・横に和をとる］</strong><br>
+                    $$ S_n = \frac{1}{2} \left[ \left( \frac{1}{1} - \frac{1}{3} \right) + \left( \frac{1}{3} - \frac{1}{5} \right) + \left( \frac{1}{5} - \frac{1}{7} \right) + \dots + \left( \frac{1}{2n-1} - \frac{1}{2n+1} \right) \right] $$
+                    中間項がすべて打ち消し合って消去される：
+                    $$ S_n = \frac{1}{2} \left( 1 - \frac{1}{2n+1} \right) $$
+                    <br>
+                    <strong>［ステップ 3］カッコ内を通分して計算する］</strong><br>
+                    $$ S_n = \frac{1}{2} \cdot \left( \frac{(2n+1) - 1}{2n+1} \right) = \frac{1}{2} \cdot \frac{2n}{2n+1} = \frac{n}{2n+1} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        $S_n = \frac{n}{2n+1}$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（群数列の攻略法）
+             ========================================== -->
+
+        <!-- スライド9：群数列の攻略法（3つの視点） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑨</h2>
+                <span class="badge">講義：群数列の攻略ポイント（群と項の対応）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    $$ \frac{1}{2}, \ \frac{1}{3}, \ \frac{2}{3}, \ \frac{1}{4}, \ \frac{2}{4}, \ \frac{3}{4}, \ \frac{1}{5}, \ \dots $$
+                </div>
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【群数列の本質】一つの数列を、特定の規則にしたがって組（群）に区切ったもの。<br>
+                    <strong>「数列全体の通し番号 $N$ 」</strong>と<strong>「その項が第何群の何番目か $[n, m]$ 」</strong>の対応関係を突き止めることが攻略の鍵である。
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［群数列を切り崩す 3つの強力な道具（視点）］</strong><br>
+                    群数列の問題は、まず以下の3つの情報を数式（ $n$ の式）で表すことから始まる。
+                    <ol style="margin-top: 8px;">
+                        <li style="margin-bottom: 8px;">
+                            <strong>第 $n$ 群の「項数 $L_n$ 」はいくつか？</strong><br>
+                            （例：$L_n = n$ 個、 $L_n = 2n-1$ 個 など）
+                        </li>
+                        <li style="margin-bottom: 8px;">
+                            <strong>第 $n$ 群の「最後の項」は、全体の第何項（末項の通し番号）か？</strong><br>
+                            第 $1$ 群から第 $n$ 群までの項数の総和を計算する。<br>
+                            （例： $\sum_{k=1}^{n} L_k = \sum_{k=1}^{n} k = \frac{1}{2}n(n+1)$ 項 など）
+                        </li>
+                        <li>
+                            <strong>第 $n$ 群の項だけを見たときの「和（群内の和）」はいくつか？</strong><br>
+                            第 $n$ 群内の初項と項数 $L_n$ を用いて計算する。
+                        </li>
+                    </ol>
+                </div>
+
+                <div style="margin-top: 12px; background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px;">
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「群数列の問題が出たら、迷わず図を描こう。数列全体の通し番号 $N$ と、第 $n$ 群の部屋番号の対応図（マトリクス）を描くと、どの公式を使えば良いかが一目でわかるようになるよ」と、作図の重要性を伝えましょう。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（群数列の演習）
+             ========================================== -->
+
+        <!-- 1. 分数の群数列（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】52 分数の群数列</h2>
+                <span class="badge">数列演習：標準</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    次の数列について、以下の問いに答えよ。<br><br>
+                    $$ \frac{1}{2}, \ \frac{1}{3}, \ \frac{2}{3}, \ \frac{1}{4}, \ \frac{2}{4}, \ \frac{3}{4}, \ \frac{1}{5}, \ \dots $$
+                    (1) 第 50 項を求めよ。<br>
+                    (2) 初項から第 50 項までの和を求めよ。
+                </div>
+                <div style="margin-top: 20px; color: #718096; font-size: 13.5pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    分母が同じ分数ごとにグループに分ける：<br>
+                    第 1 群: $\left( \frac{1}{2} \right)$ （1個）、第 2 群: $\left( \frac{1}{3}, \frac{2}{3} \right)$ （2個）、第 3 群: $\left( \frac{1}{4}, \frac{2}{4}, \frac{3}{4} \right)$ （3個） $\dots$<br>
+                    第 $n$ 群には $n$ 個の項が含まれ、第 $1$ 群から第 $n$ 群までの項数の総和は $\frac{1}{2}n(n+1)$ である。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 分数の群数列（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】52 分数の群数列</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 12.5pt;">
+                <div>
+                    <strong>［ステップ 1］第 50 項が「第何群の何番目か」を特定する］</strong><br>
+                    第 $1$ 群から第 $n$ 群までの項数の和は $\frac{1}{2}n(n+1)$ 個である。<br>
+                    第 50 項が含まれる群 $n$ を探すために見当をつける：<br>
+                    *   $n = 9$ のとき： $\frac{1}{2} \cdot 9 \cdot 10 = 45$ （第 9 群の末項は第 45 項）<br>
+                    *   $n = 10$ のとき： $\frac{1}{2} \cdot 10 \cdot 11 = 55$ （第 10 群の末項は第 55 項）<br>
+                    したがって、第 50 項は <strong>第 10 群の第 5 番目の項</strong>（ $50 - 45 = 5$ ）である。<br>
+                    第 10 群の分母は $11$、分子は項の番号と一致するため、第 50 項は <strong>$\frac{5}{11}$</strong> 。
+                    <br><br>
+                    <strong>［ステップ 2］初項から第 50 項までの和を計算する］</strong><br>
+                    第 $k$ 群に含まれる項の和 $S_k$ は：
+                    $$ S_k = \frac{1}{k+1} + \frac{2}{k+1} + \dots + \frac{k}{k+1} = \frac{\frac{1}{2}k(k+1)}{k+1} = \frac{1}{2}k $$
+                    第 1 群から第 9 群までの和： $\sum_{k=1}^{9} S_k = \sum_{k=1}^{9} \frac{1}{2}k = \frac{1}{2} \cdot \frac{1}{2} \cdot 9 \cdot 10 = \frac{45}{2}$<br>
+                    第 10 群の最初から 5 個（第 50 項まで）の和： $\frac{1+2+3+4+5}{11} = \frac{15}{11}$<br>
+                    全体の和： $\frac{45}{2} + \frac{15}{11} = \frac{495 + 30}{22} = \frac{525}{22}$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        (1) $\frac{5}{11}$ (2) $\frac{525}{22}$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 奇数の群数列（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】53 奇数の群数列</h2>
+                <span class="badge">数列演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    自然数のうち奇数を次のように第 $n$ 群が $n$ 個の数を含むように分ける。<br><br>
+                    (1) ｜ (3, 5) ｜ (7, 9, 11) ｜ (13, 15, 17, 19) ｜ $\dots$<br><br>
+                    (1) 第 $n$ 群の最初の数を $n$ の式で表せ。<br>
+                    (2) 101 は第何群の何番目の数か。
+                </div>
+                <div style="margin-top: 20px; color: #718096; font-size: 13.5pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    (1) 第 $n$ 群の最初の数は、全体（奇数の数列 $a_N = 2N - 1$ ）の<strong>「第 (第 $n-1$ 群までの項数 $+ 1$ ) 項」</strong>である。<br>
+                    (2) まず 101 が奇数列の中で全体で何番目（ $2N - 1 = 101$ ）かを求めよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 奇数の群数列（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】53 奇数の群数列</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 12.5pt;">
+                <div>
+                    <strong>［(1) の解説］</strong><br>
+                    $n \geqq 2$ のとき、第 $1$ 群から第 $n-1$ 群までに含まれる個数の和は $\frac{1}{2}(n-1)n$ 個である。<br>
+                    したがって、第 $n$ 群の最初の数は、奇数列全体の <strong>第 $\left\{ \frac{1}{2}(n-1)n + 1 \right\}$ 項</strong> となる。<br>
+                    奇数列の一般項は $a_N = 2N - 1$ であるから、 $N = \frac{1}{2}(n-1)n + 1$ を代入する：
+                    $$ 2 \left\{ \frac{1}{2}(n-1)n + 1 \right\} - 1 = n(n-1) + 2 - 1 = n^2 - n + 1 $$
+                    これは $n = 1$ のときも第 1 群の最初の数 $1$ に一致して成り立つ。<br>
+                    したがって、第 $n$ 群の最初の数は <strong>$n^2 - n + 1$</strong> 。
+                    <br><br>
+                    <strong>［(2) の解説］</strong><br>
+                    101 は奇数列の中で $2N - 1 = 101 \implies 2N = 102 \implies N = 51$ 番目の数である。<br>
+                    通し番号 51 が第何群に含まれるかを探す：<br>
+                    *   $n = 9$ のとき： $\frac{1}{2} \cdot 9 \cdot 10 = 45$ （第 9 群までの総数は 45 個）<br>
+                    *   $n = 10$ のとき： $\frac{1}{2} \cdot 10 \cdot 11 = 55$ （第 10 群までの総数は 55 個）<br>
+                    したがって、51 番目の数は <strong>第 10 群の第 6 番目</strong>（ $51 - 45 = 6$ ）の数である。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        (1) $n^2 - n + 1$ (2) 第 10 群の 6 番目
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅱ　漸化式</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（漸化式の基本4パターン）
+             ========================================== -->
+
+        <!-- スライド10：漸化式の基本4パターン -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑩</h2>
+                <span class="badge">講義：漸化式の基本 4 パターン</span>
+            </div>
+            <div class="content-box" style="font-size: 11pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【漸化式の基本姿勢】どんなに複雑な漸化式が出題されても、目指すゴールは<strong>「知っている数列（等差・等比・階差）の形に持ち込むこと」</strong>である。
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11pt; text-align: center;">
+                        <thead>
+                            <tr style="background-color: #edf2f7; border-bottom: 2px solid #cbd5e0;">
+                                <th style="padding: 8px; color: #1a365d; width: 25%;">パターン</th>
+                                <th style="padding: 8px; color: #1a365d; width: 35%;">漸化式の形</th>
+                                <th style="padding: 8px; color: #1a365d; width: 40%;">帰着する数列と解法方針</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px; font-weight: bold; color: #2b6cb0;">① 等差型</td>
+                                <td style="padding: 8px; font-size: 12pt;">$a_{n+1} = a_n + d$</td>
+                                <td style="padding: 8px; text-align: left;">公差 $d$ の<strong>等差数列</strong><br>$\implies a_n = a_1 + (n-1)d$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 8px; font-weight: bold; color: #2b6cb0;">② 等比型</td>
+                                <td style="padding: 8px; font-size: 12pt;">$a_{n+1} = r a_n$</td>
+                                <td style="padding: 8px; text-align: left;">公比 $r$ の<strong>等比数列</strong><br>$\implies a_n = a_1 \cdot r^{n-1}$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px; font-weight: bold; color: #2b6cb0;">③ 階差型</td>
+                                <td style="padding: 8px; font-size: 12pt;">$a_{n+1} = a_n + f(n)$</td>
+                                <td style="padding: 8px; text-align: left;">階差数列が $f(n)$<br>$\implies a_n = a_1 + \sum_{k=1}^{n-1} f(k) \ (n \geqq 2)$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 8px; font-weight: bold; color: #e53e3e;">④ 特性方程式型</td>
+                                <td style="padding: 8px; font-size: 12pt;">$a_{n+1} = p a_n + q$</td>
+                                <td style="padding: 8px; text-align: left;">$\alpha = p\alpha + q$ とおいて変形<br>$\implies a_{n+1} - \alpha = p(a_n - \alpha)$ <strong>（等比型へ）</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 12px; background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px;">
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「①〜③は公式をそのまま適用するだけ。入試の主役は④の $a_{n+1} = p a_n + q$ で、特性方程式を使って<strong>数列 $\{a_n - \alpha\}$ という新しい等比数列を作る</strong>のが解法の最大の鍵だよ」と伝えましょう。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（特性方程式型漸化式）
+             ========================================== -->
+
+        <!-- スライド11：特性方程式型漸化式の原理と解法 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑪</h2>
+                <span class="badge">講義：特性方程式型 an+1 = p an + q の解法</span>
+            </div>
+            <div class="content-box" style="font-size: 11pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【目標】 $a_{n+1} = p a_n + q$ （ $p \neq 1, q \neq 0$ ）の形を、<strong>$a_{n+1} - \alpha = p(a_n - \alpha)$ （等比数列の形）</strong> へ変形することを目指す。
+                </div>
+
+                <div style="margin-top: 12px; display: flex; gap: 10px;">
+                    <!-- 左列：変形のメカニズム -->
+                    <div style="flex: 1.2; background-color: #fffaf0; border: 1px solid #feebc8; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #dd6b20; font-size: 11.5pt;">［1. 特性方程式ができる仕組み］</strong><br>
+                        目指す等比型： $a_{n+1} - \alpha = p(a_n - \alpha)$<br>
+                        これを展開すると： $a_{n+1} = p a_n + \alpha(1 - p)$<br>
+                        与えられた式 $a_{n+1} = p a_n + q$ と比較すると、定数項について：
+                        <div style="background-color: #ffffff; padding: 6px; border-radius: 4px; text-align: center; margin: 6px 0; font-weight: bold; color: #e53e3e; font-size: 12pt; border: 1px solid #cbd5e0;">
+                            $q = \alpha(1 - p) \iff \alpha = p \alpha + q$
+                        </div>
+                        この <strong>$\alpha = p \alpha + q$</strong> を<strong>特性方程式</strong>と呼ぶ。
+                    </div>
+
+                    <!-- 右列：変形の手順 -->
+                    <div style="flex: 1; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #2b6cb0; font-size: 11.5pt;">［2. 実戦での手順（3ステップ）］</strong><br>
+                        <ol style="margin-top: 6px; padding-left: 18px;">
+                            <li style="margin-bottom: 6px;">
+                                方程式 $\alpha = p \alpha + q$ を解いて解 $\alpha$ を求める。
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                $a_{n+1} - \alpha = p(a_n - \alpha)$ の形に書き換える。
+                            </li>
+                            <li>
+                                数列 $\{a_n - \alpha\}$ は<strong>「初項 $a_1 - \alpha$、公比 $p$ の等比数列」</strong>として一般項を求める。
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px; background-color: #edf2f7; border-left: 4px solid #1a365d; padding: 8px 12px;">
+                    <strong>［具体的な変形例］</strong><br>
+                    $a_{n+1} = 3 a_n - 4$ の場合、特性方程式 $\alpha = 3\alpha - 4 \implies -2\alpha = -4 \implies \mathbf{\alpha = 2}$<br>
+                    したがって、式は即座に <strong>$a_{n+1} - 2 = 3(a_n - 2)$</strong> と変形できる！
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             数B：数列（漸化式の演習）
+             ========================================== -->
+
+        <!-- 1. 階差型の漸化式（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】54 階差型の漸化式</h2>
+                <span class="badge">数列演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    初項 $a_1 = 1$、および次の漸化式によって定められる数列 $\{a_n\}$ の一般項 $a_n$ を求めよ。<br><br>
+                    $$ a_{n+1} = a_n + 2^n $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    $a_{n+1} - a_n = 2^n$ と変形できるため、数列 $\{a_n\}$ の階差数列が $b_n = 2^n$ （公比 2 の等比数列）である。<br>
+                    公式 <strong>$a_n = a_1 + \sum_{k=1}^{n-1} 2^k \ (n \geqq 2)$</strong> を適用し、等比数列の和の公式を用いよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 階差型の漸化式（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】54 階差型の漸化式</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］階差数列の公式を適用する］</strong><br>
+                    $a_{n+1} - a_n = 2^n$ より、階差数列は $b_n = 2^n$ である。<br>
+                    初項 $a_1 = 1$ より、 $n \geqq 2$ のとき：
+                    $$ a_n = a_1 + \sum_{k=1}^{n-1} 2^k = 1 + \sum_{k=1}^{n-1} 2^k $$
+                    <br>
+                    <strong>［ステップ 2］等比数列の和を計算する］</strong><br>
+                    $\sum_{k=1}^{n-1} 2^k$ は「初項 $2$、公比 $2$、項数 $n-1$」の等比数列の和であるから：
+                    $$ a_n = 1 + \frac{2(2^{n-1} - 1)}{2 - 1} = 1 + (2^n - 2) = 2^n - 1 $$
+                    <br>
+                    <strong>［ステップ 3］$n = 1$ の成立確認］</strong><br>
+                    $2^n - 1$ に $n = 1$ を代入すると、 $2^1 - 1 = 1$<br>
+                    これは実際の初項 $a_1 = 1$ と一致する。<br>
+                    したがって、すべての自然数 $n$ で $a_n = 2^n - 1$ が成り立つ。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        $a_n = 2^n - 1$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 特性方程式型の漸化式（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】55 特性方程式型の漸化式</h2>
+                <span class="badge">数列演習：標準</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    初項 $a_1 = 5$、および次の漸化式によって定められる数列 $\{a_n\}$ の一般項 $a_n$ を求めよ。<br><br>
+                    $$ a_{n+1} = 3a_n - 4 $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    特性方程式 $\alpha = 3\alpha - 4$ を解いて $\alpha = 2$ を得よ。<br>
+                    漸化式を <strong>$a_{n+1} - 2 = 3(a_n - 2)$</strong> と変形し、数列 $\{a_n - 2\}$ の初項と公比を特定せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 特性方程式型の漸化式（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】55 特性方程式型の漸化式</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］特性方程式から変形を行う］</strong><br>
+                    方程式 $\alpha = 3\alpha - 4$ を解くと、 $-2\alpha = -4 \implies \alpha = 2$<br>
+                    与えられた漸化式は次のように変形できる：
+                    $$ a_{n+1} - 2 = 3(a_n - 2) $$
+                    <br>
+                    <strong>［ステップ 2］数列 $\{a_n - 2\}$ の一般項を求める］</strong><br>
+                    数列 $\{a_n - 2\}$ は、
+                    *   <strong>初項：</strong> $a_1 - 2 = 5 - 2 = 3$
+                    *   <strong>公比：</strong> $3$
+                    の等比数列である。したがって：
+                    $$ a_n - 2 = 3 \cdot 3^{n-1} = 3^n $$
+                    <br>
+                    <strong>［ステップ 3］$a_n$ を導出する］</strong><br>
+                    $-2$ を右辺に移項して：
+                    $$ a_n = 3^n + 2 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        $a_n = 3^n + 2$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（漸化式の応用・発展3パターン）
+             ========================================== -->
+
+        <!-- スライド12：漸化式の応用 3パターン -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑫</h2>
+                <span class="badge">講義：漸化式の発展 3 パターン（全パターン制覇）</span>
+            </div>
+            <div class="content-box" style="font-size: 11pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【発展型の攻略法】一見複雑な式も、<strong>「適切な式変形や置き換え」</strong>を行えば、必ず「等比型」や「特性方程式型」などの基本形に化ける。
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt; text-align: center;">
+                        <thead>
+                            <tr style="background-color: #edf2f7; border-bottom: 2px solid #cbd5e0;">
+                                <th style="padding: 8px; color: #1a365d; width: 22%;">パターン</th>
+                                <th style="padding: 8px; color: #1a365d; width: 33%;">漸化式の形</th>
+                                <th style="padding: 8px; color: #1a365d; width: 45%;">変形テクニックと狙い</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px; font-weight: bold; color: #2b6cb0;">① $p^n$ 混在型</td>
+                                <td style="padding: 8px; font-size: 11.5pt;">$a_{n+1} = p a_n + q \cdot r^n$</td>
+                                <td style="padding: 8px; text-align: left;">両辺を <strong>$r^{n+1}$ で割る</strong><br>$\implies b_n = \frac{a_n}{r^n}$ と置くと特性方程式型へ！</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 8px; font-weight: bold; color: #2b6cb0;">② 累乗（積）型</td>
+                                <td style="padding: 8px; font-size: 11.5pt;">$a_{n+1} = p (a_n)^r$</td>
+                                <td style="padding: 8px; text-align: left;">両辺の <strong>対数（$\log$）をとる</strong><br>$\implies b_n = \log a_n$ と置くと特性方程式型へ！</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px; font-weight: bold; color: #e53e3e;">③ 隣接3項間</td>
+                                <td style="padding: 8px; font-size: 11.5pt;">$a_{n+2} + p a_{n+1} + q a_n = 0$</td>
+                                <td style="padding: 8px; text-align: left;">二次方程式 $x^2 + px + q = 0$ の解 $\alpha, \beta$ より<br>$\implies a_{n+2} - \alpha a_{n+1} = \beta(a_{n+1} - \alpha a_n)$ <strong>（等比型へ）</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 12px; background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px;">
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「難関大の入試で出る漸化式は、結局のところ『両辺を何かで割る』か『対数をとる』か『置き換える』のどれか。初見の形が来たら『どの基本型に落とし込めるか？』を逆算して式変形を試そう」と指導すると応用力が一気に伸びます。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（隣接3項間漸化式）
+             ========================================== -->
+
+        <!-- スライド13：隣接3項間漸化式の解法と構造 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑬</h2>
+                <span class="badge">講義：隣接3項間漸化式の構造と解法</span>
+            </div>
+            <div class="content-box" style="font-size: 11pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【変形のゴール】 $a_{n+2} + p a_{n+1} + q a_n = 0$ を、<strong>「階差の数列が公比 $\beta$ の等比数列になる形」</strong>へ持ち込む。
+                    <div style="text-align: center; font-size: 12.5pt; font-weight: bold; margin-top: 6px; color: #e53e3e;">
+                        $$ a_{n+2} - \alpha a_{n+1} = \beta(a_{n+1} - \alpha a_n) $$
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px; display: flex; gap: 10px;">
+                    <!-- 左列：変形のメカニズム -->
+                    <div style="flex: 1.2; background-color: #fffaf0; border: 1px solid #feebc8; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #dd6b20; font-size: 11.5pt;">［1. 2次特性方程式ができる理由］</strong><br>
+                        目指す式を展開して整理すると：<br>
+                        $a_{n+2} - (\alpha + \beta) a_{n+1} + \alpha \beta a_n = 0$<br>
+                        元の式 $a_{n+2} + p a_{n+1} + q a_n = 0$ と比較すると、解と係数の関係より：
+                        <div style="background-color: #ffffff; padding: 6px; border-radius: 4px; text-align: center; margin: 6px 0; font-weight: bold; color: #2b6cb0; font-size: 11.5pt; border: 1px solid #cbd5e0;">
+                            $\alpha + \beta = -p, \quad \alpha \beta = q$
+                        </div>
+                        これは <strong>2次方程式 $x^2 + px + q = 0$ の 2 解が $\alpha, \beta$</strong> であることを意味する！
+                    </div>
+
+                    <!-- 右列：2解 α, β が異なる場合の連立 -->
+                    <div style="flex: 1; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #2b6cb0; font-size: 11.5pt;">［2. $\alpha \neq \beta$（2解が異なる）とき］</strong><br>
+                        $\alpha$ と $\beta$ を入れ替えた 2 つの等比数列の式を作る：
+                        <ol style="margin-top: 4px; padding-left: 18px;">
+                            <li style="margin-bottom: 4px;">
+                                $a_{n+1} - \alpha a_n = (a_2 - \alpha a_1) \cdot \beta^{n-1}$
+                            </li>
+                            <li style="margin-bottom: 4px;">
+                                $a_{n+1} - \beta a_n = (a_2 - \beta a_1) \cdot \alpha^{n-1}$
+                            </li>
+                        </ol>
+                        <strong>① － ② を行えば、$a_{n+1}$ が消去されて $a_n$ が一発で求まる！</strong>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; background-color: #edf2f7; border-left: 4px solid #1a365d; padding: 6px 10px;">
+                    <span style="font-size: 10pt; color: #2d3748;">
+                        💡 <strong>重解（ $\alpha = \beta$ ）の場合の補足：</strong><br>
+                        式が 1 つ（ $a_{n+1} - \alpha a_n = (a_2 - \alpha a_1) \alpha^{n-1}$ ）しか作れないため、両辺を $\alpha^{n+1}$ で割って<strong>等差数列型</strong>に持ち込むのが鉄則です。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（漸化式発展の演習）
+             ========================================== -->
+
+        <!-- 1. r^n 混在型（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】56 r^n 混在型の漸化式</h2>
+                <span class="badge">数列演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    初項 $a_1 = 1$、および次の漸化式によって定められる数列 $\{a_n\}$ の一般項 $a_n$ を求めよ。<br><br>
+                    $$ a_{n+1} = 2a_n + 3^n $$
+                </div>
+                <div style="margin-top: 20px; color: #718096; font-size: 13.5pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    両辺を $3^{n+1}$ で割ると、 $\frac{a_{n+1}}{3^{n+1}} = \frac{2}{3} \cdot \frac{a_n}{3^n} + \frac{1}{3}$ となる。<br>
+                    $b_n = \frac{a_n}{3^n}$ と置くことで、<strong>特性方程式型 $b_{n+1} = \frac{2}{3}b_n + \frac{1}{3}$</strong> へ帰着させよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. r^n 混在型（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】56 r^n 混在型の漸化式</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 12.5pt;">
+                <div>
+                    <strong>［ステップ 1］両辺を $3^{n+1}$ で割って置換する］</strong><br>
+                    $$ \frac{a_{n+1}}{3^{n+1}} = \frac{2a_n}{3^{n+1}} + \frac{3^n}{3^{n+1}} \iff \frac{a_{n+1}}{3^{n+1}} = \frac{2}{3} \cdot \frac{a_n}{3^n} + \frac{1}{3} $$
+                    $b_n = \frac{a_n}{3^n}$ とおくと、 $b_1 = \frac{a_1}{3^1} = \frac{1}{3}$ であり、漸化式は：
+                    $$ b_{n+1} = \frac{2}{3}b_n + \frac{1}{3} $$
+                    <br>
+                    <strong>［ステップ 2］特性方程式を用いて $b_n$ を求める］</strong><br>
+                    特性方程式 $\alpha = \frac{2}{3}\alpha + \frac{1}{3}$ より $\frac{1}{3}\alpha = \frac{1}{3} \implies \alpha = 1$<br>
+                    したがって、 $b_{n+1} - 1 = \frac{2}{3}(b_n - 1)$ と変形できる。<br>
+                    数列 $\{b_n - 1\}$ は初項 $b_1 - 1 = \frac{1}{3} - 1 = -\frac{2}{3}$、公比 $\frac{2}{3}$ の等比数列であるから：
+                    $$ b_n - 1 = -\frac{2}{3} \left( \frac{2}{3} \right)^{n-1} = -\left( \frac{2}{3} \right)^n \implies b_n = 1 - \left( \frac{2}{3} \right)^n $$
+                    <br>
+                    <strong>［ステップ 3］元の $a_n$ に戻す］</strong><br>
+                    $a_n = 3^n b_n$ より：
+                    $$ a_n = 3^n \left\{ 1 - \left( \frac{2}{3} \right)^n \right\} = 3^n - 2^n $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        $a_n = 3^n - 2^n$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 対数利用型（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】57 累乗・対数型の漸化式</h2>
+                <span class="badge">数列演習：発展</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    各項が正の数であり、初項 $a_1 = 2$、および次の漸化式によって定められる数列 $\{a_n\}$ の一般項 $a_n$ を求めよ。<br><br>
+                    $$ a_{n+1} = 2 (a_n)^2 $$
+                </div>
+                <div style="margin-top: 20px; color: #718096; font-size: 13.5pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    $a_n > 0$ であるため、底を 2 とする対数 $\log_2$ を両辺にとれ。<br>
+                    $\log_2 a_{n+1} = \log_2 \{2 (a_n)^2\} = 1 + 2 \log_2 a_n$ と変形し、 $b_n = \log_2 a_n$ とおけ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 対数利用型（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】57 累乗・対数型の漸化式</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 12.5pt;">
+                <div>
+                    <strong>［ステップ 1］両辺の対数をとる］</strong><br>
+                    すべての $n$ について $a_n > 0$ である。底を 2 とする対数をとると：
+                    $$ \log_2 a_{n+1} = \log_2 (2 \cdot a_n^2) = \log_2 2 + \log_2 a_n^2 = 1 + 2 \log_2 a_n $$
+                    $b_n = \log_2 a_n$ とおくと、初項 $b_1 = \log_2 2 = 1$ であり：
+                    $$ b_{n+1} = 2 b_n + 1 $$
+                    <br>
+                    <strong>［ステップ 2］$b_n$ の一般項を求める］</strong><br>
+                    特性方程式 $\alpha = 2\alpha + 1 \implies \alpha = -1$<br>
+                    よって、 $b_{n+1} + 1 = 2(b_n + 1)$<br>
+                    数列 $\{b_n + 1\}$ は初項 $b_1 + 1 = 1 + 1 = 2$、公比 2 の等比数列であるから：
+                    $$ b_n + 1 = 2 \cdot 2^{n-1} = 2^n \implies b_n = 2^n - 1 $$
+                    <br>
+                    <strong>［ステップ 3］元の $a_n$ を復元する］</strong><br>
+                    $\log_2 a_n = 2^n - 1$ より、対数の定義から：
+                    $$ a_n = 2^{2^n - 1} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        $a_n = 2^{2^n - 1}$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 隣接3項間漸化式（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】58 隣接3項間漸化式</h2>
+                <span class="badge">数列演習：発展</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    初項 $a_1 = 1$、第 2 項 $a_2 = 4$、および次の漸化式によって定められる数列 $\{a_n\}$ の一般項 $a_n$ を求めよ。<br><br>
+                    $$ a_{n+2} - 5a_{n+1} + 6a_n = 0 $$
+                </div>
+                <div style="margin-top: 20px; color: #718096; font-size: 13.5pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    2次特性方程式 $x^2 - 5x + 6 = 0$ を解くと $(x-2)(x-3) = 0 \implies x = 2, 3$<br>
+                    $a_{n+2} - 2a_{n+1} = 3(a_{n+1} - 2a_n)$ と $a_{n+2} - 3a_{n+1} = 2(a_{n+1} - 3a_n)$ の 2 式を作って引き算せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 隣接3項間漸化式（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】58 隣接3項間漸化式</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 12.5pt;">
+                <div>
+                    <strong>［ステップ 1］特性方程式の 2 解から 2 つの等比型を作る］</strong><br>
+                    $x^2 - 5x + 6 = 0$ の解 $x = 2, 3$ を用いて漸化式を変形する：
+                    $$ a_{n+2} - 2a_{n+1} = 3(a_{n+1} - 2a_n) \quad \cdots \text{①} $$
+                    $$ a_{n+2} - 3a_{n+1} = 2(a_{n+1} - 3a_n) \quad \cdots \text{②} $$
+                    <br>
+                    <strong>［ステップ 2］①・② それぞれの一般項を求める］</strong><br>
+                    ①より、数列 $\{a_{n+1} - 2a_n\}$ は初項 $a_2 - 2a_1 = 4 - 2(1) = 2$、公比 3 の等比数列：
+                    $$ a_{n+1} - 2a_n = 2 \cdot 3^{n-1} \quad \cdots \text{③} $$
+                    ②より、数列 $\{a_{n+1} - 3a_n\}$ は初項 $a_2 - 3a_1 = 4 - 3(1) = 1$、公比 2 の等比数列：
+                    $$ a_{n+1} - 3a_n = 1 \cdot 2^{n-1} = 2^{n-1} \quad \cdots \text{④} $$
+                    <br>
+                    <strong>［ステップ 3］③ － ④ を行い $a_n$ を求める］</strong><br>
+                    ③ － ④ より、 $a_{n+1}$ が消去されて：
+                    $$ (-2a_n) - (-3a_n) = 2 \cdot 3^{n-1} - 2^{n-1} \implies a_n = 2 \cdot 3^{n-1} - 2^{n-1} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        $a_n = 2 \cdot 3^{n-1} - 2^{n-1}$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅱ　数学的帰納法</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（数学的帰納法）
+             ========================================== -->
+
+        <!-- スライド14：数学的帰納法の基本原理（ドミノ倒しの論理） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑭ 数学的帰納法</h2>
+                <span class="badge">講義：数学的帰納法の原理と証明の型</span>
+            </div>
+            <div class="content-box" style="font-size: 11pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【本質】すべての自然数 $n$ で命題 $P(n)$ が成り立つことを、無限に計算するのではなく<strong>「2つのステップ（ドミノ倒し）」</strong>で完全証明する技法。
+                </div>
+
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <!-- 左列：2ステップの論理構造 -->
+                    <div style="flex: 1.2; background-color: #fffaf0; border: 1px solid #feebc8; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #dd6b20; font-size: 11.5pt;">［証明の 2 大ステップ］</strong><br>
+                        <ul style="margin-top: 6px; padding-left: 18px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>［Step 1］$n = 1$ のとき（最初のドミノを倒す）</strong><br>
+                                実際に $n = 1$ を代入し、命題が成り立つことを示す。
+                            </li>
+                            <li>
+                                <strong>［Step 2］$n = k$ の仮定 $\implies n = k+1$ の証明（ドミノが連鎖する仕組み）</strong><br>
+                                「 $n = k$ で成り立つ」と<strong>仮定</strong>した式を利用して、 $n = k+1$ のときも成立することを証明する。
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 右列：答案の黄金テンプレート -->
+                    <div style="flex: 1; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #2b6cb0; font-size: 11.5pt;">［記述答案の必須フレーズ］</strong><br>
+                        <ol style="margin-top: 6px; padding-left: 18px; font-size: 10.5pt;">
+                            <li style="margin-bottom: 4px;">[1] $n = 1$ のとき、(左辺) $= \dots$, (右辺) $= \dots$ より成立。</li>
+                            <li style="margin-bottom: 4px;">[2] $n = k$ のとき成立すると仮定すると…</li>
+                            <li style="margin-bottom: 4px;">$n = k+1$ のとき、(左辺) $= \dots =$ (右辺)</li>
+                            <li>[1], [2] より、すべての自然数 $n$ で成立する。</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px; background-color: #edf2f7; border-left: 4px solid #1a365d; padding: 8px 12px;">
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「Step 2 でやってしまいがちな最大のミスは、証明したい $n = k+1$ の式をそのまま使ってしまうこと。『 $n = k$ のときの仮定の式をどこで変形に組み込むか』が採点官の見るポイントだよ」と強調しましょう。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド15：不等式の証明と目標式の見せ方 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑮</h2>
+                <span class="badge">講義：不等式の証明における「仲介役」の論理</span>
+            </div>
+            <div class="content-box" style="font-size: 11pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【難所】不等式 $A > B$ の証明では、仮定を利用して得られた式 $A > C$ を使い、<strong>目標の $B$ と比較（ $C > B$ を示す）する「三段論法」</strong>を利用する。
+                </div>
+
+                <div style="margin-top: 15px; background-color: #fffaf0; border: 1px solid #feebc8; padding: 12px; border-radius: 6px; text-align: center;">
+                    <strong style="color: #e53e3e; font-size: 12pt;">［不等式証明の核心：三段論法のイメージ］</strong>
+                    <div style="margin-top: 8px; font-size: 13pt; font-weight: bold; color: #1a365d;">
+                        示したい目標： $A > B$
+                    </div>
+                    <div style="margin-top: 6px; font-size: 11.5pt;">
+                        1. 仮定を使って導く： <span style="color: #2b6cb0; font-weight: bold;">$A > C$</span><br>
+                        2. 差をとって示す： <span style="color: #dd6b20; font-weight: bold;">$C - B > 0 \implies C > B$</span><br>
+                        <div style="background-color: #ffffff; display: inline-block; padding: 4px 12px; border-radius: 4px; border: 1px solid #cbd5e0; margin-top: 6px;">
+                            $A > C$ かつ $C > B$ だから、自信を持って <strong>$A > B$</strong> が言える！
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; background-color: #f8fafc; border-left: 4px solid #2b6cb0; padding: 8px 12px;">
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「目標の式（ $B$ ）に向かって直接変形できないときは、手持ちの式（ $C$ ）との差をとって <strong>$C - B > 0$</strong> を作り出すのが不等式証明の鉄則だよ」とアドバイスすると記述力が上がります。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（数学的帰納法の演習）
+             ========================================== -->
+
+        <!-- 1. 等式の証明（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】59 数学的帰納法による等式の証明</h2>
+                <span class="badge">数列演習：標準</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    すべての自然数 $n$ について、次の等式が成り立つことを数学的帰納法を用いて証明せよ。<br><br>
+                    $$ 1 \cdot 2 + 2 \cdot 3 + 3 \cdot 4 + \dots + n(n+1) = \frac{1}{3}n(n+1)(n+2) \quad \cdots \text{①} $$
+                </div>
+                <div style="margin-top: 20px; color: #718096; font-size: 13.5pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    1. $n = 1$ のとき、(左辺) と (右辺) をそれぞれ計算して一致することを示せ。<br>
+                    2. $n = k$ で①が成り立つと仮定した式に、両辺 <strong>$(k+1)(k+2)$ を足し算</strong> して $n = k+1$ の場合の左辺を作り出し、右辺の目標形へ変形せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 等式の証明（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】59 数学的帰納法による等式の証明</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div>
+                    証明すべき等式を ① とする。<br><br>
+                    <strong>［[1] $n = 1$ のとき］</strong><br>
+                    (左辺) $= 1 \cdot 2 = 2$<br>
+                    (右辺) $= \frac{1}{3} \cdot 1 \cdot (1+1)(1+2) = \frac{1}{3} \cdot 1 \cdot 2 \cdot 3 = 2$<br>
+                    よって、 $n = 1$ のとき ① は成り立つ。
+                    <br><br>
+                    <strong>［[2] $n = k$ のとき成立を仮定し、$n = k+1$ のときを証明］</strong><br>
+                    $n = k$ のとき ① が成り立つ、すなわち次式を仮定する：
+                    $$ 1 \cdot 2 + 2 \cdot 3 + \dots + k(k+1) = \frac{1}{3}k(k+1)(k+2) \quad \cdots \text{②} $$
+                    $n = k+1$ のときの ① の左辺を考えると：
+                    $$ (\text{左辺}) = 1 \cdot 2 + 2 \cdot 3 + \dots + k(k+1) + (k+1)(k+2) $$
+                    仮定 ② を代入して書き換える：
+                    $$ = \frac{1}{3}k(k+1)(k+2) + (k+1)(k+2) $$
+                    共通因数 $(k+1)(k+2)$ で括り出す：
+                    $$ = (k+1)(k+2) \left( \frac{1}{3}k + 1 \right) = \frac{1}{3}(k+1)(k+2)(k+3) $$
+                    これは ① の右辺に $n = k+1$ を代入した形に等しい。<br>
+                    したがって、 $n = k+1$ のときも ① は成り立つ。
+                    <br><br>
+                    <strong>［結論］</strong><br>
+                    [1], [2] より、すべての自然数 $n$ について等式 ① は成り立つ。 （証明終）
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 不等式の証明（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】60 数学的帰納法による不等式の証明</h2>
+                <span class="badge">数列演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    $n$ が 5 以上の自然数のとき、次の不等式が成り立つことを数学的帰納法を用いて証明せよ。<br><br>
+                    $$ 2^n > n^2 \quad \cdots \text{①} $$
+                </div>
+                <div style="margin-top: 20px; color: #718096; font-size: 13.5pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    1. 出発点は $n = 1$ ではなく <strong>$n = 5$ のとき</strong> である点に注意せよ。<br>
+                    2. $n = k \ (k \geqq 5)$ で $2^k > k^2$ を仮定し、 $2^{k+1} > (k+1)^2$ を示したい。<br>
+                    $2^{k+1} = 2 \cdot 2^k > 2k^2$ であるから、<strong>$2k^2 - (k+1)^2 > 0$</strong> を示せば三段論法により証明が完了する。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 不等式の証明（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】60 数学的帰納法による不等式の証明</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div>
+                    証明すべき不等式を ① とする。<br><br>
+                    <strong>［[1] $n = 5$ のとき］</strong><br>
+                    (左辺) $= 2^5 = 32$<br>
+                    (右辺) $= 5^2 = 25$<br>
+                    $32 > 25$ であるから、 $n = 5$ のとき ① は成り立つ。
+                    <br><br>
+                    <strong>［[2] $n = k \ (k \geqq 5)$ のとき成立を仮定し、$n = k+1$ のときを証明］</strong><br>
+                    $n = k \ (k \geqq 5)$ のとき ① が成り立つ、すなわち <strong>$2^k > k^2$</strong> と仮定する。<br>
+                    $n = k+1$ のときの ① の左辺を考えると：
+                    $$ 2^{k+1} = 2 \cdot 2^k > 2k^2 \quad \dots \text{②} $$
+                    ここで、目標形 $(k+1)^2$ との差をとると：
+                    $$ 2k^2 - (k+1)^2 = k^2 - 2k - 1 = (k-1)^2 - 2 $$
+                    $k \geqq 5$ であるから、 $k-1 \geqq 4$ より：
+                    $$ (k-1)^2 - 2 \geqq 16 - 2 = 14 > 0 $$
+                    すなわち $2k^2 > (k+1)^2 \quad \cdots \text{③}$<br>
+                    ②, ③ より、 $2^{k+1} > (k+1)^2$ が成り立つ。<br>
+                    したがって、 $n = k+1$ のときも ① は成り立つ。
+                    <br><br>
+                    <strong>［結論］</strong><br>
+                    [1], [2] より、 5 以上のすべての自然数 $n$ について不等式 ① は成り立つ。 （証明終）
+                </div>
+            </div>
+        </div>
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅱ　応用</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数B：数列（漸化式の応用：確率・図形＆2段階帰納法）
+             ========================================== -->
+
+        <!-- スライド16：確率漸化式と図形漸化式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑯<br>確率漸化式と図形漸化式</h2>
+                <span class="badge">講義：確率漸化式と図形漸化式の立式プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 10.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【立式の鉄則】「第 $n$ 回目（または第 $n$ 段階）の状態から、第 $n+1$ 回目へどのように遷移するか」の<strong>1ステップの変化に着目して立式する</strong>。
+                </div>
+
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <!-- 左列：確率漸化式 -->
+                    <div style="flex: 1; background-color: #fffaf0; border: 1px solid #feebc8; padding: 8px; border-radius: 6px;">
+                        <strong style="color: #dd6b20; font-size: 11pt;">［1. 確率漸化式の解法ステップ］</strong><br>
+                        1. 状態 $A$ にある確率を $p_n$、状態 $B$ にある確率を $1 - p_n$ とおく。<br>
+                        2. 状態遷移図を描き、 $n+1$ 回目に状態 $A$ になる経路をすべて洗い出す。<br>
+                        3. 確率の漸化式 <strong>$p_{n+1} = a p_n + b(1 - p_n)$</strong> を立て、特性方程式型に帰着させる。
+                    </div>
+
+                    <!-- 右列：図形漸化式 -->
+                    <div style="flex: 1; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px;">
+                        <strong style="color: #2b6cb0; font-size: 11pt;">［2. 図形（平面分割）漸化式］</strong><br>
+                        例：どの2本も平行でなく3本が1点で交わらない $n$ 本の直線で分割される領域の個数 $a_n$<br>
+                        *   $(n+1)$ 本目の直線は、既存の $n$ 本の直線と $n$ 個の交点を持つ。<br>
+                        *   直線は $n+1$ 個の領域に分断され、領域が $n+1$ 個増える。<br>
+                        $\implies$ 漸化式 <strong>$a_{n+1} = a_n + (n+1)$ （階差型）</strong>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; background-color: #edf2f7; border-left: 4px solid #1a365d; padding: 6px 10px;">
+                    <span style="font-size: 10pt; color: #2d3748;">
+                        💡 <strong>指導のアドバイス：</strong>「確率漸化式は問題文が長く見えても、やることは『状態遷移図を描いて $p_{n+1} = p p_n + q$ を作る』の1パターンだけ。立式さえできればただの特性方程式型だよ」と伝えることでハードルを下げられます。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- スライド18：3状態以上の確率漸化式の解法テクニック -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑱</h2>
+                <span class="badge">講義：3状態以上の確率漸化式（多変数の処理）</span>
+            </div>
+            <div class="content-box" style="font-size: 10.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【問題の構造】状態が $A, B, C$ の 3 つある場合、確率を $p_n, q_n, r_n$ とおいて連立漸化式を立てる。<br>
+                    未知数が 3 つに増えるため、以下の <strong>「3 大テクニック」</strong> を駆使して変数削減・等比型化を図る。
+                </div>
+
+                <div style="margin-top: 10px; display: flex; gap: 8px;">
+                    <!-- テクニック1：確率の和＝1 -->
+                    <div style="flex: 1; background-color: #fffaf0; border: 1px solid #feebc8; padding: 8px; border-radius: 6px;">
+                        <strong style="color: #dd6b20; font-size: 10.5pt;">［1. 全確率の和 ＝ 1］</strong><br>
+                        必ず <strong>$p_n + q_n + r_n = 1$</strong> が成り立つ。<br>
+                        1 つの変数を消去する基礎方程式として常時使用する。
+                    </div>
+
+                    <!-- テクニック2：対称性 -->
+                    <div style="flex: 1; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px;">
+                        <strong style="color: #2b6cb0; font-size: 10.5pt;">［2. 図形の対称性の利用］</strong><br>
+                        構造が左右対称な場合、<strong>$q_n = r_n$</strong> のように確率が等しくなる状態を見つけて変数を減らす。
+                    </div>
+
+                    <!-- テクニック3：和・差の利用 -->
+                    <div style="flex: 1; background-color: #f7fafc; border: 1px solid #cbd5e0; padding: 8px; border-radius: 6px;">
+                        <strong style="color: #1a365d; font-size: 10.5pt;">［3. 漸化式の和・差をとる］</strong><br>
+                        式同士を<strong>「足し算（ $p_n + q_n$ ）」や「引き算（ $q_n - r_n$ ）」</strong>して等比数列の形を作る。
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; background-color: #edf2f7; border-left: 4px solid #1a365d; padding: 6px 10px;">
+                    <span style="font-size: 10pt; color: #2d3748;">
+                        💡 <strong>指導のアドバイス：</strong>「状態が3つに増えてもビビる必要はないよ。まずは状態遷移図から $p_{n+1}, q_{n+1}, r_{n+1}$ の3式を書き出し、<strong>“対称性で2変数を同じにする”</strong>か<strong>“確率の和が1を使って消す”</strong>のどちらかで必ず基本の特性方程式型に落とし込める」と解法パターンを整理してあげましょう。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド17：2段階の仮定を用いる数学的帰納法 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>数列 ⑰<br>2段階の仮定を用いる<br>数学的帰納法</h2>
+                <span class="badge">講義：2段階の仮定を用いる帰納法（n=k, k+1 の利用）</span>
+            </div>
+            <div class="content-box" style="font-size: 10.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【使いどころ】隣接3項間漸化式（フィボナッチ数列など）の一般項の証明や、1つ手前だけでなく<strong>「2つ手前までの結果」を必要とする命題</strong>で使用する。
+                </div>
+
+                <div style="margin-top: 10px; background-color: #fffaf0; border: 1px solid #feebc8; padding: 10px; border-radius: 6px;">
+                    <strong style="color: #e53e3e; font-size: 11pt;">［証明の 2 大ステップと答案の枠組み］</strong>
+                    <ol style="margin-top: 6px; padding-left: 18px;">
+                        <li style="margin-bottom: 6px;">
+                            <strong>［Step 1］$n = 1, 2$ の成立を示す（スタートラインを2つ確保）</strong><br>
+                            $n=1$ と $n=2$ のときの両方で、命題が成り立つことを直接計算で示す。
+                        </li>
+                        <li>
+                            <strong>［Step 2］$n = k, k+1$ での成立を仮定 $\implies n = k+2$ の成立を証明</strong><br>
+                            「 $n = k$ および $n = k+1$ の両方で成り立つ」と仮定し、その2つの式を用いて $n = k+2$ のときも成立することを証明する。
+                        </li>
+                    </ol>
+                </div>
+
+                <div style="margin-top: 10px; background-color: #f8fafc; border-left: 4px solid #2b6cb0; padding: 6px 10px;">
+                    <span style="font-size: 10pt; color: #4a5568;">
+                        💡 <strong>記述の注意点：</strong>「Step 1 で $n=1$ しか確認しないと、Step 2 で $n=1, 2$ の仮定から $n=3$ を導くときに論理に穴ができて減点される」という失敗例を提示すると効果的です。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             数B：数列（確率漸化式＆2段階帰納法の演習）
+             ========================================== -->
+
+        <!-- 1. 確率漸化式（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】61 確率漸化式</h2>
+                <span class="badge">数列演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 14pt; padding: 18px;">
+                    1つの袋の中に赤球と白球が合わせて 5 個入っている。コインを投げ、表が出れば赤球を 1 個白球に変え、裏が出れば白球を 1 個赤球に変える操作を行う。最初、赤球が 2 個入っているとき、 $n$ 回の操作後に赤球が偶数個になっている確率 $p_n$ を求めよ。
+                </div>
+                <div style="margin-top: 15px; color: #718096; font-size: 13pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    偶数個から1回操作すると奇数個になり、奇数個から1回操作すると偶数個になる。<br>
+                    すなわち、 $n+1$ 回目に偶数個になるのは「 $n$ 回目が奇数個（確率 $1 - p_n$ ）」のときに限られる。<br>
+                    漸化式 <strong>$p_{n+1} = (1 - p_n) \cdot 1 = 1 - p_n$</strong> を立てて解け。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 確率漸化式（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】61 確率漸化式</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div>
+                    <strong>［ステップ 1］事象の遷移から漸化式を立てる］</strong><br>
+                    赤球の個数は、1回の操作で必ず 1 個増えるか 1 個減る（偶奇が反転する）。<br>
+                    よって、 $n+1$ 回後に赤球が偶数個になるのは、 $n$ 回後に赤球が奇数個（確率 $1 - p_n$ ）であったときに確実（確率 1）に起こる。<br>
+                    したがって、漸化式は：
+                    $$ p_{n+1} = 1 - p_n \iff p_{n+1} = -p_n + 1 $$
+                    <br>
+                    <strong>［ステップ 2］初項 $p_1$ を求める］</strong><br>
+                    最初は赤球が 2 個（偶数個）である。<br>
+                    1回の操作を行うと赤球は 1 個または 3 個（奇数個）になるため、 1 回後に偶数個である確率は <strong>$p_1 = 0$</strong> 。
+                    <br><br>
+                    <strong>［ステップ 3］漸化式を解く］</strong><br>
+                    特性方程式 $\alpha = -\alpha + 1 \implies 2\alpha = 1 \implies \alpha = \frac{1}{2}$<br>
+                    よって、 $p_{n+1} - \frac{1}{2} = -\left( p_n - \frac{1}{2} \right)$<br>
+                    数列 $\{p_n - \frac{1}{2}\}$ は初項 $p_1 - \frac{1}{2} = -\frac{1}{2}$、公比 $-1$ の等比数列であるから：
+                    $$ p_n - \frac{1}{2} = -\frac{1}{2} \cdot (-1)^{n-1} = \frac{1}{2} \cdot (-1)^n \implies p_n = \frac{1}{2} + \frac{1}{2}(-1)^n = \frac{1 + (-1)^n}{2} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 13.5pt; font-weight: bold;">
+                        $p_n = \frac{1 + (-1)^n}{2}$ （ $n$ が偶数なら 1、奇数なら 0 ）
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】63 3状態の確率漸化式（対称性の利用）</h2>
+                <span class="badge">数列演習：難関大レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 13.5pt; padding: 15px;">
+                    1 辺の長さが 1 の正三角形 ABC の頂点上を移動する点 P がある。点 P は最初頂点 A にあり、1 秒ごとに他の 2 頂点のいずれかへ等確率（確率 $\frac{1}{2}$ ）で移動する。 $n$ 秒後に点 P が頂点 A, B, C にいる確率をそれぞれ $p_n, q_n, r_n$ とする。<br>
+                    (1) $q_n = r_n$ であることを示せ。<br>
+                    (2) $p_n$ を $n$ の式で表せ。
+                </div>
+                <div style="margin-top: 12px; color: #718096; font-size: 12.5pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    ・頂点 B と頂点 C は頂点 A に対して完全に対照的であるため $q_n = r_n$ となる。<br>
+                    ・全確率の和より $p_n + q_n + r_n = 1 \implies p_n + 2q_n = 1 \implies q_n = \frac{1 - p_n}{2}$ である。<br>
+                    ・ $n+1$ 秒後に A にいるのは「 $n$ 秒後に B または C にいて A へ移動したとき」であるから <strong>$p_{n+1} = \frac{1}{2}q_n + \frac{1}{2}r_n = q_n$</strong> と立式せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 3状態の確率漸化式（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】63 3状態の確率漸化式（対称性の利用）</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div>
+                    <strong>［(1) 対称性の証明］</strong><br>
+                    点 P は最初頂点 A にあり、頂点 B と頂点 C への移動規則は完全に等価（対称）である。<br>
+                    したがって、すべての自然数 $n$ について <strong>$q_n = r_n$</strong> が成り立ち、 $r_n$ を消去できる。
+                    <br><br>
+                    <strong>［(2) 漸化式の立式と変形］</strong><br>
+                    全確率の和は 1 であるから：
+                    $$ p_n + q_n + r_n = 1 \iff p_n + 2q_n = 1 \implies q_n = \frac{1 - p_n}{2} \quad \cdots \text{①} $$
+                    $n+1$ 秒後に点 P が頂点 A に位置するのは、 $n$ 秒後に頂点 B または C にいて、確率 $\frac{1}{2}$ で A に移動するときである：
+                    $$ p_{n+1} = \frac{1}{2}q_n + \frac{1}{2}r_n = \frac{1}{2}q_n + \frac{1}{2}q_n = q_n \quad \cdots \text{②} $$
+                    ① を ② に代入すると、 $p_n$ のみの漸化式が得られる：
+                    $$ p_{n+1} = \frac{1 - p_n}{2} \iff p_{n+1} = -\frac{1}{2}p_n + \frac{1}{2} $$
+                    <br>
+                    <strong>［特性方程式を解いて一般項を求める］</strong><br>
+                    特性方程式 $\alpha = -\frac{1}{2}\alpha + \frac{1}{2} \implies \frac{3}{2}\alpha = \frac{1}{2} \implies \alpha = \frac{1}{3}$<br>
+                    変形すると： $p_{n+1} - \frac{1}{3} = -\frac{1}{2}\left( p_n - \frac{1}{3} \right)$<br>
+                    初項は $0$ 秒後に A にいるので $p_0 = 1$ （または 1 秒後に A にいないので $p_1 = 0$ ）。<br>
+                    $p_1 = 0$ より、初項 $p_1 - \frac{1}{3} = -\frac{1}{3}$、公比 $-\frac{1}{2}$ の等比数列であるから：
+                    $$ p_n - \frac{1}{3} = -\frac{1}{3} \left( -\frac{1}{2} \right)^{n-1} = \frac{2}{3} \left( -\frac{1}{2} \right)^n \implies p_n = \frac{1}{3} + \frac{2}{3}\left( -\frac{1}{2} \right)^n $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 13pt; font-weight: bold;">
+                        (1) 略（対称性より） (2) $p_n = \frac{1}{3} + \frac{2}{3}\left( -\frac{1}{2} \right)^n$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 2段階帰納法（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】62 2段階仮定の数学的帰納法</h2>
+                <span class="badge">数列演習：発展</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 14pt; padding: 18px;">
+                    数列 $\{a_n\}$ が $a_1 = 1, a_2 = 3, \ a_{n+2} = 3a_{n+1} - 2a_n$ で定められているとき、すべての自然数 $n$ について $a_n = 2^n - 1$ が成り立つことを数学的帰納法を用いて証明せよ。
+                </div>
+                <div style="margin-top: 15px; color: #718096; font-size: 13pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    漸化式が隣接3項間であるため、仮定が2つ必要となる。<br>
+                    1. $n = 1, 2$ のとき成立することを示せ。<br>
+                    2. $n = k$ および $n = k+1$ で成立（ $a_k = 2^k - 1, a_{k+1} = 2^{k+1} - 1$ ）を仮定し、漸化式に代入して $a_{k+2} = 2^{k+2} - 1$ を導け。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 2段階帰納法（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】62 2段階仮定の数学的帰納法</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div>
+                    証明すべき等式を ① とする。<br><br>
+                    <strong>［[1] $n = 1, 2$ のとき］</strong><br>
+                    $n = 1$ のとき： $2^1 - 1 = 1 = a_1$ より成立。<br>
+                    $n = 2$ のとき： $2^2 - 1 = 3 = a_2$ より成立。
+                    <br><br>
+                    <strong>［[2] $n = k, k+1$ での成立を仮定し、$n = k+2$ のときを証明］</strong><br>
+                    $n = k$ および $n = k+1$ のとき ① が成り立つ、すなわち：
+                    $$ a_k = 2^k - 1, \quad a_{k+1} = 2^{k+1} - 1 $$
+                    と仮定する。漸化式 $a_{k+2} = 3a_{k+1} - 2a_k$ にこれらを代入すると：
+                    $$\begin{aligned}
+                    a_{k+2} &= 3(2^{k+1} - 1) - 2(2^k - 1) \\
+                    &= 3 \cdot 2^{k+1} - 3 - 2^{k+1} + 2 \\
+                    &= (3 - 1) \cdot 2^{k+1} - 1 \\
+                    &= 2 \cdot 2^{k+1} - 1 = 2^{k+2} - 1
+                    \end{aligned}$$
+                    これは ① の $n = k+2$ のときの式に等しい。<br>
+                    したがって、 $n = k+2$ のときも ① は成り立つ。
+                    <br><br>
+                    <strong>［結論］</strong><br>
+                    [1], [2] より、すべての自然数 $n$ について $a_n = 2^n - 1$ は成り立つ。 （証明終）
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 画面下の操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 3</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- スライドを制御するスクリプト -->
+        <!-- スライドを制御するスクリプト（スマホボタン限定版） -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        // PC用のキーボード操作（←、→、スペース、Enter）は維持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+    </script>
+    <!-- ==========================================
+         全スライド共通：ポップアップ式スキップ機能（目次）
+         ========================================== -->
+    <!-- 画面右下に常駐するメニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu" style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <!-- 各章へのジャンプボタン（実際のスライドのインデックス番号を指定） -->
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">数列（スライド1〜）</button>
+            <button onclick="goToSlide(32)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">漸化式（スライド33〜）</button>
+            <button onclick="goToSlide(47)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">数学的帰納法（スライド48〜）</button>
+            <button onclick="goToSlide(54)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">応用</button>
+            <button onclick="goToSlide(999)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">ラスト</button>
+        </div>
+    </div>
+
+    <script>
+        // メニューの開閉制御
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        }
+
+        // 指定したスライドインデックス（0スタート）へ直接ジャンプ
+        function goToSlide(slideIndex) {
+            // お使いのスクリプト内の管理変数「currentSlide」を直接更新
+            currentSlide = slideIndex;
+            
+            // 安全策：インデックスの範囲外チェック
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            
+            // お使いのスクリプト内の画面更新関数「updateSlide()」をトリガー
+            updateSlide();
+            
+            // メニューを自動で閉じる
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        // 画面のどこかをクリックしたらメニューを自動で閉じる
+        document.addEventListener('click', function() {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
