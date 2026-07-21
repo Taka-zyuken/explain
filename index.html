@@ -2,17 +2,83 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>数学の解説トップページ</title>
+    <style>
+        /* 全体の基本設定 */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 24px;
+            border-bottom: 2px solid #eef2f5;
+            padding-bottom: 15px;
+        }
+
+        /* リンク一覧のグリッドレイアウト */
+        .grid-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        /* カード風ボタンのデザイン */
+        .grid-list a {
+            display: block;
+            padding: 18px 20px;
+            background-color: #ffffff;
+            color: #34495e;
+            text-decoration: none;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        /* ホバー（マウスを乗せた時）の動き */
+        .grid-list a:hover {
+            border-color: #3498db;
+            background-color: #f0f8ff;
+            color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.15);
+        }
+    </style>
 </head>
 <body>
-    <h1>数学の解説ページ一覧</h1>
-    <ul>
-        <li><a href="微分.html">微分</a></li>
-        <li><a href="放物線.html">放物線</a></li>
-        <li><a href="数列.html">数列</a></li>
-        <li><a href="極限.html">極限</a></li>
-        <li><a href="積分.html">積分</a></li>
-        <li><a href="複素数.html">複素数</a></li>
-    </ul>
+
+    <div class="container">
+        <h1>数学の解説ページ一覧</h1>
+        <ul class="grid-list">
+            <li><a href="微分.html">微分</a></li>
+            <li><a href="放物線.html">放物線</a></li>
+            <li><a href="数列.html">数列</a></li>
+            <li><a href="極限.html">極限</a></li>
+            <li><a href="積分.html">積分</a></li>
+            <li><a href="複素数.html">複素数</a></li>
+        </ul>
+    </div>
+
 </body>
 </html>
