@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅲ　微分</title>
+    
+    <!-- 数式を美しく表示するためのMathJaxライブラリ -->
+     <!-- 200行辺りまでテンプレ -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        /* 全体スタイルの定義（明朝体・である調の統一ベース） */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden; /* スライド全体のスクロールを抑止 */
+            line-height: 1.8;
+        }
+
+        /* スライドコンテナ */
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 各スライドの共通デザイン */
+        .slide {
+            display: none; /* 初期状態は非表示 */
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px 60px;
+            overflow-y: auto; /* コンテンツが多い場合はスライド内スクロール */
+        }
+
+        /* アクティブなスライドのみ表示 */
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ヘッダーデザイン */
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        /* コンテンツ部分のレイアウト */
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* 強調用の正解ボックス */
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        /* リストスタイル */
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        /* 操作用ナビゲーションUI */
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        /* ==========================================
+           スマートフォン向けの表示最適化（サイズ縮小）
+           ========================================== */
+        @media screen and (max-width: 768px) {
+            body {
+                line-height: 1.6; /* 行間を少し詰めて視認性を上げる */
+            }
+
+            /* スライド全体の余白を削り、画面を広く使う */
+            .slide {
+                width: 95%;
+                height: 88vh;
+                padding: 20px 20px; /* 横余白を60pxから20pxに縮小 */
+            }
+
+            /* ヘッダーの文字を小さく */
+            .slide-header h2 {
+                font-size: 18pt;
+            }
+            .badge {
+                font-size: 10pt;
+                padding: 2px 8px;
+            }
+
+            /* 本文・問題文の文字サイズをひと回り小さく */
+            .content-box {
+                font-size: 12pt; /* 16ptから12ptに縮小 */
+                margin-bottom: 15px;
+            }
+            .problem-text {
+                padding: 15px;
+                font-size: 13pt;
+                margin-bottom: 15px;
+            }
+
+            /* 正解・結論ボックスの調整 */
+            .answer-box {
+                padding: 10px 15px;
+                margin-top: 15px;
+            }
+            .answer-box div[style*="font-size"] {
+                font-size: 14pt !important; /* スマホのみ大きな正解文字を14ptに抑制 */
+            }
+
+            /* 表（まとめスライド）の文字サイズと余白をスマホ用に最小化 */
+            table {
+                font-size: 11pt !important;
+            }
+            th, td {
+                padding: 8px !important;
+            }
+
+            /* MathJaxの数式全体がスマホ画面からはみ出さないように自動縮小 */
+            .mjx-chtml {
+                font-size: 90% !important; 
+            }
+            .math-block, mjx-container[display="true"] {
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 5px 0;
+            }
+
+            /* 下部ナビゲーションボタンを押しやすいサイズに微調整 */
+            .nav-controls {
+                bottom: 15px;
+                gap: 20px;
+            }
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 11pt;
+            }
+            .page-indicator {
+                font-size: 12pt;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド1：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ　微分</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+         <!-- ここからいじる -->
+        <!-- ==========================================
+             数Ⅲ微分法：講義セクション
+             ========================================== -->
+
+        <!-- スライド23：微分するということの本質 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ①</h2>
+                <span class="badge">講義：微分する意味の再定義</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【導入】数Ⅲの複雑な微分に入る前に、そもそも「微分する（導関数を求める）」とはどういう行為だったかを、極限の視点から再確認する。
+                </div>
+                <div style="margin-top: 20px;">
+                    高校数Ⅱで習った微分の定義式は、以下の通りである。
+                    $$ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} $$
+                    この式は、分数関数の極限で学んだ <strong>$\frac{0}{0}$ 型の不定形</strong> そのものである。
+                    <br><br>
+                    直感的なイメージは以下の通りとなる。
+                    <ul>
+                        <li>グラフ上の $2$ 点の距離 $h$ を、極限（$h \to 0$）によって限りなくゼロに近づける。</li>
+                        <li>すると、$2$ 点を結ぶ直線の傾きが、最終的に $1$ 点における<strong>「接線の傾き（瞬間の変化率）」</strong>へと収束する。</li>
+                    </ul>
+                    <br>
+                    数Ⅲでは、扱う関数が $x^n$ だけでなく、$\sin x, \log x, e^x$ などへと一気に広がる。しかし、どれだけ関数が複雑になろうとも、<strong>「微分とは、グラフのローカルな傾き（接線の傾き）を求める関数を作ることである」</strong>という本質は一切変わらない。
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに、曲線上を動く $2$ 点の幅 $h$ が狭まり、最終的に $1$ 本の接線に重なっていくアニメーション的な図解を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド24：積の微分公式のメカニズム -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ②</h2>
+                <span class="badge">講義：なぜバラバラに微分してはいけないのか</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】掛け算された関数 $\{ f(x)g(x) \}'$ を微分するとき、初学者が最もやりがちな誤りは $f'(x)g'(x)$ と別々に微分してしまうことである。なぜこれが通用しないのか。
+                </div>
+                <div style="margin-top: 20px;">
+                    直感的に理解させるために、<strong>「長方形の面積の増え方」</strong>をイメージさせる。
+                    <br><br>
+                    縦の長さが $f(x)$、横の長さが $g(x)$ の長方形を考える。このときの面積は $f(x)g(x)$ である。<br>
+                    ここから時間が少し経ち、縦が $\Delta f$、横が $\Delta g$ だけ微小に成長したとき、面積の増え方（微分）はどうなるだろうか。
+                    <br><br>
+                    面積の増加分は、以下の $3$ つのエリアの合計となる。
+                    <ol>
+                        <li>縦が伸びた分のエリア $\quad \rightarrow \quad f'(x) \cdot g(x)$</li>
+                        <li>横が伸びた分のエリア $\quad \rightarrow \quad f(x) \cdot g'(x)$</li>
+                        <li>右上の角の微小なエリア $\quad \rightarrow \quad f'(x) \cdot g'(x)$ （※極限の世界では小さすぎて無視できる）</li>
+                    </ol>
+                    <br>
+                    したがって、残った $1$ と $2$ の合計こそが、積の微分公式の正体となる。
+                    $$ \{ f(x)g(x) \}' = \color{red}f'(x)g(x) + f(x)g'(x) $$
+                    「前だけ微分」と「後ろだけ微分」を足し合わせなければ、全体の成長速度（微分）を正しく測ることはできないのである。
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに、長方形の縦と横が伸びて面積が増加する様子を色分け（前微分エリア・後ろ微分エリア）した概念図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド25：商の微分公式の覚え方と構造 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ③</h2>
+                <span class="badge">講義：商の微分公式の構造と呪文</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】分数型の関数 $\displaystyle \left\{ \frac{f(x)}{g(x)} \right\}'$ の微分公式は、数Ⅲの中で最も計算ミスが多発する場所である。
+                </div>
+                <div style="margin-top: 20px;">
+                    $$ \left\{ \frac{f(x)}{g(x)} \right\}' = \frac{f'(x)g(x) - f(x)g'(x)}{\{g(x)\}^2} $$
+                    初学者がこの公式を見る際、ただのアルファベットの羅列として暗記しようとすると、分子の引き算の順番（どちらにダッシュが先につくか）を高確率で混同する。
+                    <br><br>
+                    そのため、指導の際は以下の<strong>「構造と呪文」</strong>で脳内にインプットさせる。
+                    <br><br>
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; border-radius: 0 8px 8px 0; font-size: 15pt; font-weight: bold; text-align: center;">
+                        「分母は $2$ 乗。分子は、上（子）微分・下（母）そのまま<br>
+                        マイナス、上そのまま・下微分」
+                    </div>
+                    <br>
+                    割り算の微分においては、分母が大きくなるほど分数全体の価値は「減少」するため、分母を微分した成分（後ろの項）の前に<strong>マイナス$$(-)$$がつく</strong>という力学的なイメージを持たせると、符号のミスが劇的に減少する。
+                </div>
+            </div>
+        </div>
+        <!-- スライド26：合成関数の微分のメカニズム -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ④</h2>
+                <span class="badge">講義：合成関数の微分（マトリョーシカ構造）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【講義】数Ⅲ微分の最大の主役であり、すべての計算の基盤となる「合成関数の微分」のメカニズムを解き明かす。
+                </div>
+                <div style="margin-top: 20px;">
+                    教科書には $y = f(g(x))$ の微分は $y' = f'(g(x)) \cdot g'(x)$ と書かれているが、初学者にはこれを<strong>「マトリョーシカの構造」</strong>として説明する。
+                    <br><br>
+                    関数の中に、もう一つの関数がすっぽり閉じ込められている状態である。<br>
+                    この全体を微分（外側の箱を開ける）するときの鉄則は以下の通りとなる。
+                    <br><br>
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; border-radius: 0 8px 8px 0; font-size: 14pt; font-weight: bold;">
+                        ① 外微分（そとびぶん）<br>
+                        <span style="font-weight: normal; font-size: 12pt; color: #4a5568;">中身の関数を「ひとつの大きな塊 $\blacksquare$」とみなして、外側の箱だけを普通に微分する。</span><br>
+                        ② 内微分（うちびぶん）<br>
+                        <span style="font-weight: normal; font-size: 12pt; color: #4a5568;">中に閉じ込められていた「中身の関数」を引っ張り出して微分し、後ろから掛け算する。</span>
+                    </div>
+                    <br>
+                    初学者には<strong>「外側微分 $\times$ 中身の微分」</strong>という呪文を徹底させる。中身の微分を後ろに掛け忘れるミス（内微分忘れ）が非常に多いため、「箱を開けたら、中身のケアも忘れるな」と印象づけるのがコツである。
+                </div>
+                
+                <!-- 【将来的な図のスペース】 -->
+                <div style="border: 2px dashed #cbd5e0; background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; color: #718096; border-radius: 6px;">
+                    [ここに、大きなマトリョーシカ（外関数）から小さなマトリョーシカ（内関数）が飛び出して掛け算されるイメージ図を後ほど挿入]
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド27：三角関数の微分公式の連動性 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ⑤</h2>
+                <span class="badge">講義：三角関数の微分と「符号」の法則</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】$\sin x$、$\cos x$、$\tan x$ の微分公式である。初学者が最も混同しやすい「マイナスがつくのはどちらか」をスッキリ整理する。
+                </div>
+                <div style="margin-top: 20px;">
+                    数Ⅲで覚えるべき三角関数の基本微分は次の $3$ つである。
+                    $$\begin{aligned}
+                    (\sin x)' &= \cos x \\
+                    \color{red}(\cos x)' &= \color{red}-\sin x \\
+                    (\tan x)' &= \frac{1}{\cos^2 x}
+                    \end{aligned}$$
+                    <br>
+                    <strong>【初学者向けの覚え方：コサインの呪い】</strong><br>
+                    微分してマイナス（$-$）がつくのは、元の関数が<strong>「コ（ $co$ ）」から始まる関数だけ</strong>である。この「『コ』がついたらマイナス」という法則は、この後に学ぶ発展公式（$\text{cosec } x$ や $\text{cot } x$ など）でもすべて共通して成り立つ強力なルールである。
+                    <br><br>
+                    また、$(\tan x)'$ については、前章で学んだ<strong>商の微分公式</strong>（$\tan x = \frac{\sin x}{\cos x}$ として分数を微分する）を使うことで、公式を忘れても数秒で自力で導出できるという安心感を与えておく。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド28：指数・対数関数の微分公式と e の威力 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ⑥</h2>
+                <span class="badge">講義：指数・対数関数の微分と魔法の数字 e</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】指数関数と対数関数の微分公式である。極限の章で学んだ「ネイピア数 $e$ のありがたみ」をここで完全に回収する。
+                </div>
+                <div style="margin-top: 20px;">
+                    底が $e$ である自然対数や指数関数の微分は、驚くほどシンプルになる。
+                    $$\begin{aligned}
+                    (\log x)' &= \frac{1}{x} \\
+                    (e^x)' &= e^x
+                    \end{aligned}$$
+                    極限の最後で予告した通り、$e^x$ は微分しても形が一切変わらない唯一無二の魔法の関数である。
+                    <br><br>
+                    <strong>【発展：底が $e$ 以外のときはどうなるか？】</strong><br>
+                    初学者には、底が $a$ （普通の数字）になったときの公式も対比で示す。
+                    $$\begin{aligned}
+                    (\log_a x)' &= \frac{1}{x \log a} \\
+                    (a^x)' &= a^x \log a
+                    \end{aligned}$$
+                    底が $e$ じゃないときは、微分するたびに<strong>「$\log a$ という調整用のゴミ」</strong>がくっついてくる。対数（$\log$）を微分するときは分母にゴミが、指数（$a^x$）を微分するときは分子にゴミがつく。「$e$ を底に選ぶことで、このゴミをすべて $1$ （$\log e = 1$）にして消し去っていたのだ」と伝えると、ネイピア数の本質が完璧に繋がる。
+                </div>
+            </div>
+        </div>
+        <!-- スライド29：対数微分法の魔力 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ⑦</h2>
+                <span class="badge">講義：対数微分法（複雑な累乗を一撃で分解する）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【講義】「底にも指数の肩にも $x$ がある関数（$y = x^x$ など）」や、「複雑な分数・累乗が絡み合った関数」を一撃で解きほぐす強力な兵器「対数微分法」を学ぶ。
+                </div>
+                <div style="margin-top: 20px;">
+                    初学者には、この技法を使う動機（サイン）を明確に教え込む。<strong>「肩に $x$ が乗っていて、これまでの公式が使えないとき」</strong>が発動の合図である。
+                    <br><br>
+                    <strong>【鉄則の手順】</strong>
+                    <ol>
+                        <li><strong>両辺の自然対数（$\log$）を取る</strong>：対数の性質によって、重たい肩の上の $x$ を「前に引きずり下ろす」ことができる。
+                            $$ y = x^x \quad \Longrightarrow \quad \log y = \log x^x \quad \Longrightarrow \quad \log y = x \log x $$
+                        </li>
+                        <li><strong>両辺を $x$ で微分する</strong>：左辺の $(\log y)'$ は、合成関数の微分（外側が $\log \blacksquare$、中身が $y$）となるため、必ず $\displaystyle \frac{y'}{y}$ という形になる。
+                            $$ \frac{y'}{y} = (x)' \log x + x (\log x)' = \log x + x \cdot \frac{1}{x} = \log x + 1 $$
+                        </li>
+                        <li><strong>全体に $y$ を掛け算して $y'$ を孤立させる</strong>：最後に元の関数の形に戻してフィニッシュとなる。
+                            $$ y' = y (\log x + 1) \quad \Longrightarrow \quad y' = x^x (\log x + 1) $$
+                        </li>
+                    </ol>
+                    初学者が最も忘れるのが、最後の<strong>「両辺に $y$ を掛け算するステップ」</strong>である。「対数を取ってバラしたのは、あくまで計算を楽にするための仮の姿。最後に現実の世界（$y$ の掛け算）に戻してあげるのを忘れるな」と言語化して定着させる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド30：増減表と第1次導関数の役割 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ⑧</h2>
+                <span class="badge">講義：増減表の作成と「傾き」の符号</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】数Ⅲ微分法の最終ゴールである「関数のグラフを描く」ための設計図、増減表の正しい描き方を整理する。
+                </div>
+                <div style="margin-top: 20px;">
+                    数Ⅱまでの増減表とやるべきことは同じだが、数Ⅲでは関数の形が複雑になるため、符号判定でミスが多発する。
+                    <br><br>
+                    <strong>【初学者が迷わないための3ステップ】</strong>
+                    <br><br>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13pt;">
+                        <thead>
+                            <tr style="background-color: #1a365d; color: white;">
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 25%;">ステップ</th>
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 75%;">実行することと注意点</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">1. $y'=0$ を解く</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">グラフの傾きがフラット（$0$）になるポイントを特定する。<br><span style="font-weight: bold; color: #1a365d;">※だから微分した後は必ず因数分解の形にしておく必要がある。</span></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">2. 符号を調べる</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">$y'$ の式に、境目の値の「間の数字」を頭の中で代入してみる。<br><span style="font-weight: bold; color: #dd6b20;">※$e^x$ や分母の $2$ 乗など、「常にプラスの塊」は符号判定から無視して、変化する部分だけに集中させるのがコツ。</span></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">3. 矢印を描く</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">$y' > 0$ なら右上がり（$\nearrow$）、$y' < 0$ なら右下がり（$\searrow$）の矢印を書き込む。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド31：第2次導関数とグラフの凹凸 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の本質 ⑨</h2>
+                <span class="badge">講義：第2次導関数 $y''$ とグラフの凹凸・変曲点</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】数Ⅲで新しく登場する「$2$ 回微分（第$2$ 次導関数 $y''$）」の意味と、グラフのカーブの向き（凹凸）の捉え方を学ぶ。
+                </div>
+                <div style="margin-top: 20px;">
+                    初学者は「$1$ 回微分と $2$ 回微分で何が違うのか」を混同しやすい。それぞれの役割を明確に分担させて教え込む。
+                    <br><br>
+                    <ul>
+                        <li><strong>第1次導関数 $y'$</strong>：グラフが<strong>「上がっているか、下がっているか」</strong>（進む方向）を決める。</li>
+                        <li><strong>第2次導関数 $y''$</strong>：グラフが<strong>「どちら向きにカーブしているか」</strong>（曲がり方）を決める。</li>
+                    </ul>
+                    <br>
+                    <strong>【凹凸の符号のイメージ】</strong>
+                    <ul>
+                        <li>$y'' > 0 \quad \Longrightarrow \quad$ <strong>下に凸</strong>（お椀の形 $\cup$）<br>
+                        <span style="font-size: 11pt; color: #4a5568;">※傾き $y'$ がどんどんプラスの方向に増えていくため、ググッと上に反り上がるカーブになる。</span></li>
+                        <li>$y'' < 0 \quad \Longrightarrow \quad$ <strong>上に凸</strong>（山の形 $\cap$）<br>
+                        <span style="font-size: 11pt; color: #4a5568;">※傾き $y'$ がどんどんマイナスの方向に減っていくため、お辞儀をするようなカーブになる。</span></li>
+                    </ul>
+                    また、$y''$ の符号がプラスからマイナス（またはその逆）へと切り替わる、カーブの向きの境界線のことを<strong>変曲点（へんきょくてん）</strong>と呼び、数Ⅲのグラフ描画において非常に美しいアクセントとなる。
+                </div>
+                
+                <!-- 【SVGによる凹凸と変曲点のグラフ描画】 -->
+                <div style="background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 20px; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                    <svg viewBox="0 0 400 180" style="width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto;">
+                        <!-- 座標軸 -->
+                        <line x1="20" y1="150" x2="380" y2="150" stroke="#718096" stroke-width="1.5" marker-end="url(#arrow)" />
+                        <line x1="40" y1="170" x2="40" y2="20" stroke="#718096" stroke-width="1.5" marker-end="url(#arrow)" />
+                        <text x="375" y="165" font-size="10" fill="#718096" font-weight="bold">x</text>
+                        <text x="25" y="25" font-size="10" fill="#718096" font-weight="bold">y</text>
+                        
+                        <!-- 曲線：変曲点(200, 85)を境に上に凸から下に凸へ -->
+                        <!-- 左半分（上に凸）：コントロールポイント (120, 10) -->
+                        <!-- 右半分（下に凸）：コントロールポイント (280, 160) -->
+                        <path d="M 60,130 Q 120,10 200,85 T 340,40" fill="none" stroke="#1a365d" stroke-width="3" />
+                        
+                        <!-- 変曲点のプロット -->
+                        <circle cx="200" cy="85" r="5" fill="#e53e3e" />
+                        <line x1="200" y1="85" x2="200" y2="150" stroke="#e53e3e" stroke-dasharray="3,3" stroke-width="1" />
+                        <text x="210" y="85" font-size="11" fill="#e53e3e" font-weight="bold">変曲点 (y'' = 0)</text>
+                        
+                        <!-- エリアの解説テキスト -->
+                        <!-- 左側：上に凸 -->
+                        <path d="M 80,45 Q 110,35 130,45" fill="none" stroke="#4a5568" stroke-width="1" marker-end="url(#arrow)" />
+                        <text x="90" y="30" font-size="11" fill="#2d3748" font-weight="bold">上に凸 (y'' < 0)</text>
+                        <text x="95" y="135" font-size="10" fill="#718096">山のカーブ ( ∩ )</text>
+                        
+                        <!-- 右側：下に凸 -->
+                        <path d="M 300,115 Q 280,125 260,115" fill="none" stroke="#4a5568" stroke-width="1" marker-end="url(#arrow)" />
+                        <text x="255" y="140" font-size="11" fill="#2d3748" font-weight="bold">下に凸 (y'' > 0)</text>
+                        <text x="255" y="60" font-size="10" fill="#718096">お椀のカーブ ( ∪ )</text>
+                        
+                        <!-- 矢印の定義（SVGマーカー） -->
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 2 L 10 5 L 0 8 z" fill="#718096" />
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <!-- スライド32：平均値の定理の本質 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の細かい補強 ①</h2>
+                <span class="badge">講義：平均値の定理と「一瞬のパラドックス」</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【定理】入試の不等式の証明や、極限の難問で牙を剥く「平均値の定理」の直感を掴む。
+                </div>
+                <div style="margin-top: 20px;">
+                    関数 $f(x)$ が閉区間 $[a, b]$ で連続、開区間 $(a, b)$ で微分可能であるとき、次の式を満たす実数 $c$ が開区間 $(a, b)$ 内に<strong>少なくとも $1$ つ</strong>存在する。
+                    $$ \frac{f(b) - f(a)}{b - a} = f'(c) \quad (a < c < b) $$
+                    <br>
+                    <strong>【初学者への噛み砕いた説明】</strong><br>
+                    初学者はこの数式を見ると身構えるが、言っていることは<strong>「車の平均速度」</strong>と同じである。
+                    <br><br>
+                    例えば、東京からある地点まで「$2$ 時間で $120\text{ km}$」走ったとする。このときの平均速度は時速 $60\text{ km}$（これが左辺の平均変化率）である。
+                    このとき、道中のどこかの一瞬（時刻 $c$）では、<strong>スピードメーターが完全に「時速 $60\text{ km}$」をピタッと指していた瞬間（これが右辺の瞬間の傾き $f'(c)$）が絶対に $1$ 回以上はあるはずだ</strong>、と言っているに過ぎない。
+                    <br><br>
+                    グラフで言えば、「始点と終点を結んだ直線の傾き」と「完全に平行になる接線」が、途中のどこかで必ず引けるということである。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド33：平均値の定理の「使いどころ」と前提の罠 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の細かい補強 ②</h2>
+                <span class="badge">講義：記述の必須条件と定理の発動サイン</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【落とし穴】平均値の定理は、入試の答案で最も減点されやすい鬼門である。絶対に外せない記述のルールを叩き込む。
+                </div>
+                <div style="margin-top: 20px;">
+                    <strong>⚠️ 1. 「連続」「微分可能」の呪文を絶対にサボるな</strong><br>
+                    答案の冒頭で「関数 $f(x)$ は区間 $[a, b]$ で連続、$(a, b)$ で微分可能であるから、平均値の定理より〜」と書かなければ、それだけで<strong>一発で数点〜10点近く大減点される</strong>。
+                    グラフが途切れていたり、尖ったり（微分不可）していないことを保証することが、この定理を使うための絶対の入場券となる。
+                    <br><br>
+                    <strong>💡 2. 入試における「発動のサイン」を見抜く</strong><br>
+                    問題文に「平均値の定理を使え」とは書いてくれない。初学者には、以下の形を見たら定理の発動を疑うよう教え込む。
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 12px; border-radius: 0 8px 8px 0; font-size: 13pt; font-weight: bold; margin-top: 15px;">
+                        【サイン】「 $f(b) - f(a)$ 」のように、同じ関数の引き算が不等式の中にポツンと浮いているとき。
+                    </div>
+                    <br>
+                    この形を見たら、すかさず分母に $(b-a)$ を補って「平均値の定理より、これは $f'(c)(b-a)$ に置き換えられる！」と閃く感覚が、数Ⅲの記述における最高峰の武器となる。
+                </div>
+            </div>
+        </div>
+        <!-- スライド34：方程式の実数解の個数への応用 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の細かい補強 ③</h2>
+                <span class="badge">講義：方程式の実数解の個数（視覚化の鉄則）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【応用】数Ⅲの入試問題で定番の「方程式 $f(x) = 0$ の実数解の個数を求めよ」という問題を、微分の力で確実に仕留める戦略を学ぶ。
+                </div>
+                <div style="margin-top: 20px;">
+                    数式を数式のままこねくり回すのは初学者が最も迷子になりやすいアプローチである。ここでの大原則は<strong>「方程式の解を、グラフの交点として視覚化する」</strong>ことである。
+                    <br><br>
+                    <strong>【鉄則：定数分離（ていすうぶんり）】</strong><br>
+                    もし方程式の中に動く定数 $k$ が含まれている場合（例：$x e^x - k = 0$）、文字 $k$ だけを強引に右辺に孤立させる。
+                    $$ x e^x = k $$
+                    こうすることで、問題を次の $2$ つのグラフの交点探しに翻訳できる。
+                    <ul>
+                        <li>左辺：$y = x e^x$ （微分して増減表を描き、完璧に固定されたグラフ）</li>
+                        <li>右辺：$y = k$ （真横に引かれた、上下に動く一本の直線）</li>
+                    </ul>
+                    <br>
+                    初学者には、<strong>「複雑な曲線を動かすのではなく、定数の『ただの真っ直ぐな棒』を上下にスライドさせて、曲線と何回ぶつかるかを数えるだけ」</strong>というイージーなゲームに落とし込ませるのが最も効果的である。
+                </div>
+                <!-- 【SVGによる定数分離の視覚イメージ図】 -->
+                <div style="background-color: #f7fafc; padding: 15px; text-align: center; margin-top: 25px; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="font-size: 11pt; font-weight: bold; color: #1a365d; margin-bottom: 10px;">
+                        視覚化イメージ：$y = f(x)$ の固定グラフと動く直線 $y = k$
+                    </div>
+                    <svg viewBox="0 0 420 220" style="width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto;">
+                        <!-- 座標軸 -->
+                        <line x1="20" y1="180" x2="400" y2="180" stroke="#718096" stroke-width="1.5" marker-end="url(#arrow)" />
+                        <line x1="50" y1="210" x2="50" y2="20" stroke="#718096" stroke-width="1.5" marker-end="url(#arrow)" />
+                        <text x="395" y="195" font-size="11" fill="#718096" font-weight="bold">x</text>
+                        <text x="35" y="25" font-size="11" fill="#718096" font-weight="bold">y</text>
+                        <text x="38" y="195" font-size="11" fill="#718096">O</text>
+                        
+                        <!-- 固定された曲線 y = f(x) (例として極大・極小を持つ3次曲線風の山) -->
+                        <path d="M 60,160 Q 130,-10 200,90 T 340,40" fill="none" stroke="#1a365d" stroke-width="3" />
+                        <text x="310" y="25" font-size="11" fill="#1a365d" font-weight="bold">y = f(x) (固定)</text>
+                        
+                        <!-- 動く直線 y = k のバリエーション（点線と実線） -->
+                        <!-- パターンA（上部：交点1個） -->
+                        <line x1="30" y1="40" x2="380" y2="40" stroke="#a0aec0" stroke-width="1" stroke-dasharray="3,3" />
+                        <circle cx="335" cy="40" r="4" fill="#a0aec0" />
+                        <text x="250" y="45" font-size="10" fill="#718096">y = k₁ (交点1個)</text>
+                        
+                        <!-- パターンB（中央：交点3個 ★メイン実線） -->
+                        <line x1="30" y1="80" x2="380" y2="80" stroke="#dd6b20" stroke-width="2" />
+                        <circle cx="105" cy="80" r="5" fill="#e53e3e" />
+                        <circle cx="193" cy="80" r="5" fill="#e53e3e" />
+                        <circle cx="320" cy="80" r="5" fill="#e53e3e" />
+                        <!-- 上下の移動を示す矢印 -->
+                        <path d="M 360,65 L 360,95" fill="none" stroke="#dd6b20" stroke-width="1.2" marker-start="url(#arrow-orange)" marker-end="url(#arrow-orange)" />
+                        <text x="295" y="95" font-size="11" fill="#dd6b20" font-weight="bold">y = k (可動・交点3個)</text>
+                        
+                        <!-- パターンC（下部：交点2個） -->
+                        <line x1="30" y1="130" x2="380" y2="130" stroke="#008000" stroke-width="1" stroke-dasharray="3,3" />
+                        <circle cx="75" cy="130" r="4" fill="#008000" />
+                        <circle cx="260" cy="130" r="4" fill="#008000" />
+                        <text x="325" y="145" font-size="10" fill="#008000">y = k₂ (交点2個)</text>
+                        
+                        <!-- 矢印の定義（SVGマーカー） -->
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 2 L 10 5 L 0 8 z" fill="#718096" />
+                            </marker>
+                            <marker id="arrow-orange" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 2 L 10 5 L 0 8 z" fill="#dd6b20" />
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド35：速度と加速度（物理との完全リンク） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の細かい補強 ④</h2>
+                <span class="badge">講義：速度と加速度（時間の微分）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【物理連携】数Ⅲの微分の最後の方にポツンと登場する「速度と加速度」のセクションである。物理選択の生徒には有利だが、未選択の生徒がパニックにならないようイメージを整理する。
+                </div>
+                <div style="margin-top: 20px;">
+                    ここでは、これまでの $x$ での微分ではなく、<strong>時間 $t$ （$time$）での微分</strong>が主役となる。<br>
+                    数式が何を意味しているのか、階層構造で頭に入れさせる。
+                    <br><br>
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; border-radius: 0 8px 8px 0; font-size: 13pt;">
+                        ① <strong>位置 $x = f(t)$</strong>：いま物体がどこにいるか（すべてのスタート）。<br>
+                        ② <strong>速度 $v = \frac{dx}{dt}$</strong>：位置を時間で <strong>$1$ 回微分</strong> したもの。位置の変化のハイスピード感。<br>
+                        ③ <strong>加速度 $a = \frac{dv}{dt} = \frac{d^2x}{dt^2}$</strong>：位置を時間で <strong>$2$ 回微分</strong> したもの。速度の勢いの変化。
+                    </div>
+                    <br>
+                    数学的なポイントは、「ただの文字が $x$ から $t$ に変わっただけで、やるべき微分の計算ルール（合成関数や積の微分など）は全く同じである」という安心感を与えること。また、平面運動（座標が $x$ と $y$ の $2$ つある場合）のときは、それぞれの速度の $2$ 乗を足してルートを取る<strong>「三平方の定理」で速度の大きさ（速さ）を求める</strong>という幾何学的なつながりを意識させる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド36：媒介変数表示の微分（連鎖律の応用） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の細かい補強 ⑤</h2>
+                <span class="badge">講義：媒介変数（パラメータ）表示の微分公式</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【公式】$x$ と $y$ が、別の第$3$ の文字 $t$ を仲介して $x = f(t), y = g(t)$ と表されているときの微分手法をマスターする。
+                </div>
+                <div style="margin-top: 20px;">
+                    求めたいゴールは、いつも通りのグラフの傾き、すなわち <strong>$\frac{dy}{dx}$</strong> である。<br>
+                    しかし、$y$ の式に直接 $x$ がいないため、そのままでは微分できない。
+                    <br><br>
+                    ここで、極限の章で学んだ分数のようなリミットの性質（連鎖律）を利用する。<br>
+                    <strong>「分母と分子を、それぞれ仲介役の $t$ で個別に微分して割り算する」</strong>というアプローチをとる。
+                    $$ \frac{dy}{dx} = \frac{\frac{dy}{dt}}{\frac{dx}{dt}} = \frac{g'(t)}{f'(t)} \quad (\text{ただし } f'(t) \neq 0) $$
+                    <br>
+                    <strong>⚠️ 初学者が大怪我をする落とし穴（$2$ 回微分）</strong><br>
+                    このテーマで入試で最も凶悪な減点ポイントは、「$2$ 回微分 $\frac{d^2y}{dx^2}$ を求めよ」と言われたときである。
+                    初学者は高確率で「さっき求めた $\frac{dy}{dx}$ の式を、もう一回 $t$ で微分すればいいんでしょ？」と勘違いする。
+                    <br><br>
+                    しかし、正しい定義は「求めた $\frac{dy}{dx}$ （$t$ の式）を <strong>$x$ で微分しなければならない</strong>」ため、合成関数の微分が発動し、後ろに<strong>「 $\frac{dt}{dx}$ （$\frac{dx}{dt}$ の逆数）を掛け算する」</strong>という超重要ステップが発生する。ここを強調して指導することが、数Ⅲ微分の最後の守護神となる。
+                </div>
+            </div>
+        </div>
+        <!-- スライド37：媒介変数表示の微分（具体例：サイクロイド） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の細かい補補強 ⑥</h2>
+                <span class="badge">講義：サイクロイドを題材にした傾きの決定</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【具体例】次の媒介変数表示された関数（サイクロイド）の <strong>$\frac{dy}{dx}$</strong> を求めよ。
+                    $$ x = \theta - \sin \theta, \quad y = 1 - \cos \theta $$
+                </div>
+                <div style="margin-top: 15px;">
+                    第$3$ の文字 $\theta$ が仲介役である。鉄則通り、まずは $x$ と $y$ をそれぞれ個別へ $\theta$ で微分（割り算のパーツ作り）する。
+                    $$\begin{aligned}
+                    \frac{dx}{d\theta} &= 1 - \cos \theta \\
+                    \frac{dy}{d\theta} &= 0 - (-\sin \theta) = \sin \theta
+                    \end{aligned}$$
+                    パーツが揃ったので、分数のようにドッキングさせて接線の傾き $\frac{dy}{dx}$ を炙り出す。
+                    $$ \frac{dy}{dx} = \frac{\frac{dy}{d\theta}}{\frac{dx}{d\theta}} = \frac{\sin \theta}{1 - \cos \theta} $$
+                    <br>
+                    <div class="answer-box" style="background-color: #f7fafc; border-left-color: #4a5568; margin-top: 10px; padding: 10px 15px;">
+                        <strong>💡 指導のポイント：</strong><br>
+                        「$x$ の式に $y$ はいないし、$y$ の式に $x$ はいない。だから仲介役の $\theta$ でそれぞれを個別に微分して、最後に『分母と分子にセットする』だけ」と教えれば、1回微分までは全員がノーミスでクリアできるようになる。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド38：魔の2回微分・完全攻略 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の細かい補強 ⑦</h2>
+                <span class="badge">講義：なぜ2回微分は「もう一度微分」ではダメなのか</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text">
+                    【超重要】先ほどのサイクロイドの <strong>$2$ 回微分（ $\frac{d^2y}{dx^2}$ ）</strong>を求める。ここで受験生の $9$ 割が仕掛けられる罠の正体を暴く。
+                </div>
+                <div style="margin-top: 15px;">
+                    絶対にやってはならない大誤答は、先ほどの $\frac{\sin \theta}{1 - \cos \theta}$ を「ただもう一回 $\theta$ で微分する」ことである。<br>
+                    $2$ 回微分の本当の定義は、<strong>「$1$ 回微分の結果（$\theta$ の式）を、あくまで $x$ の世界で微分すること」</strong>である。
+                    
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 12px; border-radius: 6px; margin: 15px 0;">
+                        $$ \frac{d^2y}{dx^2} = \frac{d}{dx} \left( \frac{dy}{dx} \right) = \color{red}\frac{d}{d\theta} \left( \frac{dy}{dx} \right) \times \frac{d\theta}{dx} $$
+                        <span style="font-size: 11pt; color: #4a5568;">※ $\theta$ で微分する代わりに、後ろに補正用として <strong>$\frac{d\theta}{dx}$ （$\frac{dx}{d\theta}$ の逆数）</strong> を掛け算しなければならない！（合成関数の微分）</span>
+                    </div>
+
+                    <strong>［実際の計算プロセス］</strong><br>
+                    ① 前半部分を $\theta$ で普通に商の微分：
+                    $$ \frac{d}{d\theta} \left( \frac{\sin \theta}{1 - \cos \theta} \right) = \frac{\cos\theta(1-\cos\theta) - \sin\theta(\sin\theta)}{(1-\cos\theta)^2} = \frac{\cos\theta - 1}{(1-\cos\theta)^2} = -\frac{1}{1-\cos\theta} $$
+                    ② 後ろに「$\frac{dx}{d\theta}$ の逆数」をお守りとして掛け算してフィニッシュ：
+                    $$ \frac{d^2y}{dx^2} = \left( -\frac{1}{1-\cos\theta} \right) \times \color{red}\frac{1}{1-\cos\theta} = -\frac{1}{(1-\cos\theta)^2} $$
+                </div>
+            </div>
+        </div>
+        <!-- スライド39：微分の記号 dy/dx は「分数」なのか？ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>微分法の細かい補強 ⑧</h2>
+                <span class="badge">講義：dy/dx の正体と「分数」として扱う境界線</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【数Ⅲ最大の疑問】置換積分や媒介変数表示の微分で、$\frac{dy}{dx}$ や $\frac{dx}{dt}$ を「本物の分数」のようにバラバラに掛け算・割り算しているが、これは数学的に許されるのだろうか？
+                </div>
+                <br>
+                    ここで、先ほどの計算で $\frac{d\theta}{dx}$ を $\frac{dx}{d\theta}$ の逆数（分数）として機械的に処理したが、「これも分数として扱って良いのだろうか？」という疑問が当然湧くだろう。これこそが、このページで解説する「1回微分のうちは分数として扱って100%正しい結果が出る」というライプニッツ記号の魔法の正体である。
+                <div style="margin-top: 15px;">
+                    <strong>結論：厳密には「分数ではない」が、1回微分（1階）のうちは「分数として扱って100%正しい結果が出る」性質を持っている。</strong>
+                    <br><br>
+                    <ul>
+                        <li><strong>大学数学（解析学）の視点：</strong><br>
+                        $\frac{dy}{dx}$ は「$y$ を $x$ で微分せよ」という1つの塊の記号（演算命令）であり、分子と分母が独立した数字ではない。そのため、バラバラに引き剥がすことは本来タブーである。</li>
+                        <li><strong>なぜ高校数Ⅲでは分数として扱って良いのか：</strong><br>
+                        この記号の生みの親（ライプニッツ）の設計が天才的だったため、極限を飛ばした後も「分数と完全に同じルールで連動する性質（微分形式）」がキープされる。大学数学の高度な理論でも、この変形の安全性は裏から完全に保証されている。</li>
+                    </ul>
+                    
+                    <div class="answer-box" style="background-color: #fffaf0; border-left-color: #dd6b20; margin-top: 15px; padding: 12px 15px;">
+                        <div class="answer-label" style="color: #dd6b20;">⚠️ 指導上、絶対に教え込むべき「境界線」</div>
+                        分数として甘えて良いのは<strong>「1回微分（ $\frac{dy}{dx}$ ）のときだけ」</strong>である。<br>
+                        先ほど学んだ通り、2回微分（ $\frac{d^2y}{dx^2}$ ）になった瞬間に、この分数の魔法は完全に崩壊する（ $\frac{d^2y}{dt^2} / \frac{d^2x}{dt^2}$ とは絶対に書けない）。<br>
+                        <span style="font-weight: bold; color: #1a365d;">「1階のうちは超便利な分数。2階になったらただの記号に戻る」</span>という境界線を徹底させよ。
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             微分法：演習セクション（問題＆解説）
+             ========================================== -->
+
+        <!-- 1. 積の微分・商の微分の複合（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑧ 積と商の微分公式</h2>
+                <span class="badge">微分法演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の関数を $x$ で微分せよ。
+                    $$ y = \frac{e^x}{x + 1} $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    分数の形をしているため「商の微分公式」がベースとなるが、分子に $e^x$ がいる。商の微分公式の呪文<strong>「分母は $2$ 乗、上微分・下そのままマイナス上そのまま・下微分」</strong>を忠実に実行せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 積の微分・商の微分の複合（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑧ 積と商の微分公式</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］商の微分公式の適用</strong><br>
+                    公式通り、分母を $2$ 乗し、分子の「引き算の順番」に気をつけて展開する。
+                    $$ y' = \frac{(e^x)'(x + 1) - e^x(x + 1)'}{(x + 1)^2} $$
+                    <br>
+                    <strong>［ステップ 2］各パーツの微分を実行</strong><br>
+                    $(e^x)' = e^x$、および $(x+1)' = 1$ を代入する。
+                    $$ y' = \frac{e^x(x + 1) - e^x \cdot 1}{(x + 1)^2} $$
+                    <br>
+                    <strong>［ステップ 3］分子の因数分解（鉄則）</strong><br>
+                    分子を展開すると $e^x x + e^x - e^x = e^x x$ となる。増減表を見据えて、共通因数である $e^x$ で綺麗に括られた状態を確認する。
+                    $$ y' = \frac{e^x x}{(x + 1)^2} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ y' = \frac{x e^x}{(x + 1)^2} $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 合成関数・三角関数の微分（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑨ 三角・合成関数の微分</h2>
+                <span class="badge">微分法演習：重要</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の関数を $x$ で微分せよ。
+                    $$ y = \sin^3 x \quad (\text{※ } (\sin x)^3 \text{ のこと}) $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    この関数は「三乗の箱（外関数）」の中に「$\sin x$（内関数）」がすっぽり入っている合成関数である。呪文<strong>「外微分 $\times$ 中身の微分」</strong>を発動せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 合成関数・三角関数の微分（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑨ 三角・合成関数の微分</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］マトリョーシカの分解（外微分）</strong><br>
+                    中身の $\sin x$ をひとつの大きな塊 $\blacksquare$ とみなして、$\blacksquare^3$ を微分する感覚で外側を微分する。
+                    $$ 3(\sin x)^2 = 3\sin^2 x $$
+                    <br>
+                    <strong>［ステップ 2］お守りの掛け算（内微分）</strong><br>
+                    中に閉じ込められていた中身（$\sin x$）の微分を、後ろからお守りのように掛け算する。
+                    $$ y' = 3\sin^2 x \times (\sin x)' $$
+                    <br>
+                    <strong>［ステップ 3］公式の適用と仕上げ</strong><br>
+                    $(\sin x)' = \cos \theta$（微分してもマイナスはつかない。「コ」ではないから）を代入して整理する。
+                    $$ y' = 3\sin^2 x \cdot \cos x $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ y' = 3\sin^2 x \cos x $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 対数微分法（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑩ 対数微分法の適用</h2>
+                <span class="badge">微分法演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の関数を $x$ で微分せよ。
+                    $$ y = x^{\sin x} \quad (x > 0) $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    底にも指数の肩にも変数 $x$ が乗っているため、通常の公式（$n x^{n-1}$ や $a^x \log a$）は一切使えない。<strong>「肩に文字が乗っていて困ったら、両辺の対数を取って引きずり下ろす」</strong>という対数微分法の手順を思い出せ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 対数微分法（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑩ 対数微分法の適用</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］両辺の自然対数を取り、肩を下ろす</strong><br>
+                    両辺の対数を取ると、指数の $\sin x$ が前に飛び出してくる。
+                    $$ \log y = \log x^{\sin x} \quad \Longrightarrow \quad \log y = \sin x \cdot \log x $$
+                    <br>
+                    <strong>［ステップ 2］両辺を $x$ で微分（右辺は積の微分）</strong><br>
+                    左辺は必ず $\frac{y'}{y}$ になり、右辺は「前微分・後ろそのまま ＋ 前そのまま・後ろ微分」を実行する。
+                    $$ \frac{y'}{y} = (\sin x)' \log x + \sin x (\log x)' $$
+                    $$ \frac{y'}{y} = \cos x \log x + \sin x \cdot \frac{1}{x} $$
+                    <br>
+                    <strong>［ステップ 3］両辺に $y$ を掛け算して現実に戻す</strong><br>
+                    仮の姿から戻すために全体に $y$（つまり $x^{\sin x}$）を掛け算する。
+                    $$ y' = y \left( \cos x \log x + \frac{\sin x}{x} \right) = x^{\sin x} \left( \cos x \log x + \frac{\sin x}{x} \right) $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">$$ y' = x^{\sin x} \left( \cos x \log x + \frac{\sin x}{x} \right) $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 定数分離と実数解の個数（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑪ 定数分離と実数解の個数</h2>
+                <span class="badge">微分法演習：入試定番</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    方程式 $x^2 - 2x - k = 0$ の実数解の個数は、定数 $k$ の値によってどのように変化するか。微分の考え方（定数分離）を用いて調べよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    （※数Ⅰの判別式でも解けますが、数Ⅲの武器をテストします）<br>
+                    動く文字 $k$ だけを右辺に隔離し、<strong>「固定された曲線 $y = x^2 - 2x$」と「上下に動く横棒 $y = k$」の交点ゲーム</strong>に持ち込め。
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 定数分離と実数解の個数（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑪ 定数分離と実数解の個数</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］定数を分離して主役を決める</strong><br>
+                    文字 $k$ を右辺に移項し、$f(x) = x^2 - 2x$ と置いてグラフの形を調べる（今回は頂点 $(1, -1)$ の放物線）。
+                    $$ x^2 - 2x = k $$
+                    <br>
+                    <strong>［ステップ 2］横棒 $y = k$ をスライドさせる</strong><br>
+                    先ほど追加したイメージ図の通り、最下点（頂点）である $y = -1$ を基準にして、横棒がぶつかる回数を数える。
+                    <ul>
+                        <li>頂点より上（$k > -1$）のとき：左右で $2$ 回ぶつかる $\rightarrow$ <strong>$2$ 個</strong></li>
+                        <li>頂点にピタッと重なる（$k = -1$）とき：頂点だけで接触 $\rightarrow$ <strong>$1$ 個</strong></li>
+                        <li>頂点より下（$k < -1$）のとき：空を切ってどこもぶつからない $\rightarrow$ <strong>$0$ 個</strong></li>
+                    </ul>
+                </div>
+                <div class="answer-box" style="padding: 10px 15px;">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 12pt; text-align: left; line-height: 1.5;">
+                        ・$k > -1$ のとき $2$ 個<br>
+                        ・$k = -1$ のとき $1$ 個<br>
+                        ・$k < -1$ のとき $0$ 個
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 媒介変数表示の2回微分（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑫ 媒介変数表示の2回微分</h2>
+                <span class="badge">微分法演習：最高峰の罠</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 17pt; padding: 30px变量;">
+                    $x = t^2, y = t^3$ と表される関数の第$2$次導関数 <strong>$\frac{d^2y}{dx^2}$</strong> を $t$ の式で表せ。
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    まずは普通に $1$ 回微分 $\frac{dy}{dx}$ を求める。その後、それを「もう一度ただ $t$ で微分する」という大誤答の罠を回避せよ。後ろに掛け算すべき<strong>「命綱（逆数）」</strong>は何だったか。
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 媒介変数表示の2回微分（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑫ 媒介変数表示の2回微分</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div>
+                    <strong>［ステップ 1］1回微分をノーミスで仕留める</strong><br>
+                    $x$ と $y$ をそれぞれ $t$ で微分し、分数としてドッキングする。
+                    $$ \frac{dx}{dt} = 2t, \quad \frac{dy}{dt} = 3t^2 \quad \Longrightarrow \quad \frac{dy}{dx} = \frac{3t^2}{2t} = \frac{3}{2}t $$
+                    <br>
+                    <strong>［ステップ 2］2回微分の定義の発動（罠の回避）</strong><br>
+                    求めた $\frac{3}{2}t$ を $t$ で微分（結果は $\frac{3}{2}$）するだけで終わらせてはならない。
+                    「$x$ の世界で微分する」という帳尻合わせのために、後ろから必ず <strong>$\frac{dt}{dx}$ （ $\frac{dx}{dt}$ の逆数）</strong> を掛け算する。
+                    $$ \frac{d^2y}{dx^2} = \frac{d}{dt}\left( \frac{3}{2}t \right) \times \color{red}\frac{dt}{dx} $$
+                    <br>
+                    <strong>［ステップ 3］逆数を代入してフィニッシュ</strong><br>
+                    ステップ1で求めた $\frac{dx}{dt} = 2t$ の逆数、すなわち $\color{red}\frac{1}{2t}$ を掛け算する。
+                    $$ \frac{d^2y}{dx^2} = \frac{3}{2} \times \color{red}\frac{1}{2t} = \frac{3}{4t} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \frac{d^2y}{dx^2} = \frac{3}{4t} $$</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 画面下の操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 3</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- スライドを制御するスクリプト -->
+        <!-- スライドを制御するスクリプト（スマホボタン限定版） -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        // PC用のキーボード操作（←、→、スペース、Enter）は維持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+    </script>
+</body>
+</html>

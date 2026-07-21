@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅲ　微分</title>
+    
+    <!-- 数式を美しく表示するためのMathJaxライブラリ -->
+     <!-- 200行辺りまでテンプレ -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        /* 全体スタイルの定義（明朝体・である調の統一ベース） */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden; /* スライド全体のスクロールを抑止 */
+            line-height: 1.8;
+        }
+
+        /* スライドコンテナ */
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 各スライドの共通デザイン */
+        .slide {
+            display: none; /* 初期状態は非表示 */
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px 60px;
+            overflow-y: auto; /* コンテンツが多い場合はスライド内スクロール */
+        }
+
+        /* アクティブなスライドのみ表示 */
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ヘッダーデザイン */
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        /* コンテンツ部分のレイアウト */
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* 強調用の正解ボックス */
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        /* リストスタイル */
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        /* 操作用ナビゲーションUI */
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        /* ==========================================
+           スマートフォン向けの表示最適化（サイズ縮小）
+           ========================================== */
+        @media screen and (max-width: 768px) {
+            body {
+                line-height: 1.6; /* 行間を少し詰めて視認性を上げる */
+            }
+
+            /* スライド全体の余白を削り、画面を広く使う */
+            .slide {
+                width: 95%;
+                height: 88vh;
+                padding: 20px 20px; /* 横余白を60pxから20pxに縮小 */
+            }
+
+            /* ヘッダーの文字を小さく */
+            .slide-header h2 {
+                font-size: 18pt;
+            }
+            .badge {
+                font-size: 10pt;
+                padding: 2px 8px;
+            }
+
+            /* 本文・問題文の文字サイズをひと回り小さく */
+            .content-box {
+                font-size: 12pt; /* 16ptから12ptに縮小 */
+                margin-bottom: 15px;
+            }
+            .problem-text {
+                padding: 15px;
+                font-size: 13pt;
+                margin-bottom: 15px;
+            }
+
+            /* 正解・結論ボックスの調整 */
+            .answer-box {
+                padding: 10px 15px;
+                margin-top: 15px;
+            }
+            .answer-box div[style*="font-size"] {
+                font-size: 14pt !important; /* スマホのみ大きな正解文字を14ptに抑制 */
+            }
+
+            /* 表（まとめスライド）の文字サイズと余白をスマホ用に最小化 */
+            table {
+                font-size: 11pt !important;
+            }
+            th, td {
+                padding: 8px !important;
+            }
+
+            /* MathJaxの数式全体がスマホ画面からはみ出さないように自動縮小 */
+            .mjx-chtml {
+                font-size: 90% !important; 
+            }
+            .math-block, mjx-container[display="true"] {
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 5px 0;
+            }
+
+            /* 下部ナビゲーションボタンを押しやすいサイズに微調整 */
+            .nav-controls {
+                bottom: 15px;
+                gap: 20px;
+            }
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 11pt;
+            }
+            .page-indicator {
+                font-size: 12pt;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド1：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ　不定積分</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+         <!-- ここからいじる -->
+        <!-- ==========================================
+             数Ⅲ積分法：講義セクション
+             ========================================== -->
+
+        <!-- スライド40：積分とは「微分の逆再生」である -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ①</h2>
+                <span class="badge">講義：不定積分と微分の逆算</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d;">
+                    【導入】積分法（ $\int f(x) dx$ ）を学ぶ最大のコツは、「新しく積分の公式を覚える」のではなく、頭の中で「微分のビデオを逆再生する」という感覚を持つことである。
+                </div>
+                <div style="margin-top: 20px;">
+                    数Ⅲの積分公式は、すべて微分公式の裏返しに過ぎない。
+                    $$\begin{aligned}
+                    (e^x)' = e^x \quad &\Longleftrightarrow \quad \int e^x dx = e^x + C \\
+                    (\sin x)' = \cos x \quad &\Longleftrightarrow \quad \int \cos x dx = \sin x + C \\
+                    \color{red}(\cos x)' = \color{red}-\sin x \quad &\Longleftrightarrow \quad \int \sin x dx = \color{red}-\cos x + C
+                    \end{aligned}$$
+                    <br>
+                    <strong>【初学者への指導のポイント：符号の逆転】</strong><br>
+                    微分では「『コ』がついたらマイナス」だったが、積分では逆再生になるため、<strong>「積分した『結果』に『コ』がついたらマイナス（ $-$ ）がつく」</strong>というルールに切り替わる（ $\int \sin x dx = -\cos x$ ）。
+                    <br><br>
+                    初学者が符号のプラス・マイナスで迷ったときは、必ず「今作った答えを頭の中で微分してみて、元に戻るかどうか」を検算させるクセを徹底させよ。これが積分の失点を防ぐ最強のセーフティネットとなる。
+                </div>
+            </div>
+        </div>
+        <!-- スライド45：数Ⅲの基本積分公式ロードマップ（完全対比表） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ⑥</h2>
+                <span class="badge">講義：数Ⅲ基本積分公式の一覧と検算の仕組み</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【ロードマップ】新しく覚えるのではなく「微分の記憶」から逆引きする。右辺を微分して左辺のインテグラルの中身に戻るかを常に意識せよ。（※積分定数 $C$ は省略）
+                </div>
+                <div style="margin-top: 15px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11pt;">
+                        <thead>
+                            <tr style="background-color: #1a365d; color: white;">
+                                <th style="border: 1px solid #cbd5e0; padding: 8px; width: 45%;">【順方向】微分公式の記憶</th>
+                                <th style="border: 1px solid #cbd5e0; padding: 8px; width: 55%; background-color: #2b6cb0;">【逆再生】数Ⅲの積分公式</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 多項式 -->
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px;">$(x^{n+1})' = (n+1)x^n$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px; background-color: #f7fafc; font-weight: bold;">$\displaystyle \int x^n dx = \frac{1}{n+1}x^{n+1} \quad (n \neq -1)$</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px;">$(\log |x|)' = \frac{1}{x}$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px; background-color: #f7fafc; font-weight: bold;">$\displaystyle \int \frac{1}{x} dx = \log |x|$</td>
+                            </tr>
+                            <!-- 指数 -->
+                            <tr style="background-color: #fffaf0;">
+                                <td style="border: 1px solid #cbd5e0; padding: 8px;">$(e^x)' = e^x$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px; font-weight: bold; color: #b7791f;">$\displaystyle \int e^x dx = e^x \quad$ <span style="font-size: 9pt; font-weight: normal; color: #718096;">(微分しても積分しても不変)</span></td>
+                            </tr>
+                            <tr style="background-color: #fffaf0;">
+                                <td style="border: 1px solid #cbd5e0; padding: 8px;">$(a^x)' = a^x \log a$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px; font-weight: bold;">$\displaystyle \int a^x dx = \frac{a^x}{\log a} \quad$ <span style="font-size: 9pt; font-weight: normal; color: #718096;">(積分時は $\log a$ が分母に回る)</span></td>
+                            </tr>
+                            <!-- 三角関数 -->
+                            <tr style="background-color: #fff5f5;">
+                                <td style="border: 1px solid #cbd5e0; padding: 8px;">$(\sin x)' = \cos x$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px; font-weight: bold;">$\displaystyle \int \cos x dx = \sin x$</td>
+                            </tr>
+                            <tr style="background-color: #fff5f5;">
+                                <td style="border: 1px solid #cbd5e0; padding: 8px;">$(\cos x)' = -\sin x$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px; font-weight: bold; color: #e53e3e;">$\displaystyle \int \sin x dx = -\cos x \quad$ <span style="font-size: 9pt; font-weight: normal; color: #718096;">(結果に「コ」でマイナス)</span></td>
+                            </tr>
+                            <tr style="background-color: #fff5f5;">
+                                <td style="border: 1px solid #cbd5e0; padding: 8px;">$(\tan x)' = \frac{1}{\cos^2 x}$</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 8px; font-weight: bold;">$\displaystyle \int \frac{1}{\cos^2 x} dx = \tan x$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 15px; font-size: 11pt; color: #4a5568; line-height: 1.5;">
+                        <strong>💡 初学者への指導のポイント：</strong><br>
+                        数Ⅲ積分で最も忘れがちなのが $\int \frac{1}{x} dx = \log |x|$ の<strong>「絶対値（ $| \cdot |$ ）」</strong>である。真数条件（ログの中身は必ずプラス）をクリアするために絶対値のお守りが必須であることを、この一覧表の段階で視覚的に強調して叩き込んでおくのがコツである。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド41：置換積分のメカニズム（塊の相棒） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ②</h2>
+                <span class="badge">講義：置換積分（1）合成関数の逆再生</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】数Ⅲ積分の最初の大きな壁「置換積分（ちかんせきぶん）」である。なぜ文字を置き換えるだけで複雑な積分が解けるのか、その仕組みを暴く。
+                </div>
+                <div style="margin-top: 20px;">
+                    置換積分は、微分で学んだ<strong>「合成関数の微分（外微分 $\times$ 内微分）」の完全な逆再生</strong>である。<br>
+                    教科書の公式は非常に難解だが、実戦で使うための見極めサインはたったの $1$ つである。
+                    <br><br>
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; border-radius: 0 8px 8px 0; font-size: 14pt; font-weight: bold; text-align: center;">
+                        「インテグラルの中に、ある塊 $\blacksquare$ と、<br>
+                        その塊を微分した相棒 $\blacksquare'$ が掛け算で同居しているとき」
+                    </div>
+                    <br>
+                    具体的には、$\int (3x-2)^4 \cdot \color{red}3 \color{black} dx$ のような形である。<br>
+                    中身の $3x-2$ を微分した「 $3$ 」という相棒が外に浮いているため、この相棒がクッション（吸収剤）の役割を果たし、全体をただの $\int \blacksquare^4 d\blacksquare$ という中学生でも解ける単純な積分へワープさせることができる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド42：置換積分とお作法（dxの書き換え） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ③</h2>
+                <span class="badge">講義：置換積分（2）dxを引き剥がす魔法</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】先ほど微分の章（スライド39）で議論した「 $dx$ を分数のように扱って引き剥がす魔法」が、この置換積分で最大の威力を発揮する。
+                </div>
+                <div style="margin-top: 20px;">
+                    $\int (3x-2)^4 dx$ を計算するとき、中身を $t = 3x - 2$ と置換する。このとき、インテグラルの後ろにいる <strong>$dx$ も $dt$ の世界へ引っ越さなければならない</strong>。
+                    <br><br>
+                    ここで、先ほど学んだライプニッツ記号のお作法（分数もどき）を発動させる。
+                    <ol>
+                        <li style="margin-bottom: 10px;">$t = 3x - 2$ の両辺を $x$ で微分して、 <strong>$\frac{dt}{dx} = 3$</strong> とする。</li>
+                        <li style="margin-bottom: 10px;">分母の $dx$ を右辺に掛け算して、 <strong>$dt = 3 dx$</strong> に引き剥がす。</li>
+                        <li style="margin-bottom: 10px;">両辺を $3$ で割れば、 <strong>$dx = \frac{1}{3} dt$</strong> という完璧な翻訳カードが完成する。</li>
+                    </ol>
+                    <br>
+                    $$ \int (3x-2)^4 \color{red}dx \color{black} \quad \Longrightarrow \quad \int t^4 \cdot \color{red}\frac{1}{3} dt \color{black} = \frac{1}{3} \cdot \frac{1}{5}t^5 = \frac{1}{15}(3x-2)^5 + C $$
+                    大学数学ではグレーとされるこの「 $dx$ の掛け算引き剥がし」だが、高校数Ⅲの置換積分においては、これ以上ないほど美しく、かつ機械的に安全に答えを導ける最強マニュアル（公認お作法）なのである。
+                </div>
+            </div>
+        </div>
+        <!-- スライド43：部分積分公式の呪文とメカニズム -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ④</h2>
+                <span class="badge">講義：部分積分（積の微分の逆再生）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】2つの異なる種類の関数が掛け算されているときに発動する「部分積分法」の構造と、絶対に忘れない呪文をインストールする。
+                </div>
+                <div style="margin-top: 20px;">
+                    部分積分は、微分で学んだ<strong>「積の微分公式：$(fg)' = f'g + fg'$」のビデオを完全に逆再生</strong>したものである。<br>
+                    教科書の公式は非常にややこしいが、実際の計算プロセスは次のシンプルな「呪文」として脳内に叩き込ませる。
+                    <br><br>
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; border-radius: 0 8px 8px 0; font-size: 14pt; font-weight: bold; text-align: center;">
+                        「そのまま・積分」マイナス「インテグラル（左を）微分・（右を）そのまま」
+                    </div>
+                    <br>
+                    $$ \int f(x)g'(x) dx = [f(x)g(x)] - \int f'(x)g(x) dx $$
+                    <br>
+                    <strong>【初学者が迷うポイント：どちらを積分側に選ぶべきか？】</strong><br>
+                    この公式の最大の難所は、2つの関数のうち「どちらを $g'(x)$（先に積分する側）に選ぶか」である。指導の際は、以下の頭文字をとった優先順位の法則を教え込む。
+                    <div style="background-color: #f7fafc; padding: 12px; border-radius: 6px; margin-top: 10px; font-weight: bold; border-left: 4px solid #1a365d;">
+                        【積分側の選択順位】：対数（log） ＜ 整式（xⁿ） ＜ 三角（sin, cos） ＜ 指数（eˣ）
+                    </div>
+                    右側にいる関数ほど「微分しても形があまり変わらない（＝積分が極めてイージー）」という性質を持っているため、右の関数を先鋒として先に積分させ、左に残った関数をインテグラルの奥で微分して「次数を消滅させる」のが部分積分の必勝パターンである。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド44：分数関数の積分3大パターン -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ⑤</h2>
+                <span class="badge">講義：分数関数の積分（分母の微分の形）</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    【講義】分数型の積分が出題されたとき、ただ闇雲に悩むのではなく、形を見た瞬間に次の3つのルートのどれにハメるかを自動判定させる。
+                </div>
+                <div style="margin-top: 20px;">
+                    分数式の積分は、分子と分母の「次数の関係」によって解法が100%自動的に決定される。
+                    <br><br>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12pt;">
+                        <thead>
+                            <tr style="background-color: #1a365d; color: white;">
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 30%;">次数の状態</th>
+                                <th style="border: 1px solid #cbd5e0; padding: 10px; width: 70%;">発動する戦略と公式</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">分子の次数 ≧ 分母の次数</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">微分の漸近線と同じ。まずは<strong>多項式の割り算（筆算）</strong>を実行して分子の次数を限界まで引き下げ、「整式 ＋ 分数」の形に引き裂く。</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">分子が「分母の微分」の形</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">数Ⅲ積分の最強公式が発動。分母を丸ごと対数（log）の中に吸い込ませて一撃で終了。
+                                <div style="font-weight: bold; color: #dd6b20; font-size: 13pt; margin-top: 5px;">$$ \int \frac{f'(x)}{f(x)} dx = \log |f(x)| + C $$</div></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px; font-weight: bold; text-align: center; background-color: #f7fafc;">分母が因数分解できる</td>
+                                <td style="border: 1px solid #cbd5e0; padding: 12px;">数列の「数の列」で習った技術の再利用。<strong>部分分数分解（ぶぶんぶんすうぶんかい）</strong>を使って、掛け算の形をした分母を、引き算の形に分解してそれぞれの項を対数にする。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- スライド46：分数関数3大パターンの具体例マップ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ⑦</h2>
+                <span class="badge">講義：分数関数積分の具体例とアプローチ</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【具体例】先ほどの3大パターンを実際の数式にマッピングする。問題を見た瞬間に、頭の中で以下の「仕分け」を自動実行させよ。
+                </div>
+                <div style="margin-top: 15px;">
+                    
+                    <!-- パターン1 -->
+                    <div style="margin-bottom: 20px;">
+                        <span style="background-color: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #4a5568;">パターン 1：分子の次数 ≧ 分母の次数</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0;">
+                            $$ \int \frac{x^2 + 1}{x + 1} dx \quad \Longrightarrow \quad \int \left( x - 1 + \frac{2}{x + 1} \right) dx $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            分子（2次）の方が分母（1次）より重いため、割り算（筆算）を実行して「普通の整式」と「軽い分数」に強引に引き裂くのがスタートラインである。
+                        </span>
+                    </div>
+
+                    <!-- パターン2 -->
+                    <div style="margin-bottom: 20px; border-top: 1px dashed #cbd5e0; padding-top: 15px;">
+                        <span style="background-color: #feebc8; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #c05621;">パターン 2：分子が「分母の微分」の形</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0;">
+                            $$ \int \frac{2x}{x^2 + 1} dx \quad \Longrightarrow \quad \log |x^2 + 1| + C $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            分母 $x^2 + 1$ を微分すると、分子にある $2x$ にピタッと一致する。この形を見抜けたら、置換積分すらサボって中身を丸ごと $\log$ に吸い込ませるだけで終了する。
+                        </span>
+                    </div>
+
+                    <!-- パターン3 -->
+                    <div style="margin-bottom: 10px; border-top: 1px dashed #cbd5e0; padding-top: 15px;">
+                        <span style="background-color: #fed7d7; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #9b2c2c;">パターン 3：分母が因数分解できる</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0;">
+                            $$ \int \frac{1}{x(x + 1)} dx \quad \Longrightarrow \quad \int \left( \frac{1}{x} - \frac{1}{x + 1} \right) dx $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            分母が掛け算の形になっている。このままでは積分できないため、部分分数分解の技術を使って「引き算の形」にバラすことで、それぞれの項を独立した $\log$ の積分に変形する。
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- スライド47：指数・三角関数が絡む分数関数 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ⑧</h2>
+                <span class="badge">講義：指数・三角の分数関数（置換のコンビネーション）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【応用】$\displaystyle \int \frac{e^x}{e^x + 1} dx$ や $\displaystyle \int \frac{\cos x}{\sin x} dx$ のように、超越関数が分母・分子に散らばった形を攻略する。
+                </div>
+                <div style="margin-top: 15px;">
+                    一見すると複雑に見えるが、これらはすべて先ほど学んだ<strong>「分子が分母の微分の形（ $\frac{f'(x)}{f(x)}$ ）」</strong>の美しいバリエーションに過ぎない。
+                    <br><br>
+                    <strong>［視覚的なマッピング］</strong>
+                    <ul>
+                        <li style="margin-bottom: 12px;"><strong>指数関数のケース：</strong><br>
+                        分母の $f(x) = e^x + 1$ を微分すると、分子の $e^x$ にピタッと一致する。
+                        $$\int \frac{e^x}{e^x + 1} dx = \log(e^x + 1) + C \quad \text{（※ } e^x+1>0 \text{ なので絶対値は不要）}$$
+                        </li>
+                        <li><strong>三角関数のケース（ $\cot x$ の正体）：</strong><br>
+                        分母の $f(x) = \sin x$ を微分すると、分子の $\cos x$ にピタッと一致する。
+                        $$\int \frac{\cos x}{\sin x} dx = \log |\sin x| + C$$
+                        </li>
+                    </ul>
+                    <div class="answer-box" style="background-color: #fffaf0; border-left-color: #dd6b20; padding: 10px 15px; margin-top: 15px;">
+                        <strong>💡 指導のポイント：</strong><br>
+                        「 $\sin$ や $e^x$ が分数になっていても、身構える必要は一切ない。分母を頭の中で微分してみて、それが分子にそのまま乗っかっていないかを真っ先に確認させよ」と伝えることで、無駄な置換計算をカットする大局観を養わせる。
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- スライド50：三角関数の分数積分（分子・分母に同じものを掛ける） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ⑪</h2>
+                <span class="badge">講義：1/cos x の積分（同値変形による相棒の強制召喚）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【難関】$\displaystyle \int \frac{1}{\cos x} dx$ のように、分母に三角関数がポツンと $1$ つだけいる形を攻略する。
+                </div>
+                <div style="margin-top: 15px;">
+                    このままでは置換積分も分数パターンのどれも使えない。ここで発動するのが、<strong>「分子と分母に同じものを掛けて、無理やり相棒を出現させる」</strong>という魔術的な変形である。
+                    <br><br>
+                    <strong>［劇的な変形の3ステップ］</strong>
+                    <br>
+                    <strong>① 分子と分母にあえて「 $\cos x$ 」を掛け算する</strong>
+                    $$ \int \frac{1}{\cos x} dx \quad \Longrightarrow \quad \int \frac{\cos x}{\cos^2 x} dx $$
+                    <br>
+                    <strong>② 分母の $\cos^2 x$ を「 $1 - \sin^2 x$ 」に化けさせる</strong>
+                    $$ \int \frac{\cos x}{1 - \sin^2 x} dx $$
+                    <br>
+                    <strong>③ 「塊と相棒」が同居する分数式が完成！</strong><br>
+                    分母の塊を $t = \sin x$ と捉えると、分子の $\cos x$ はその微分（相棒 $dt = \cos x dx$）そのものである。
+                    $$ \int \frac{1}{1 - t^2} dt $$
+                    あとは、これを先ほど学んだ<strong>パターン3（部分分数分解）</strong>を使って引き算にバラせば、無事に $\log$ で積分が完了する。
+                    <br><br>
+                    <div class="answer-box" style="background-color: #fffaf0; border-left-color: #dd6b20; padding: 10px 15px;">
+                        <strong>💡 指導のポイント：</strong><br>
+                        「分母に $\cos x$ が単独でいるときは、分子分母に同じものを掛けて、分母を $\sin$ の世界、分子を $\cos$（相棒）の世界へと引き裂くのが鉄則。この『あえて同じものを掛けて、微分を分子に用意する』という感覚は、数Ⅲ積分における最高峰のパズルだよ」と伝えることで、解法の美しさと必然性を叩き込める。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド49：三角関数の積分（2倍角・半角・積和による変形） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分法の本質 ⑩</h2>
+                <span class="badge">講義：三角関数の積分（公式による形状変換）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【盲点】$\displaystyle \int \sin^2 x dx$ や $\displaystyle \int \sin 3x \cos 2x dx$ は、これまでの「塊とその相棒」の形ではないため、そのままでは絶対に積分できない。
+                </div>
+                <div style="margin-top: 15px;">
+                    三角関数の積分における大原則は、<strong>「高次の形（2乗など）を1次に下げる」「掛け算の形を足し引き（和）の形にバラす」</strong>ことである。ここで数Ⅱの三角関数の公式が最強の変形兵器として蘇る。
+                    <br><br>
+                    
+                    <!-- パターンA：半角の公式 -->
+                    <div style="margin-bottom: 20px;">
+                        <span style="background-color: #fed7d7; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #9b2c2c;">戦略 1：2乗を見たら「半角の公式」で1次に下げる</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0;">
+                            $$ \int \sin^2 x dx \quad \Longrightarrow \quad \int \frac{1 - \cos 2x}{2} dx = \frac{1}{2}x - \frac{1}{4}\sin 2x + C $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            $\sin^2 x$ のままでは手がつけられないが、半角の公式（もとは2倍角の公式）を通すことで、中身がただの「1次の $\cos 2x$」に化ける。これなら合成関数の逆再生（ $\cos$ を積分して $\sin$ 、中身の $2x$ の逆数である $\frac{1}{2}$ を前に出す）で一撃で解ける。
+                        </span>
+                    </div>
+
+                    <!-- パターンB：積和の公式 -->
+                    <div style="margin-bottom: 10px; border-top: 1px dashed #cbd5e0; padding-top: 15px;">
+                        <span style="background-color: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #4a5568;">戦略 2：異なる角度の掛け算は「積和の公式」でバラす</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0;">
+                            $$ \int \sin 3x \cos 2x dx \quad \Longrightarrow \quad \frac{1}{2} \int (\sin 5x + \sin x) dx $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            角度が違う三角関数が掛け算されている場合、部分積分を仕掛けると無限ループに陥る。<strong>積和の公式「しん・こす はんぶん しんぷらすしん」</strong>を発動して足し算の形に引き裂けば、それぞれの項を個別に積分するだけのイージーゲームに変貌する。
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド48：部分積分の実戦プロセス（x e^x の解剖） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>部分積分</h2>
+                <span class="badge">講義：部分積分の実戦（そのまま・積分マイナス...）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【具体例】次の積分を、部分積分の呪文を忠実に使って解きほぐすプロセスを解説する。
+                    $$ \int x e^x dx $$
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>［ステップ 1］積分側のペアを決める</strong><br>
+                    「整式（ $x$ ）」と「指数（ $e^x$ ）」の掛け算である。優先順位ルール（整 ＜ 指）に従い、右側にいる <strong>$e^x$ を「先に積分する側」</strong>に任命する。
+                    <br><br>
+                    <strong>［ステップ 2］呪文の発動（前半：そのまま・積分）</strong><br>
+                    左の $x$ は「そのまま」、右の $e^x$ は「積分（ $e^x$ のまま）」してドッキングする。
+                    $$ \color{blue}x \cdot e^x \color{black} - \int \dots $$
+                    <br>
+                    <strong>［ステップ 3］呪文の完結（後半：マイナスインテグラル微分・そのまま）</strong><br>
+                    インテグラルの中では、左の $x$ を「微分（ $1$ になる）」し、右の $e^x$ は「そのまま」スライドする。
+                    $$ y = \color{blue}x e^x \color{black} - \int \color{red}(x)' \cdot e^x \color{black} dx = x e^x - \int \color{red}1 \cdot e^x \color{black} dx $$
+                    最後に残った $\int e^x dx$ を普通に積分してフィニッシュとなる。
+                    $$ y = x e^x - e^x + C = e^x(x - 1) + C $$
+                </div>
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【数式による定義】部分積分法の公式を、関数 $f(x)$ と $g(x)$ を用いて厳密に整理する。
+                </div>
+                <div style="margin-top: 15px;">
+                    部分積分法の公式は、2つの関数 $f(x)$ と $g(x)$ の「積の微分公式」の残像から作られている。
+                    <br><br>
+                    <strong>［公式の成り立ち］</strong><br>
+                    積の微分公式は、次の通りである。
+                    $$ \{f(x)g(x)\}' = f'(x)g(x) + f(x)g'(x) $$
+                    この式の両辺をそのまま $x$ で積分（インテグラルを装着）すると、左辺は微分の記号が外れて元の姿に戻る。
+                    $$ f(x)g(x) = \int f'(x)g(x) dx + \int f(x)g'(x) dx $$
+                    この式を、求めたい積分である <strong>$\int f(x)g'(x) dx$ について解くように移項</strong>したものが、部分積分の公式の正体である。
+                    
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; border-radius: 6px; margin: 20px 0; font-size: 14pt; font-weight: bold; text-align: center;">
+                        $$ \int f(x)g'(x) dx = f(x)g(x) - \int f'(x)g(x) dx $$
+                    </div>
+
+                    <strong>［初学者が数式で迷わないためのマッピング法］</strong><br>
+                    生徒がこの公式を使うとき、頭の中で次の「役割分担」を明確に意識させよ。
+                    <ul>
+                        <li style="margin-bottom: 10px;">左辺の <strong>$g'(x)$</strong> に選ばれた関数は、右辺に移った瞬間に<strong>「真っ先に積分（ $g(x)$ に変化）」</strong>される。</li>
+                        <li style="margin-bottom: 10px;">左辺の <strong>$f(x)$</strong> に選ばれた関数は、最初は<strong>「そのまま」</strong>置かれ、最後のインテグラルの奥で<strong>「微分（ $f'(x)$ に変化）」</strong>される。</li>
+                    </ul>
+                    <br>
+                    この構造が、先ほどインストールした呪文「そのまま・積分マイナス、インテグラル微分・そのまま」の文字通りの正体である。公式のアルファベットをただ追うのではなく、「左側の関数は微分で小さくなり、右側の関数は積分でパーツを繋ぐ」という力学として理解させよ。
+                </div>
+            </div>
+        </div>
+        <!-- スライド51：部分積分の盲点（「1」の強制召喚と log x の積分） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>部分積分②</h2>
+                <span class="badge">講義：部分積分の盲点（隠された「1」を引っ張り出す）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【超重要】$\displaystyle \int \log x dx$ を求めよ。一見すると「掛け算」の形になっていないため、部分積分が使えないように思えるが……？
+                </div>
+                <div style="margin-top: 15px;">
+                    初学者はこの積分を公式として丸暗記しようとするが、入試では $\int \log(x^2+1) dx$ のように形を変えて牙を剥く。ここで発動するのが、<strong>「目の前にあえて『 $1$ 』という整式を強制召喚する」</strong>というテクニックである。
+                    $$ \int \log x dx \quad \Longrightarrow \quad \int \color{red}1 \color{black} \cdot \log x dx $$
+                    優先順位ルール（対 ＜ 整）に従い、自分で用意した <strong>$1$ を「先に積分する側（結果は $x$ ）」</strong>に任命して、お馴染みの呪文を発動する。
+                    <br><br>
+                    <strong>［呪文の実行プロセス］</strong>
+                    <ol>
+                        <li style="margin-bottom: 8px;"><strong>そのまま・積分：</strong>左の $\log x$ はそのまま、右の $1$ を積分して $x$ に。
+                            $$ \color{blue}(\log x) \cdot x \color{black} - \int \dots $$
+                        </li>
+                        <li style="margin-bottom: 8px;"><strong>マイナスインテグラル微分・そのまま：</strong>インテグラルの中で、左の $\log x$ を微分して $\frac{1}{x}$ に、右の $x$ はそのままスライド。
+                            $$ y = x \log x - \int \color{red}(\log x)' \cdot x \color{black} dx = x \log x - \int \color{red}\frac{1}{x} \cdot x \color{black} dx $$
+                        </li>
+                    </ol>
+                    インテグラルの中身が $\frac{1}{x} \cdot x = 1$ というただの数字に綺麗に相殺されるため、結果として使い慣れた公式が自力で完全に導出される。
+                    $$ y = x \log x - \int 1 dx = x \log x - x + C = x(\log x - 1) + C $$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド52：部分積分の無限ループ（指数×三角の同型出現） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>部分積分③</h2>
+                <span class="badge">講義：部分積分の無限ループ（同型出現による方程式処理）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【最高峰】$\displaystyle I = \int e^x \sin x dx$ のように、「指数（ $e^x$ ）」と「三角（ $\sin x$ ）」のコンビは、微分しても積分しても双方が消滅しないため、部分積分を繰り返すと無限ループに陥る。
+                </div>
+                <div style="margin-top: 15px;">
+                    このパターンの脱出方法は、<strong>「2回部分積分を仕掛けて、最初の問題と同じ形（ $I$ ）を無理やり作り出し、方程式として解く」</strong>ことである。
+                    <br><br>
+                    <strong>［脱出のロードマップ： $e^x$ を積分側に固定して2回走る］</strong><br>
+                    ① 1回目の部分積分（そのまま・積分 $\dots$）：
+                    $$ I = \sin x \cdot e^x - \int \cos x \cdot e^x dx = e^x \sin x - \color{red}\int e^x \cos x dx $$
+                    ② 赤い部分に、もう一度だけ部分積分を仕掛ける：
+                    $$ \int e^x \cos x dx = \cos x \cdot e^x - \int (-\sin x) \cdot e^x dx = e^x \cos x + \color{blue}\int e^x \sin x dx $$
+                    ③ ここで、最初の問題と全く同じ形（ $\color{blue}I$ ）が逆転して出現した！
+                    $$ I = e^x \sin x - \left( e^x \cos x + \color{blue}I \color{black} \right) \quad \Longrightarrow \quad I = e^x(\sin x - \cos x) - I $$
+                    あとは、この $-I$ を左辺に移項して $2I$ とし、最後に $2$ で割り算すれば終了である。
+                    $$ 2I = e^x(\sin x - \cos x) \quad \Longrightarrow \quad I = \frac{e^x(\sin x - \cos x)}{2} + C $$
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             積分法：演習セクション（問題＆解説）
+             ========================================== -->
+
+        <!-- 1. 置換積分（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑬ 置換積分（塊と相棒）</h2>
+                <span class="badge">積分法演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の不定積分を求めよ。
+                    $$ \int x(x^2 + 1)^3 dx $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    展開して解くことも不可能ではないが、時間がかかりすぎる。インテグラルの中に「ある塊 $\blacksquare$ 」と「それを微分した相棒 $\blacksquare'$ 」が同居していることに気づければ、置換積分のショートカットルートが開通する。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 置換積分（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑬ 置換積分（塊と相棒）</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］塊と相棒の発見</strong><br>
+                    かっこ分母の塊を $t = x^2 + 1$ と置く。この両辺を $x$ で微分すると $\frac{dt}{dx} = 2x$ となる。<br>
+                    公認のお作法（分数もどき）で $dx$ を引き剥がすと、<strong>$xdx = \frac{1}{2}dt$</strong> という完璧な翻訳カードが手に入る。
+                    <br><br>
+                    <strong>［ステップ 2］$t$ の世界への引っ越し</strong><br>
+                    問題の式に翻訳カードを代入して、$t$ だけのシンプルな積分に変形する。
+                    $$ \int (x^2 + 1)^3 \cdot \color{red}x dx \color{black} \quad \Longrightarrow \quad \int t^3 \cdot \color{red}\frac{1}{2}dt \color{black} = \frac{1}{2} \int t^3 dt $$
+                    <br>
+                    <strong>［ステップ 3］積分を実行し、現実に戻す</strong><br>
+                    普通に $t$ で積分を完了させ、最後に $t$ を元の $x^2 + 1$ に戻してフィニッシュ。
+                    $$ \frac{1}{2} \cdot \frac{1}{4}t^4 + C = \frac{1}{8}(x^2 + 1)^4 + C $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \frac{1}{8}(x^2 + 1)^4 + C \quad (\text{Cは積分定数}) $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 部分積分（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑭ 部分積分公式の適用</h2>
+                <span class="badge">積分法演習：重要</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の不定積分を求めよ。
+                    $$ \int x \cos x dx $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    「整式（ $x$ ）」と「三角（ $\cos x$ ）」という異なる種類の関数の掛け算である。優先順位ルール（整 ＜ 三）に従い、どちらを先に積分側の $g'(x)$ に選ぶべきか判断し、あの呪文を発動せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 部分積分（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑭ 部分積分公式の適用</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］積分側のペアの決定</strong><br>
+                    ルール通り、右側にいる三角関数の <strong>$\cos x$ を「先に積分する側」</strong>、整式の <strong>$x$ を「そのまま・微分する側」</strong>に任命する。
+                    <br><br>
+                    <strong>［ステップ 2］呪文の発動（そのまま・積分）</strong><br>
+                    左の $x$ はそのまま、右の $\cos x$ を積分して $\sin x$ にし、ドッキングする。
+                    $$ \color{blue}x \cdot \sin x \color{black} - \int \dots $$
+                    <br>
+                    <strong>［ステップ 3］呪文の完結（マイナスインテグラル微分・そのまま）</strong><br>
+                    インテグラルの中で、左の $x$ を微分して $1$ にし、右の $\sin x$ はそのままスライドさせる。
+                    $$ y = x \sin x - \int \color{red}(x)' \cdot \sin x \color{black} dx = x \sin x - \int \color{red}1 \cdot \sin x \color{black} dx $$
+                    最後に $\int \sin x dx = -\cos x$ （結果に「コ」でマイナス）を実行してフィニッシュ。マイナスが衝突してプラスになる点に注意。
+                    $$ y = x \sin x - (-\cos x) + C = x \sin x + \cos x + C $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ x \sin x + \cos x + C \quad (\text{Cは積分定数}) $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 分数関数・f'(x)/f(x) の形（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑮ 分数関数の積分</h2>
+                <span class="badge">積分法演習：必修パターン</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の不定積分を求めよ。
+                    $$ \int \frac{x}{x^2 + 3} dx $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    分数式を見たら、まずは分子と分母の次数の力関係を確認せよ。今回は分子（1次）が分母（2次）より軽い。このとき、分母を頭の中で微分した形が、分子に惜しい形で浮いていないだろうか？
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 分数関数・f'(x)/f(x) の形（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑮ 分数関数の積分</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］「分母の微分」の形への変形</strong><br>
+                    分母の $f(x) = x^2 + 3$ を微分すると $2x$ である。分子には $x$ しかいないため、<strong>あえて「 2 」を強引に掛け算し、前に「 $\frac{1}{2}$ 」を置いて帳尻を合わせる</strong>。
+                    $$ \int \frac{x}{x^2 + 3} dx = \frac{1}{2} \int \frac{\color{red}2x \color{black}}{x^2 + 3} dx $$
+                    <br>
+                    <strong>［ステップ 2］最強対数公式の発動</strong><br>
+                    これで分子が完全に「分母の微分（ $f'(x)$ ）」の形になったため、分母をごっそり $\log$ の中に吸い込ませる。
+                    $$ y = \frac{1}{2} \log |x^2 + 3| + C $$
+                    <br>
+                    <strong>［ステップ 3］絶対値の外し（ハイレベル検算）</strong><br>
+                    $x^2 + 3$ は、$x$ がどんな実数であっても常にプラス（ 0 より大きい ）であることが確定している。したがって、記述の答案では絶対値を普通のかっこに外して仕上げるのが洗練された記述となる。
+                    $$ y = \frac{1}{2} \log (x^2 + 3) + C $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \frac{1}{2} \log (x^2 + 3) + C \quad (\text{Cは積分定数}) $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 三角関数の形状変換（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑯ 三角関数の次数下げ</h2>
+                <span class="badge">積分法演習：定番</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の不定積分を求めよ。
+                    $$ \int \cos^2 x dx $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    $\cos^2 x$ のままでは、置換積分も部分積分も手が出ない。三角関数の積分の鉄則<strong>「2乗を見たら、数Ⅱの公式を使って1次に強制降格させる」</strong>という戦略を思い出せ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 三角関数の形状変換（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑯ 三角関数の次数下げ</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］半角の公式による形状変換</strong><br>
+                    $\cos^2 x$ を半角の公式を用いて、1次の $\cos 2x$ の式に書き換える。
+                    $$ \int \cos^2 x dx \quad \Longrightarrow \quad \int \frac{1 + \cos 2x}{2} dx = \frac{1}{2} \int (1 + \cos 2x) dx $$
+                    <br>
+                    <strong>［ステップ 2］1次式の合成関数の積分</strong><br>
+                    それぞれの項を個別に積分する。ここで $\cos 2x$ を積分するときは、中身の $2x$ を微分した「 2 」の逆数である <strong>$\frac{1}{2}$ を前に掛け算する</strong>のを絶対に忘れてはならない。
+                    $$ y = \frac{1}{2} \left( x + \color{red}\frac{1}{2} \color{black} \sin 2x \right) + C $$
+                    <br>
+                    <strong>［ステップ 3］かっこを展開して整理</strong><br>
+                    全体の $\frac{1}{2}$ を分配法則で展開してフィニッシュ。
+                    $$ y = \frac{1}{2}x + \frac{1}{4}\sin 2x + C $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \frac{1}{2}x + \frac{1}{4}\sin 2x + C \quad (\text{Cは積分定数}) $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 三角関数の分数積分・分子分母掛け（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑰ 1/sin x の難関積分</h2>
+                <span class="badge">積分法演習：最高峰の初見殺し</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の不定積分を求めよ。
+                    $$ \int \frac{1}{\sin x} dx $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    分母に $\sin x$ が単独でポツンと佇んでいる。このままでは身動きが取れないため、スライド50で学んだ魔術<strong>「分子と分母にあえて同じものを掛け算し、微分（相棒）を分子に強制召喚する」</strong>という突破口を切り開け。
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 三角関数の分数積分・分子分母掛け（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑰ 1/sin x の難関積分</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div>
+                    <strong>［ステップ 1］分子・分母への同物掛けと変形</strong><br>
+                    分子と分母にあえて「 $\sin x$ 」を掛け算し、分母の $\sin^2 x$ を $1 - \cos^2 x$ へと変身させる。
+                    $$ \int \frac{1}{\sin x} dx \quad \Longrightarrow \quad \int \frac{\sin x}{\sin^2 x} dx \quad \Longrightarrow \quad \int \frac{\sin x}{1 - \cos^2 x} dx $$
+                    これで分母の塊 $t = \cos x$ に対し、分子にその微分（相棒 $(\cos x)' = -\sin x$）の影が完成する。
+                    <br><br>
+                    <strong>［ステップ 2］置換による分数パターンのハメ込み</strong><br>
+                    $t = \cos x$ と置くと $\frac{dt}{dx} = -\sin x$ より、$\sin x dx = -dt$ となる。
+                    $$ \int \frac{1}{1 - t^2} (\color{red}-dt \color{black}) = \int \frac{1}{t^2 - 1} dt = \int \frac{1}{(t-1)(t+1)} dt $$
+                    分母が因数分解できたので、<strong>パターン3（部分分数分解）</strong>を仕掛けて引き算に引き裂く。
+                    $$ \int \frac{1}{2} \left( \frac{1}{t-1} - \frac{1}{t+1} \right) dt = \frac{1}{2} \left( \log|t-1| - \log|t+1| \right) + C = \frac{1}{2} \log \left| \frac{t-1}{t+1} \right| + C $$
+                    <br>
+                    <strong>［ステップ 3］現実への帰還と整理</strong><br>
+                    $t = \cos x$ を元の姿に戻す。絶対値の中身を整えるため、分母分子に $-1$ を掛け算して美しく整えて終了。
+                    $$ y = \frac{1}{2} \log \left| \frac{\cos x - 1}{\cos x + 1} \right| + C = \frac{1}{2} \log \frac{1 - \cos x}{1 + \cos x} + C \quad \text{（※中身が常に正なので絶対値解除可）} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">$$ \frac{1}{2} \log \frac{1 - \cos x}{1 + \cos x} + C \quad (\text{Cは積分定数}) $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 定積分p25～ -->
+         <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ　定積分</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+         <!-- ==========================================
+             数Ⅲ積分法：定積分講義セクション
+             ========================================== -->
+
+        <!-- スライド53：定積分とは何か（インテグラルに数字が乗る意味） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>定積分の本質 ①</h2>
+                <span class="badge">講義：定積分の定義と「面積」への架け橋</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【概念】不定積分に「数字（区間）」が乗っかったものが定積分（ $\displaystyle \int_{a}^{b} f(x) dx$ ）である。不定積分との決定的な違いを整理する。
+                </div>
+                <div style="margin-top: 15px;">
+                    <ul>
+                        <li style="margin-bottom: 12px;"><strong>不定積分：</strong>答えは「 $x$ の関数（数式）」。＋ $C$ という仮の姿のまま終わる。</li>
+                        <li style="margin-bottom: 12px;"><strong>定積分：</strong>答えは「ただの定数（具体的な数字）」。上端と下端を代入して引き算するため、積分定数 $C$ は完全に相殺されて消滅する。</li>
+                    </ul>
+                    $$ \int_{a}^{b} f(x) dx = [F(x)]_{a}^{b} = F(b) - F(a) $$
+                    <br>
+                    <strong>【初学者へ絶対に意識させる幾何学的イメージ】</strong><br>
+                    定積分が計算しているものの正体は、<strong>「曲線 $y = f(x)$ と $x$ 軸、および直線 $x=a, x=b$ で囲まれた部分の『面積（符号付き）』」</strong>である。<br>
+                    ただの代入ゲームとして処理させるのではなく、常に「いま自分はグラフのどの部分の広さを削り出しているのか」を意識させることが、次章の「面積・体積」の応用問題で迷子にならないための絶対条件となる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド54：定積分の置換積分（魔の「区間引っ越し」） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>定積分の本質 ②</h2>
+                <span class="badge">講義：定積分の置換積分（パスポートの更新）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【超重要】数Ⅲの記述入試・模試で、受験生が最も大量失点するポイント。定積分で文字を $t$ に置換するとき、<strong>「積分の区間（数字）」も完全に $t$ の世界の住人に変えなければならない</strong>。
+                </div>
+                <div style="margin-top: 15px;">
+                    不定積分では最後に $t$ を $x$ に戻す必要があったが、定積分では<strong>「区間さえ $t$ に引っ越しさせてしまえば、二度と $x$ の世界に戻る必要はない」</strong>という利点がある。その代わり、引っ越し用の「対応表」を答案に絶対に書かなければならない。
+                    <br><br>
+                    <strong>［魔の減点エリアを回避する記述の型］</strong><br>
+                    例えば、$\displaystyle \int_{0}^{1} x(x^2 + 1)^3 dx$ で $t = x^2 + 1$ と置換する場合：
+                    <table style="width: 50%; border-collapse: collapse; margin: 15px 0; text-align: center; font-size: 12pt;">
+                        <tr style="border-bottom: 1px solid #cbd5e0;">
+                            <td style="padding: 6px; background-color: #e2e8f0; font-weight: bold; width: 30%;">$x$</td>
+                            <td style="padding: 6px; width: 35%; font-weight: bold;">$0$</td>
+                            <td style="padding: 6px; width: 35%; font-weight: bold;">$\longrightarrow$</td>
+                            <td style="padding: 6px; width: 35%; font-weight: bold;">$1$</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px; background-color: #edf2f7; font-weight: bold;">$t$</td>
+                            <td style="padding: 6px; color: #e53e3e; font-weight: bold;">$1$</td>
+                            <td style="padding: 6px; color: #e53e3e; font-weight: bold;">$\longrightarrow$</td>
+                            <td style="padding: 6px; color: #e53e3e; font-weight: bold;">$2$</td>
+                        </tr>
+                    </table>
+                    <span style="font-size: 11pt; color: #4a5568;">
+                        $x=0$ のとき $t = 0^2 + 1 = 1$、 $x=1$ のとき $t = 1^2 + 1 = 2$ となり、積分区間は $\int_{1}^{2}$ に生まれ変わる。
+                    </span>
+                    <br><br>
+                    生徒には<strong>「 $x$ から $t$ の世界へ行くときは、国境を越えるようなもの。数字（区間）も $t$ 世界のパスポート（対応表）に更新しないと、密入国で一発大減点（または零点）を喰らうよ」</strong>と危機感を持って教え込むのが劇的に効く。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド55：偶関数・奇関数の定積分（対称性のボーナスステージ） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>定積分の本質 ③</h2>
+                <span class="badge">講義：偶関数・奇関数（対称区間における計算の裏ワザ）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【時短テク】$\displaystyle \int_{-a}^{a} f(x) dx$ のように、<strong>積分区間の数字が「マイナスからプラスまで（上下対称）」</strong>になっているとき、計算を爆速で終わらせる対称性の秘密を学ぶ。
+                </div>
+                <div style="margin-top: 15px;">
+                    関数のグラフが「 $y$ 軸対称（偶関数）」か「原点対称（奇関数）」かによって、インテグラルの中身を瞬時に消滅・変形させることができる。
+                    <br><br>
+                    
+                    <!-- 奇関数 -->
+                    <div style="margin-bottom: 20px;">
+                        <span style="background-color: #fed7d7; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #9b2c2c;">パターン 1：奇関数（原点対称： $x, x^3, \sin x$ など）</span>
+                        <div style="font-size: 15pt; font-weight: bold; margin: 5px 0; color: #e53e3e;">
+                            $$ \int_{-a}^{a} (\text{奇関数}) dx = 0 $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            原点対称なグラフでは、マイナス側の面積とプラス側の面積が「完全に同じ大きさで符号が逆」になるため、足し合わせると<strong>一瞬でゼロ（ $0$ ）になって消滅する</strong>。入試で複雑な式が出たら、まず奇関数が混ざっていないか探させよ。
+                        </span>
+                    </div>
+
+                    <!-- 偶関数 -->
+                    <div style="margin-bottom: 10px; border-top: 1px dashed #cbd5e0; padding-top: 15px;">
+                        <span style="background-color: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #4a5568;">パターン 2：偶関数（y軸対称： $x^2, \cos x$ など）</span>
+                        <div style="font-size: 15pt; font-weight: bold; margin: 5px 0; color: #2b6cb0;">
+                            $$ \int_{-a}^{a} (\text{偶関数}) dx = 2 \int_{0}^{a} (\text{偶関数}) dx $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            $y$ 軸で左右対称なため、右側（ $0 \to a$ ）の面積を求めてそれを<strong>「2倍」</strong>すれば良い。初学者にとって最も計算ミスが出やすい「マイナスの数字の代入」を、下端を $0$ にすることで完全に回避できる神の時短テクニックである。
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- スライド56：定積分の最終兵器「キングプロパティ」 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>定積分の本質 ④</h2>
+                <span class="badge">講義：キングプロパティ（区間反転による対称性の魔術）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【最高峰】難解な場合は後回しで良い。<br>難関大の入試で突如として現れる、置換も部分積分も通用しない極悪な関数を一撃で解きほぐす最強の対称性公式「キングプロパティ」をインストールする。
+                </div>
+                <div style="margin-top: 15px;">
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; border-radius: 6px; margin: 15px 0; font-size: 14pt; font-weight: bold; text-align: center;">
+                        $$ \int_{a}^{b} f(x) dx = \int_{a}^{b} f(a + b - x) dx $$
+                    </div>
+                    <strong>［なぜこれが成り立つのか？（証明の本質）］</strong><br>
+                    左辺の積分において、 <strong>$7t = a + b - x$</strong> と置換するだけである。 $dx = -dt$ となり、区間は $x: a \to b$ から $t: b \to a$ へと上下がひっくり返る。<br>
+                    このマイナス（ $-$ ）を使って積分の上下を元の $\int_{a}^{b}$ に戻してあげれば、文字を $x$ に書き換えることで完全に右辺と一致する。
+                    <br><br>
+                    
+                    <strong>［実戦での圧倒的な使い方：足して2で割る］</strong><br>
+                    この公式の真価は、元の積分を $I$ と置いたとき、<strong>「 $I$ と、公式で変形した $I$ を、左右からガッチャンコと足し算する」</strong>ことで発動する。
+                    $$ 2I = \int_{a}^{b} \Big\{ f(x) + f(a + b - x) \Big\} dx $$
+                    どれほど複雑でエグい形をした $f(x)$ であっても、この引き算の相棒と合体した瞬間に、中身が綺麗に相殺されてただの「 1 」や「簡単な定数」に化けてしまう。
+                    <br><br>
+                    <div class="answer-box" style="background-color: #f7fafc; border-left-color: #4a5568; padding: 10px 15px;">
+                        <strong>💡 指導のポイント：</strong><br>
+                        「単体では絶対に積分できないのに、区間を足して引いた中身（ $a+b-x$ ）を代入して元の式と足し算すると、パズルのピースが噛み合うように中身が消滅する。この圧倒的なカタルシスこそがキングプロパティの魅力だよ」と教えることで、難関大特有の『対称性を見抜く大局観』を最高のタイミングで授けることができる。
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             定積分：演習セクション（問題＆解説）
+             ========================================== -->
+
+        <!-- 1. 定積分の基本と代入（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑱ 定積分の基本計算</h2>
+                <span class="badge">定積分演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の定積分を計算せよ。
+                    $$ \int_{1}^{e} \frac{\log x}{x} dx $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    インテグラルの中に「 $\log x$（塊）」と「 $\frac{1}{x}$（相棒）」が同居しているため、置換積分を利用する。定積分なので、文字を置き換えた瞬間に<strong>「積分区間（ $1$ から $e$ ）の引っ越し」</strong>を絶対に忘れないこと。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 定積分の基本と代入（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑱ 定積分の基本計算</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］塊の置換と「パスポート」の更新</strong><br>
+                    $t = \log x$ と置く。両辺を微分すると $\frac{dt}{dx} = \frac{1}{x}$ より $\frac{1}{x}dx = dt$ となる。<br>
+                    ここで、定積分最大の命綱である「区間の引っ越し表」を答案に作成する。
+                    <ul>
+                        <li>$x$ が $1 \longrightarrow e$ と動くとき、</li>
+                        <li>$t$ は $\log 1 \longrightarrow \log e$ 、つまり <strong>$0 \longrightarrow 1$</strong> へと引っ越す。</li>
+                    </ul>
+                    <br>
+                    <strong>［ステップ 2］$t$ の世界だけで完結させる</strong><br>
+                    区間を $0 \to 1$ に更新すれば、もう $x$ の世界に戻る必要はない。そのまま $t$ の式として積分を計算する。
+                    $$ \int_{1}^{e} \log x \cdot \frac{1}{x} dx \quad \longrightarrow \quad \int_{0}^{1} t dt = \left[ \frac{1}{2}t^2 \right]_{0}^{1} $$
+                    <br>
+                    <strong>［ステップ 3］上端・下端の代入</strong><br>
+                    上の数字（ 1 ）を代入した結果から、下の数字（ 0 ）を代入した結果を引き算して終了。
+                    $$ \left( \frac{1}{2} \cdot 1^2 \right) - \left( \frac{1}{2} \cdot 0^2 \right) = \frac{1}{2} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \frac{1}{2} $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 偶関数・奇関数の定積分（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑲ 対称区間と偶奇性の利用</h2>
+                <span class="badge">定積分演習：時短テク</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の定積分を計算せよ。
+                    $$ \int_{-\frac{\pi}{2}}^{\frac{\pi}{2}} (x^3 + \cos x) dx $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    積分区間が <strong>$-\frac{\pi}{2}$ から $\frac{\pi}{2}$ まで（上下対称）</strong>になっている。まともに計算すると地獄のような代入作業になるが、インテグラルの中身を「偶関数」と「奇関数」に引き裂くことで、ボーナスステージに変貌する。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 偶関数・奇関数の定積分（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑲ 対称区間と偶奇性の利用</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］奇関数を一瞬で消滅させる</strong><br>
+                    $x^3$ は原点対称な「奇関数」である。上下対称な区間 $\left[-\frac{\pi}{2}, \frac{\pi}{2}\right]$ で積分すると、プラスとマイナスの面積が相殺されて<strong>完全にゼロ（ $0$ ）になって消える</strong>ため、計算から除外して良い。
+                    <br><br>
+                    <strong>［ステップ 2］偶関数を「0から」の2倍に変形</strong><br>
+                    $\cos x$ は $y$ 軸対称な「偶関数」である。左右対称の性質を使い、区間を「 $0 \longrightarrow \frac{\pi}{2}$ 」に絞って、全体を <strong>2倍</strong> に書き換える。
+                    $$ \int_{-\frac{\pi}{2}}^{\frac{\pi}{2}} (x^3 + \cos x) dx = 0 + 2 \int_{0}^{\frac{\pi}{2}} \cos x dx $$
+                    <br>
+                    <strong>［ステップ 3］爆速で代入フィニッシュ</strong><br>
+                    ミスが出やすいマイナスの代入を完全に回避し、 0 の代入に持ち込めたため極めて安全に処理できる。
+                    $$ 2 \Big[ \sin x \Big]_{0}^{\frac{\pi}{2}} = 2 \left( \sin \frac{\pi}{2} - \sin 0 \right) = 2 (1 - 0) = 2 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ 2 $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 定積分の部分積分（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】⑳ 定積分の部分積分法</h2>
+                <span class="badge">定積分演習：重要</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の定積分を計算せよ。
+                    $$ \int_{0}^{1} x e^x dx $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    講義（スライド48）で扱った部分積分の形に、今度は区間がついたパターンである。定積分の部分積分では、<strong>前半の「そのまま・積分」のパーツにも、その場で即座に区間 $[0, 1]$ をハメ込んで代入処理をスタンバイさせる</strong>のがコツである。
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 定積分の部分積分（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】⑳ 定積分の部分積分法</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］定積分の部分積分公式の発動</strong><br>
+                    優先順位ルール（整 ＜ 指）より、 $e^x$ を積分側に選んで呪文を走らせる。
+                    $$ \int_{0}^{1} x e^x dx = \Big[ x e^x \Big]_{0}^{1} - \int_{0}^{1} (x)' \cdot e^x dx $$
+                    <br>
+                    <strong>［ステップ 2］前半パーツの代入を先行して片付ける</strong><br>
+                    $\Big[ x e^x \Big]_{0}^{1}$ の部分に数字を代入する。 $1 \cdot e^1 - 0 \cdot e^0 = e$ となり、式が一気に軽くなる。
+                    $$ \Big[ x e^x \Big]_{0}^{1} = (1 \cdot e^1) - (0 \cdot e^0) = e $$
+                    これをもとの式に書き戻すと、残りは後ろのシンプルなインテグラルだけになる。
+                    $$ y = e - \int_{0}^{1} e^x dx $$
+                    <br>
+                    <strong>［ステップ 3］後半の積分を実行してフィニッシュ</strong><br>
+                    $$ y = e - \Big[ e^x \Big]_{0}^{1} = e - (e^1 - e^0) = e - e + 1 = 1 $$
+                    ※ $e^0 = 1$ になるトラップ（初学者がよく $0$ にして自滅する）を確実に回避させること。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ 1 $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 三角関数の定積分（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】21 三角関数の定積分</h2>
+                <span class="badge">定積分演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の定積分を計算せよ。
+                    $$ \int_{0}^{\frac{\pi}{4}} \tan x dx $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    $\tan x$ の単独積分は公式として用意されていない。まずは $\tan x = \frac{\sin x}{\cos x}$ と相互関係の式に引き裂き、分数関数のどのパターンに合流するかを見極めよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 三角関数の定積分（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】21 三角関数の定積分</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］「分母の微分」の形をクリエイトする</strong><br>
+                    分数式に変形すると、分母の $\cos x$ を微分した形（ $-\sin x$ ）が分子に欲しい、という状態になる。そこで、<strong>分子にマイナス（ $-$ ）を強引に付与し、インテグラルの前にもマイナスを出して帳尻を合わせる</strong>。
+                    $$ \int_{0}^{\frac{\pi}{4}} \frac{\sin x}{\cos x} dx = - \int_{0}^{\frac{\pi}{4}} \frac{\color{red}-\sin x \color{black}}{\cos x} dx $$
+                    <br>
+                    <strong>［ステップ 2］対数吸い込み公式の発動</strong><br>
+                    分子が完全に分母の微分になったため、分母を $\log$ に吸い込ませる。
+                    $$ y = - \Big[ \log |\cos x| \Big]_{0}^{\frac{\pi}{4}} $$
+                    <br>
+                    <strong>［ステップ 3］値の代入と対数法則による整理</strong><br>
+                    区間内の $\cos x$ は常にプラスなので絶対値を外し、上端と下端を代入する。
+                    $$ y = - \left( \log \cos \frac{\pi}{4} - \log \cos 0 \right) = - \left( \log \frac{1}{\sqrt{2}} - \log 1 \right) $$
+                    $\log 1 = 0$、および $\log \frac{1}{\sqrt{2}} = \log 2^{-\frac{1}{2}} = -\frac{1}{2}\log 2$ であるため、先頭のマイナスと打ち消し合って綺麗に整理される。
+                    $$ y = - \left( -\frac{1}{2}\log 2 - 0 \right) = \frac{1}{2}\log 2 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \frac{1}{2}\log 2 \quad (\text{または } \log \sqrt{2}) $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. キングプロパティ（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】22 最終兵器キングプロパティ</h2>
+                <span class="badge">定積分演習：最高峰</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の定積分を計算せよ。
+                    $$ I = \int_{0}^{\frac{\pi}{2}} \frac{\sin x}{\sin x + \cos x} dx $$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    置換積分も部分積分も完全に弾かれる難問である。ここでスライド56で学んだ最終奥義<strong>「キングプロパティ（ $x$ を $a+b-x$ に置き換える）」</strong>を発動させ、元の式 $I$ と変形後の式 $I$ をガッチャンコと足し合わせよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. キングプロパティ（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】22 最終兵器キングプロパティ</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div>
+                    <strong>［ステップ 1］キングプロパティによる形状変換</strong><br>
+                    公式 $\int_{a}^{b} f(x) dx = \int_{a}^{b} f(a+b-x) dx$ を適用する。今回の区間は $0$ から $\frac{\pi}{2}$ なので、式の中のすべての $x$ を <strong>「 $\frac{\pi}{2} - x$ 」</strong> に置き換える。
+                    $$ I = \int_{0}^{\frac{\pi}{2}} \frac{\sin(\frac{\pi}{2}-x)}{\sin(\frac{\pi}{2}-x) + \cos(\frac{\pi}{2}-x)} dx $$
+                    三角関数の公式 $\sin(\frac{\pi}{2}-x) = \cos x$ 、および $\cos(\frac{\pi}{2}-x) = \sin x$ を代入すると、式は以下のようにトランスフォームする。
+                    $$ I = \int_{0}^{\frac{\pi}{2}} \frac{\cos x}{\cos x + \sin x} dx $$
+                    <br>
+                    <strong>［ステップ 2］２つの $I$ のガッチャンコ（足し算）</strong><br>
+                    問題の最初の上式 $I$ と、いま変換した下式 $I$ を左右から足し算して <strong>$2I$</strong> を作る。分母が共通しているため、分子同士をそのまま足すことができる。
+                    $$ 2I = \int_{0}^{\frac{\frac{\pi}{2}}} \frac{\sin x}{\sin x + \cos x} dx + \int_{0}^{\frac{\pi}{2}} \frac{\cos x}{\sin x + \cos x} dx = \int_{0}^{\frac{\pi}{2}} \frac{\sin x + \cos x}{\sin x + \cos x} dx $$
+                    なんと、分子と分母が完全に一致し、中身がただの <strong>「 1 」</strong> に化けて消滅してしまった！
+                    $$ 2I = \int_{0}^{\frac{\pi}{2}} 1 dx $$
+                    <br>
+                    <strong>［ステップ 3］方程式を解いてフィニッシュ</strong><br>
+                    ただの「1」を積分して区間を代入する。
+                    $$ 2I = \Big[ x \Big]_{0}^{\frac{\pi}{2}} = \frac{\pi}{2} - 0 = \frac{\pi}{2} $$
+                    最後に、左辺の「 2 」で割り算して、私たちが求めたかった元の $I$ の値が鮮やかに導き出される。
+                    $$ I = \frac{\pi}{4} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ \frac{\pi}{4} $$</div>
+                </div>
+            </div>
+        </div>
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ　積分の応用</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ積分法：最終応用（面積・体積・道のり）
+             ========================================== -->
+
+        <!-- スライド57：面積の本質（縦切り vs 横切り） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分の最終応用 ①</h2>
+                <span class="badge">講義：面積の本質（「上引く下」と「右引く左」の自動選択）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【面積】2つの曲線で囲まれた面積を求める問題。数Ⅱまでは「上引く下」の縦切り一択だったが、数Ⅲからは状況に応じて切り方を変える大局観が求められる。
+                </div>
+                <div style="margin-top: 15px;">
+                    グラフの形状や交点の見え方によって、次の2つの戦略を直感的に使い分ける。
+                    <br><br>
+                    
+                    <!-- 縦切り -->
+                    <div style="margin-bottom: 20px;">
+                        <span style="background-color: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #4a5568;">戦略 1：$x$ 軸で積分する（縦切り）</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0; color: #2b6cb0;">
+                            $$ S = \int_{a}^{b} \Big\{ f(x) - g(x) \Big\} dx \quad \Longrightarrow \quad \int \big( \text{上の関数} - \text{下の関数} \big) dx $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            基本中の基本。幅 $dx$ の極細な「縦の線（上マイナス下）」を、 $x=a$ から $b$ まで隙間なく敷き詰めるイメージ。
+                        </span>
+                    </div>
+
+                    <!-- 横切り -->
+                    <div style="margin-bottom: 10px; border-top: 1px dashed #cbd5e0; padding-top: 15px;">
+                        <span style="background-color: #feebc8; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #c05621;">戦略 2：$y$ 軸で積分する（横切り）</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0; color: #dd6b20;">
+                            $$ S = \int_{c}^{d} \Big\{ x_1 - x_2 \Big\} dy \quad \Longrightarrow \quad \int \big( \text{右の関数} - \text{左の関数} \big) dy $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            $y=x^2$ を $x= \sqrt{y}$ のように $x=$ の形に変形し、高さ $dy$ の「横の線（右マイナス左）」を、 $y=c$ から $d$ まで積み上げていく手法。無理関数をわざわざ $x$ 軸で無理やり縦切りしようとして地獄を見る生徒に、この「横切り」の視点を与えると視野が劇的に広がる。
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド58：回転体の体積（円盤のパウムクーヘン積み上げ） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分の最終応用 ②</h2>
+                <span class="badge">講義：体積の本質（回転体が描く「円盤の断面積」）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【体積】数Ⅲの立体図形問題。どんなに複雑な回転体であっても、その正体は「極薄の円盤（コイン）をひたすら重ねたもの」に過ぎない。
+                </div>
+                <div style="margin-top: 15px;">
+                    軸のまわりにぐるりと1回転させた立体の体積は、中学数学の「円の面積 ＝ $\pi r^2$ 」の知識だけで100%立式できる。
+                    <br><br>
+                    <strong>［回転軸による半径 $r$ の見極め］</strong>
+                    <ul>
+                        <li style="margin-bottom: 15px;"><strong>$x$ 軸まわりの回転体：</strong><br>
+                        回転の半径は、グラフの縦の長さ（つまり $y$ ）。断面の円の面積は $\pi y^2$ になる。<br>
+                        これを $x$ の世界で敷き詰めるため、公式は次のようになる。
+                        <div style="font-size: 14pt; font-weight: bold; margin-top: 5px; color: #2b6cb0;">$$ V = \pi \int_{a}^{b} y^2 dx $$</div>
+                        </li>
+                        <li><strong>$y$ 軸まわりの回転体：</strong><br>
+                        回転の半径は、グラフの横の長さ（つまり $x$ ）。断面の円の面積は $\pi x^2$ になる。<br>
+                        これを $y$ の世界で積み上げるため、公式は次のようになる。
+                        <div style="font-size: 14pt; font-weight: bold; margin-top: 5px; color: #dd6b20;">$$ V = \pi \int_{c}^{d} x^2 dy $$</div>
+                        </li>
+                    </ul>
+                    <span style="font-size: 11pt; color: #4a5568;">
+                        生徒には「公式の $\pi \int y^2 dx$ を呪文のように暗記するな。インテグラルの奥にいる $\pi y^2$ は、ただの『半径 $y$ の円の面積』だ。それに厚み $dx$ を掛けた極薄円盤をスキャンしているだけだよ」と教え込むことで、立式ミスが完全に消滅する。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド59：道のりと曲線の長さ（三平方の定理の超連続） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>積分の最終応用 ③</h2>
+                <span class="badge">講義：速度・道のりと曲線の長さ（ミクロな斜め線の集大成）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【道のり】数Ⅲで新しく登場する「曲がった線の長さ（曲線の長さ）」および「点が動いた総距離（道のり）」の公式の正体を暴く。
+                </div>
+                <div style="margin-top: 15px;">
+                    一見するとルート（ $\sqrt{\quad}$ ）が入っていて極めておぞましい公式だが、この正体はただの<strong>「三平方の定理」</strong>の無限連続である。
+                    <br><br>
+                    グラフの上の、目に見えないほどミクロな「斜め線のパーツ（ $dL$ ）」を想像させる。この斜め線の横幅は $dx$、縦幅は $dy$ であるため、三平方の定理から次の関係が成り立つ。
+                    $$ dL = \sqrt{(dx)^2 + (dy)^2} $$
+                    このパーツをインテグラルで最初から最後まで全て足し合わせたい。ここで、先ほど微分の章（スライド39）で学んだ、 $dt$ や $dx$ を分数のように割り込ませる魔法が牙を剥く。
+                    <br><br>
+                    <strong>［媒介変数 $t$ で表された曲線の長さ・道のり］</strong><br>
+                    ルートの中に強引に $(dt)^2$ を割り込ませて外に引っ張り出すと、受験生お馴染みのあの公式が綺麗に完成する。
+                    <div style="font-size: 14pt; font-weight: bold; margin: 10px 0; color: #e53e3e; text-align: center;">
+                        $$ L = \int_{\alpha}^{\beta} \sqrt{\left(\frac{dx}{dt}\right)^2 + \left(\frac{dy}{dt}\right)^2} dt $$
+                    </div>
+                    物理の「速度ベクトルの大きさを積分すると、移動した総距離（道のり）になる」という概念と完全に一致していることを紐解き、数Ⅲと物理のネットワークを脳内に構築させよ。
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 画面下の操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 3</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- スライドを制御するスクリプト -->
+        <!-- スライドを制御するスクリプト（スマホボタン限定版） -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        // PC用のキーボード操作（←、→、スペース、Enter）は維持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+    </script>
+    <!-- ==========================================
+         全スライド共通：ポップアップ式スキップ機能（目次）
+         ========================================== -->
+    <!-- 画面右下に常駐するメニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu" style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <!-- 各章へのジャンプボタン（実際のスライドのインデックス番号を指定） -->
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">不定積分（スライド1〜）</button>
+            <button onclick="goToSlide(25)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">定積分（スライド25〜）</button>
+            <button onclick="goToSlide(25)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">積分の応用（スライド40〜）</button>
+            <button onclick="goToSlide(999)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">ラスト</button>
+        </div>
+    </div>
+
+    <script>
+        // メニューの開閉制御
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        }
+
+        // 指定したスライドインデックス（0スタート）へ直接ジャンプ
+        function goToSlide(slideIndex) {
+            // お使いのスクリプト内の管理変数「currentSlide」を直接更新
+            currentSlide = slideIndex;
+            
+            // 安全策：インデックスの範囲外チェック
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            
+            // お使いのスクリプト内の画面更新関数「updateSlide()」をトリガー
+            updateSlide();
+            
+            // メニューを自動で閉じる
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        // 画面のどこかをクリックしたらメニューを自動で閉じる
+        document.addEventListener('click', function() {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
