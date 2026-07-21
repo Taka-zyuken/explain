@@ -32,11 +32,21 @@
             padding-bottom: 15px;
         }
 
+        /* カテゴリーの見出し */
+        .category-title {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            padding-left: 10px;
+            border-left: 4px solid #3498db;
+        }
+
         /* リンク一覧のグリッドレイアウト */
         .grid-list {
             list-style: none;
             padding: 0;
-            margin: 0;
+            margin: 0 0 20px 0;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
@@ -70,11 +80,23 @@
 
     <div class="container">
         <h1>数学の解説ページ一覧</h1>
+        <h2 class="category-title">数Ⅰ・A</h2>
         <ul class="grid-list">
-            <li><a href="微分.html">微分</a></li>
-            <li><a href="放物線.html">放物線</a></li>
+            <!--<li><a href="数列.html">数列</a></li>-->
+        </ul>
+
+        <!-- 数Ⅱ・B グループ -->
+        <h2 class="category-title">数Ⅱ・B</h2>
+        <ul class="grid-list">
             <li><a href="数列.html">数列</a></li>
+        </ul>
+
+        <!-- 数Ⅲ・C グループ -->
+        <h2 class="category-title">数Ⅲ・C</h2>
+        <ul class="grid-list">
+            <li><a href="放物線.html">放物線</a></li>
             <li><a href="極限.html">極限</a></li>
+            <li><a href="微分.html">微分</a></li>
             <li><a href="積分.html">積分</a></li>
             <li><a href="複素数.html">複素数</a></li>
         </ul>
