@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅲ　極限</title>
+    
+    <!-- 数式を美しく表示するためのMathJaxライブラリ -->
+     <!-- 200行辺りまでテンプレ -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        /* 全体スタイルの定義（明朝体・である調の統一ベース） */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden; /* スライド全体のスクロールを抑止 */
+            line-height: 1.8;
+        }
+
+        /* スライドコンテナ */
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 各スライドの共通デザイン */
+        .slide {
+            display: none; /* 初期状態は非表示 */
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px 60px;
+            overflow-y: auto; /* コンテンツが多い場合はスライド内スクロール */
+        }
+
+        /* アクティブなスライドのみ表示 */
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ヘッダーデザイン */
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        /* コンテンツ部分のレイアウト */
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* 強調用の正解ボックス */
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        /* リストスタイル */
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        /* 操作用ナビゲーションUI */
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        /* ==========================================
+           スマートフォン向けの表示最適化（サイズ縮小）
+           ========================================== */
+        @media screen and (max-width: 768px) {
+            body {
+                line-height: 1.6; /* 行間を少し詰めて視認性を上げる */
+            }
+
+            /* スライド全体の余白を削り、画面を広く使う */
+            .slide {
+                width: 95%;
+                height: 88vh;
+                padding: 20px 20px; /* 横余白を60pxから20pxに縮小 */
+            }
+
+            /* ヘッダーの文字を小さく */
+            .slide-header h2 {
+                font-size: 18pt;
+            }
+            .badge {
+                font-size: 10pt;
+                padding: 2px 8px;
+            }
+
+            /* 本文・問題文の文字サイズをひと回り小さく */
+            .content-box {
+                font-size: 12pt; /* 16ptから12ptに縮小 */
+                margin-bottom: 15px;
+            }
+            .problem-text {
+                padding: 15px;
+                font-size: 13pt;
+                margin-bottom: 15px;
+            }
+
+            /* 正解・結論ボックスの調整 */
+            .answer-box {
+                padding: 10px 15px;
+                margin-top: 15px;
+            }
+            .answer-box div[style*="font-size"] {
+                font-size: 14pt !important; /* スマホのみ大きな正解文字を14ptに抑制 */
+            }
+
+            /* 表（まとめスライド）の文字サイズと余白をスマホ用に最小化 */
+            table {
+                font-size: 11pt !important;
+            }
+            th, td {
+                padding: 8px !important;
+            }
+
+            /* MathJaxの数式全体がスマホ画面からはみ出さないように自動縮小 */
+            .mjx-chtml {
+                font-size: 90% !important; 
+            }
+            .math-block, mjx-container[display="true"] {
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 5px 0;
+            }
+
+            /* 下部ナビゲーションボタンを押しやすいサイズに微調整 */
+            .nav-controls {
+                bottom: 15px;
+                gap: 20px;
+            }
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 11pt;
+            }
+            .page-indicator {
+                font-size: 12pt;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド1：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ_複素数</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+         <!-- ここからいじる -->
+        <!-- ==========================================
+             数Ⅲ複素数平面：講義セクション
+             ========================================= -->
+
+        <!-- スライド63：複素数平面の本質（点とベクトルの融合） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ①</h2>
+                <span class="badge">講義：実軸と虚軸（数から「平面上の点」へ）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【概念】複素数 $z = a + bi$ （ $a, b$ は実数）を、1つの数字としてではなく「座標平面上の点 $(a, b)$ 」と1対1に対応させた世界が複素数平面である。
+                </div>
+                <div style="margin-top: 15px;">
+                    従来の $xy$ 平面との最大の違いは、軸の呼び名と「ベクトルとしての性質」を持つことにある。
+                    <ul>
+                        <li style="margin-bottom: 12px;"><strong>横軸（実軸）：</strong>実数 $a$ を表す軸（従来の $x$ 軸）。</li>
+                        <li style="margin-bottom: 12px;"><strong>縦軸（虚軸）：</strong>虚数単位 $i$ の係数 $b$ を表す軸（従来の $y$ 軸）。</li>
+                        <li style="margin-bottom: 12px;"><strong>絶対値 $|z|$ の意味：</strong>原点 $O$ から点 $z$ までの距離。三平方の定理より <strong>$|z| = \sqrt{a^2 + b^2}$</strong> となる。</li>
+                    </ul>
+                    <br>
+                    <strong>【初学者へ絶対に意識させる加減算のイメージ】</strong><br>
+                    複素数の足し算 $\alpha + \beta$ や引き算 $\alpha - \beta$ は、数Bで学んだ<strong>「ベクトルの合成・成分計算」と完全に同一の挙動</strong>をする。<br>
+                    「複素数は、2次元のベクトルをたった1つの文字 $z$ でスマートに扱える画期的なツールなんだ」と認識させることが、幾何問題への心理的ハードルを下げる第一歩となる。
+                </div>
+                <!-- シンプルな幾何学的イメージ図解エリア -->
+                <div style="display: flex; justify-content: space-around; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                    
+                    <!-- 左図：a + bi の座標表示 -->
+                    <div style="text-align: center; width: 45%;">
+                        <div style="font-size: 10.5pt; font-weight: bold; color: #1a365d; margin-bottom: 6px;">【 a + bi の座標表示 】</div>
+                        <svg width="170" height="130" viewBox="-15 -15 170 130" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                            <!-- 軸 -->
+                            <line x1="0" y1="95" x2="140" y2="95" stroke="#a0aec0" stroke-width="1.5"/>
+                            <line x1="15" y1="110" x2="15" y2="10" stroke="#a0aec0" stroke-width="1.5"/>
+                            <text x="125" y="110" font-size="9" fill="#718096">実軸</text>
+                            <text x="20" y="20" font-size="9" fill="#718096">虚軸</text>
+                            <text x="5" y="107" font-size="9" fill="#718096">O</text>
+                            
+                            <!-- 破線ガイド -->
+                            <line x1="95" y1="95" x2="95" y2="35" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="3,3"/>
+                            <line x1="15" y1="35" x2="95" y2="35" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="3,3"/>
+                            
+                            <!-- 軸上の目盛りラベル -->
+                            <text x="92" y="108" font-size="10" fill="#2b6cb0" font-weight="bold">a</text>
+                            <text x="2" y="39" font-size="10" fill="#2b6cb0" font-weight="bold">b</text>
+                            
+                            <!-- 点 z = a + bi -->
+                            <line x1="15" y1="95" x2="95" y2="35" stroke="#2b6cb0" stroke-width="2"/>
+                            <circle cx="95" cy="35" r="4" fill="#e53e3e"/>
+                            <text x="100" y="32" font-size="10.5" fill="#1a365d" font-weight="bold">z = a + bi</text>
+                            <text x="100" y="46" font-size="9" fill="#718096">点(a, b)</text>
+                        </svg>
+                    </div>
+
+                    <!-- 右図：極形式 (r, θ) への対応 -->
+                    <div style="text-align: center; width: 50%;">
+                        <div style="font-size: 10.5pt; font-weight: bold; color: #1a365d; margin-bottom: 6px;">【 極形式 (r, θ) 表示 】</div>
+                        <svg width="180" height="130" viewBox="-15 -15 180 130" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                            <!-- 軸 -->
+                            <line x1="0" y1="95" x2="140" y2="95" stroke="#a0aec0" stroke-width="1.5"/>
+                            <line x1="15" y1="110" x2="15" y2="10" stroke="#a0aec0" stroke-width="1.5"/>
+                            <text x="125" y="110" font-size="9" fill="#718096">実軸</text>
+                            <text x="20" y="20" font-size="9" fill="#718096">虚軸</text>
+                            <text x="5" y="107" font-size="9" fill="#718096">O</text>
+                            
+                            <!-- 動径 r と 角度 θ -->
+                            <line x1="15" y1="95" x2="95" y2="35" stroke="#2b6cb0" stroke-width="2.5"/>
+                            <path d="M 45 95 A 30 30 0 0 0 40 78" fill="none" stroke="#dd6b20" stroke-width="2"/>
+                            <text x="48" y="88" font-size="10" fill="#dd6b20" font-weight="bold">θ</text>
+                            <text x="50" y="58" font-size="10" fill="#2b6cb0" font-weight="bold">r</text>
+                            
+                            <!-- 点 z の極形式 -->
+                            <circle cx="95" cy="35" r="4" fill="#e53e3e"/>
+                            <text x="100" y="32" font-size="10" fill="#1a365d" font-weight="bold">z = r(cosθ + i sinθ)</text>
+                            <text x="100" y="46" font-size="8.5" fill="#4a5568">a = r cosθ, b = r sinθ</text>
+                        </svg>
+                    </div>
+
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <strong>［1. 直交座標から極形式への変換］</strong><br>
+                    複素数 $z = a + bi$ の「実部 $a$ 」を横軸、「虚部 $b$ 」を縦軸にとることで、座標平面上の<strong>点 $(a, b)$</strong> と 1 対 1 に対応する。
+                    原点からの距離 $r = |z| = \sqrt{a^2 + b^2}$ と角 $\theta$ を使うと、三角比の定義より次のように書き直せる。
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12pt; font-weight: bold; text-align: center;">
+                        $$ a = r \cos \theta, \quad b = r \sin \theta \quad \Longrightarrow \quad z = r (\cos \theta + i \sin \theta) $$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- スライド63.5：偏角 arg z の定義と約束事 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ①-2</h2>
+                <span class="badge">講義：偏角 arg z の定義と範囲の約束</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【用語】複素数平面において、点 $z$ の原点からの距離を「絶対値 $|z|$ 」と呼ぶのに対し、<strong>実軸の正の向きとなす角度 $\theta$ </strong> を <strong>偏角（へんかく）</strong> と呼び、記号 <strong>$\arg z$</strong> で表す。
+                </div>
+                <div style="margin-top: 15px;">
+                    語源は英語の <i>argument</i> （主張・角度）。「 $\arg z = \frac{\pi}{3}$ 」と書かれていたら、「点 $z$ は原点から見て $60^\circ$ の方向にあるよ」という意味である。
+                    <br><br>
+                    
+                    <strong>［試験で超重要な「偏角の範囲」のルール］</strong><br>
+                    角度はぐるりと1周（ $2\pi$ または $360^\circ$ ）すると同じ位置に戻ってくるため、問題文によって偏角の範囲指定（約束事）が異なる点に注意させよ。
+                    
+                    <ul style="margin-top: 10px;">
+                        <li style="margin-bottom: 10px;">
+                            <strong>パターン A： $0 \leqq \theta < 2\pi$ （反時計回りに1周）</strong><br>
+                            最も一般的な指定。マイナスの角を使わず、すべてプラスの角度（ $0^\circ \sim 360^\circ$ ）で統一する。
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <strong>パターン B： $-\pi < \theta \leqq \pi$ （主値：しゅち）</strong><br>
+                            実軸の上半分をプラス（ $0 \sim \pi$ ）、下半分をマイナス（ $0 \sim -\pi$ ）で表す。図形的な対称性を扱う際によく使われる。
+                        </li>
+                    </ul>
+
+                    <div class="answer-box" style="background-color: #fffaf0; border-left-color: #dd6b20; padding: 10px 15px; margin-top: 15px;">
+                        <strong>💡 指導のポイント：</strong><br>
+                        「 $\arg z$ は特殊な計算記号ではなく、単に『角度 $\theta$ 』のカッコいい言い回し（ラベル）に過ぎないよ。だから $\arg(z_1 z_2) = \arg z_1 + \arg z_2$ という公式も、『掛け算したら角度は足し算になる』と言っているだけなんだ」と伝えると、記号アレルギーが一発で吹き飛びます。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド64：極形式と掛け算の幾何学的意味（拡大・縮小＋回転） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ②</h2>
+                <span class="badge">講義：極形式（掛け算の正体は「回転」である）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【超重要】複素数 $z = a + bi$ を、原点からの距離 $r = |z|$ と、実軸となす角 $\theta$ （偏角：$\text{arg } z$）で表す形式を<strong>極形式（きょくけいしき）</strong>と呼ぶ。
+                    $$ z = r (\cos \theta + i \sin \theta) $$
+                </div>
+                <div style="margin-top: 15px;">
+                    なぜわざわざ三角関数を使った極形式に変形するのか？その理由は、<strong>「複素数の掛け算」の幾何学的意味（グラフィック効果）</strong>を説明するためである。
+                    <br><br>
+                    2つの複素数 $z_1 = r_1(\cos \theta_1 + i \sin \theta_1)$ と $z_2 = r_2(\cos \theta_2 + i \sin \theta_2)$ を掛け算すると：
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; border-radius: 6px; margin: 15px 0; font-size: 14pt; font-weight: bold; text-align: center;">
+                        $$ z_1 z_2 = r_1 r_2 \Big\{ \cos(\theta_1 + \theta_2) + i \sin(\theta_1 + \theta_2) \Big\} $$
+                    </div>
+                    この数式が意味する感動的な真実は以下の2点に尽きる。
+                    <ul>
+                        <li style="margin-bottom: 8px;"><strong>大きさ（絶対値）：</strong> $r_1 \times r_2$ （距離は普通に掛け算される）</li>
+                        <li style="margin-bottom: 8px;"><strong>向き（偏角）：</strong> $\theta_1 + \theta_2$ （角度は<strong>足し算＝回転</strong>される！）</li>
+                    </ul>
+                    生徒には<strong>「複素数を掛けるという行為は、図形を『拡大・縮小しながらぐるりと回転させるダイナミックな魔法』なんだよ」</strong>と教え込むこと。特に $i$ を掛ける行為が「原点中心に $90^\circ$（ $\frac{\pi}{2}$ ）回転」を意味する理由も、これで一発で納得できる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド65：ド・モアブルの定理と図形の回転移動 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ③</h2>
+                <span class="badge">講義：ド・モアブルの定理と「点 $\alpha$ まわりの回転」</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【応用】「掛け算 ＝ 角度の足し算」という原理を $n$ 回繰り返すことで生まれる最強の公式が<strong>「ド・モアブルの定理」</strong>である。
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>［ド・モアブルの定理］</strong>
+                    $$ (\cos \theta + i \sin \theta)^n = \cos n\theta + i \sin n\theta $$
+                    「 $n$ 乗する」という重い計算が、角度を「 $n$ 倍する」というただの掛け算に化ける。これにより、 $(1 + \sqrt{3}i)^{12}$ のような異次元の多項式計算を一瞬で仕留めることができるようになる。
+                    <br><br>
+                    <strong>［実戦で最も問われる「点 $\alpha$ を中心とする回転」］</strong><br>
+                    原点中心の回転は単に $(\cos \theta + i \sin \theta)$ を掛けるだけだが、試験では「点 $\alpha$ を中心に点 $\beta$ を $\theta$ だけ回転させた点 $\gamma$ 」が問われる。<br>
+                    この時の立式の鉄則は、<strong>「一度原点まで平行移動させてから回転させ、最後に元の位置に戻す」</strong>ことである。
+                    <div style="font-size: 14pt; font-weight: bold; margin: 15px 0; color: #2b6cb0; text-align: center;">
+                        $$ \gamma - \alpha = (\cos \theta + i \sin \theta)(\beta - \alpha) $$
+                    </div>
+                    「 $\beta - \alpha$ 」で原点に引き戻し、回転用複素数を掛け算して回転させ、最後に $+\alpha$ で元の世界に書き戻す。このベクトルの平行移動の視点を持たせることが、入試記述での完答につながる。
+                </div>
+            </div>
+        </div>
+        <!-- スライド64：極形式と掛け算の幾何学的意味（図解差し込み版） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ②</h2>
+                <span class="badge">講義：極形式（掛け算の正体は「回転」である）</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 12px;">
+                    【超重要】複素数 $z = a + bi$ を、原点からの距離 $r = |z|$ と、実軸となす角 $\theta$ （偏角：$\text{arg } z$）で表す形式を<strong>極形式（きょくけいしき）</strong>と呼ぶ。
+                    $$ z = r (\cos \theta + i \sin \theta) $$
+                </div>
+                
+                <!-- 幾何学的イメージ図解エリア -->
+                <div style="display: flex; justify-content: space-around; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                    
+                    <!-- 左図：極形式の要素 (r, θ) -->
+                    <div style="text-align: center; width: 45%;">
+                        <div style="font-size: 10.5pt; font-weight: bold; color: #1a365d; margin-bottom: 8px;">【点 z の極形式表示】</div>
+                        <svg width="180" height="140" viewBox="-20 -20 180 140" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                            <!-- 軸 -->
+                            <line x1="0" y1="100" x2="140" y2="100" stroke="#a0aec0" stroke-width="1.5"/>
+                            <line x1="10" y1="110" x2="10" y2="10" stroke="#a0aec0" stroke-width="1.5"/>
+                            <text x="130" y="115" font-size="10" fill="#718096">実軸</text>
+                            <text x="15" y="20" font-size="10" fill="#718096">虚軸</text>
+                            <text x="2" y="112" font-size="10" fill="#718096">O</text>
+                            
+                            <!-- 動径 r と 角度 θ -->
+                            <line x1="10" y1="100" x2="110" y2="30" stroke="#2b6cb0" stroke-width="2.5"/>
+                            <path d="M 40 100 A 30 30 0 0 0 35 83" fill="none" stroke="#dd6b20" stroke-width="2"/>
+                            <text x="42" y="92" font-size="11" fill="#dd6b20" font-weight="bold">θ</text>
+                            <text x="50" y="58" font-size="11" fill="#2b6cb0" font-weight="bold">r</text>
+                            
+                            <!-- 点 z -->
+                            <circle cx="110" cy="30" r="4" fill="#e53e3e"/>
+                            <text x="20" y="28" font-size="11" fill="#1a365d" font-weight="bold">z = r(cosθ + i sinθ)</text>
+                        </svg>
+                    </div>
+
+                    <!-- 右図：掛け算による回転と拡大 -->
+                    <svg width="220" height="150" viewBox="-20 -20 220 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                            <!-- 軸 -->
+                            <line x1="0" y1="110" x2="180" y2="110" stroke="#a0aec0" stroke-width="1.5"/>
+                            <line x1="15" y1="125" x2="15" y2="10" stroke="#a0aec0" stroke-width="1.5"/>
+                            <text x="165" y="125" font-size="9" fill="#718096">実軸</text>
+                            <text x="20" y="20" font-size="9" fill="#718096">虚軸</text>
+                            <text x="3" y="122" font-size="9" fill="#718096">O</text>
+                            
+                            <!-- z1 (青) : 長さ r1, 角度 θ1 -->
+                            <line x1="15" y1="110" x2="85" y2="80" stroke="#2b6cb0" stroke-width="2"/>
+                            <circle cx="85" cy="80" r="3.5" fill="#2b6cb0"/>
+                            <text x="92" y="85" font-size="10" fill="#2b6cb0" font-weight="bold">z₁ (r₁, θ₁)</text>
+                            
+                            <!-- 回転を示す破線円弧 -->
+                            <path d="M 60 91 A 55 55 0 0 1 100 35" fill="none" stroke="#dd6b20" stroke-width="1.5" stroke-dasharray="3,3"/>
+                            <polygon points="102,32 94,36 98,42" fill="#dd6b20"/>
+                            <text x="95" y="55" font-size="9.5" fill="#dd6b20" font-weight="bold">+ θ₂ 回転</text>
+                            
+                            <!-- z1 * z2 (赤) : 長さ r1*r2, 角度 θ1 + θ2 -->
+                            <line x1="15" y1="110" x2="140" y2="20" stroke="#e53e3e" stroke-width="2.5"/>
+                            <circle cx="140" cy="20" r="4" fill="#e53e3e"/>
+                            <text x="45" y="20" font-size="10.5" fill="#e53e3e" font-weight="bold">z₁z₂ (r₁r₂, θ₁+θ₂)</text>
+                    </svg>
+
+                </div>
+
+                <div style="margin-top: 10px;">
+                    2つの複素数 $z_1 = r_1(\cos \theta_1 + i \sin \theta_1)$ と $z_2 = r_2(\cos \theta_2 + i \sin \theta_2)$ の積：
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12pt; font-weight: bold; text-align: center;">
+                        $$ z_1 z_2 = \color{blue}r_1 r_2 \color{black} \Big\{ \cos(\color{red}\theta_1 + \theta_2\color{black}) + i \sin(\color{red}\theta_1 + \theta_2\color{black}) \Big\} $$
+                    </div>
+                    <ul>
+                        <li style="margin-bottom: 4px;"><strong>大きさ（絶対値）：</strong> $\color{blue}r_1 \times r_2$ （距離はそのまま掛け算）</li>
+                        <li style="margin-bottom: 4px;"><strong>向き（偏角）：</strong> $\color{red}\theta_1 + \theta_2$ （角度は<strong>足し算＝反時計回りに回転</strong>）</li>
+                    </ul>
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong> $i$ を掛ける行為は $i = 1(\cos 90^\circ + i \sin 90^\circ)$ より「長さを変えずに $90^\circ$ 回転させる操作」そのものであると視覚的に理解させよ。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ複素数平面：演習セクション（問題＆解説）
+             ========================================== -->
+
+        <!-- 1. 極形式への変換と積（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】26 極形式への変換と積</h2>
+                <span class="badge">複素数平面演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    $\alpha = 1 + i, \quad \beta = \sqrt{3} + i$ とする。<br>
+                    (1) $\alpha, \beta$ をそれぞれ極形式で表せ。ただし、偏角 $\theta$ は $0 \leqq \theta < 2\pi$ とする。<br>
+                    (2) 積 $\alpha\beta$ の絶対値 $|\alpha\beta|$ と偏角 $\arg(\alpha\beta)$ を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    直交座標 $(a, b)$ から絶対値 $r = \sqrt{a^2+b^2}$ を求め、 $\cos \theta = \frac{a}{r}, \sin \theta = \frac{b}{r}$ となる有名な角度 $\theta$ を探せ。積 $\alpha\beta$ では「絶対値は掛け算、偏角は足し算」という極形式の圧倒的なメリットを活用すること。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 極形式への変換と積（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】26 極形式への変換と積</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］$\alpha = 1 + i$ の極形式変換</strong><br>
+                    絶対値： $|\alpha| = \sqrt{1^2 + 1^2} = \sqrt{2}$<br>
+                    $\cos \theta = \frac{1}{\sqrt{2}}, \sin \theta = \frac{1}{\sqrt{2}}$ より、 $\theta = \frac{\pi}{4}$<br>
+                    よって、 $\alpha = \sqrt{2} \left( \cos \frac{\pi}{4} + i \sin \frac{\pi}{4} \right)$
+                    <br><br>
+                    <strong>［ステップ 2］$\beta = \sqrt{3} + i$ の極形式変換</strong><br>
+                    絶対値： $|\beta| = \sqrt{(\sqrt{3})^2 + 1^2} = \sqrt{4} = 2$<br>
+                    $\cos \theta = \frac{\sqrt{3}}{2}, \sin \theta = \frac{1}{2}$ より、 $\theta = \frac{\pi}{6}$<br>
+                    よって、 $\beta = 2 \left( \cos \frac{\pi}{6} + i \sin \frac{\pi}{6} \right)$
+                    <br><br>
+                    <strong>［ステップ 3］積 $\alpha\beta$ の法則（絶対値は積、偏角は和）</strong><br>
+                    $|\alpha\beta| = |\alpha| \cdot |\beta| = \sqrt{2} \times 2 = 2\sqrt{2}$<br>
+                    $\arg(\alpha\beta) = \arg \alpha + \arg \beta = \frac{\pi}{4} + \frac{\pi}{6} = \frac{5\pi}{12}$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        (1) $\alpha = \sqrt{2} \left( \cos \frac{\pi}{4} + i \sin \frac{\pi}{4} \right), \quad \beta = 2 \left( \cos \frac{\pi}{6} + i \sin \frac{\pi}{6} \right)$<br>
+                        (2) $|\alpha\beta| = 2\sqrt{2}, \quad \arg(\alpha\beta) = \frac{5\pi}{12}$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ド・モアブルの定理（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】27 ド・モアブルの定理の活用</h2>
+                <span class="badge">複素数平面演習：必須テク</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 18pt; padding: 30px;">
+                    次の値を求めよ。
+                    $$ (\sqrt{3} + i)^{6} $$
+                </div>
+                <div style="margin-top: 40px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    二項定理で6乗を展開しようとすると途方もない計算になる。まずカッコの中身 $\sqrt{3} + i$ を極形式に直し、<strong>ド・モアブルの定理 $(\cos \theta + i \sin \theta)^n = \cos n\theta + i \sin n\theta$</strong> を発動させて一気に次元を落とせ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ド・モアブルの定理（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】27 ド・モアブルの定理の活用</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］中身を極形式に変換する</strong><br>
+                    前問より、 $z = \sqrt{3} + i$ の極形式は以下の通りである。
+                    $$ z = 2 \left( \cos \frac{\pi}{6} + i \sin \frac{\pi}{6} \right) $$
+                    <br>
+                    <strong>［ステップ 2］ド・モアブルの定理の適用</strong><br>
+                    両辺を 6 乗する。絶対値 $2$ は普通に 6 乗し、偏角 $\frac{\pi}{6}$ は <strong>6倍</strong> する。
+                    $$ z^6 = 2^6 \left( \cos \left( 6 \times \frac{\pi}{6} \right) + i \sin \left( 6 \times \frac{\pi}{6} \right) \right) $$
+                    $$ z^6 = 64 ( \cos \pi + i \sin \pi ) $$
+                    <br>
+                    <strong>［ステップ 3］代入して実数に戻す</strong><br>
+                    $\cos \pi = -1, \quad \sin \pi = 0$ であるから：
+                    $$ z^6 = 64 ( -1 + 0 \cdot i ) = -64 $$
+                    驚くべきことに、計算結果は虚数単位 $i$ が消滅して綺麗な「実数 $-64$」に落ち着く。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">$$ -64 $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 点αを中心とする回転（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】28 点αを中心とする回転移動</h2>
+                <span class="badge">複素数平面演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    複素数平面上において、点 $\alpha = 1 + 2i$ を中心として、点 $\beta = 4 + 5i$ を $\frac{\pi}{3}$ （ $60^\circ$ ）だけ回転させた点 $\gamma$ を表す複素数を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    中心が原点ではない回転移動の鉄則は<strong>「 $\alpha$ だけ引いて原点に移動し、回転用複素数を掛けてから、 $+\alpha$ で戻す」</strong>である。<br>
+                    公式： $\gamma - \alpha = \left( \cos \frac{\pi}{3} + i \sin \frac{\pi}{3} \right) (\beta - \alpha)$ を作動させよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 点αを中心とする回転（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】28 点αを中心とする回転移動</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］相対ベクトル（$\beta - \alpha$）の計算</strong><br>
+                    中心 $\alpha$ を原点とみなしたときの点 $\beta$ の位置を計算する。
+                    $$ \beta - \alpha = (4 + 5i) - (1 + 2i) = 3 + 3i $$
+                    <br>
+                    <strong>［ステップ 2］回転演算子を掛け算する</strong><br>
+                    回転角 $\frac{\pi}{3}$ に対応する複素数は $R = \cos \frac{\pi}{3} + i \sin \frac{\pi}{3} = \frac{1}{2} + \frac{\sqrt{3}}{2}i$ である。<br>
+                    原点まわりで回転させた位置 $\gamma - \alpha$ を計算する。
+                    $$ \gamma - \alpha = \left( \frac{1}{2} + \frac{\sqrt{3}}{2}i \right) (3 + 3i) = \frac{3}{2}(1 + \sqrt{3}i)(1 + i) $$
+                    $$ = \frac{3}{2} \Big( (1 - \sqrt{3}) + (1 + \sqrt{3})i \Big) $$
+                    <br>
+                    <strong>［ステップ 3］中心 $\alpha$ を足して元の位置へ戻す</strong><br>
+                    $$ \gamma = (\gamma - \alpha) + \alpha = \frac{3 - 3\sqrt{3}}{2} + \frac{3 + 3\sqrt{3}}{2}i + (1 + 2i) $$
+                    実部と虚部をそれぞれ整理してフィニッシュ。
+                    $$ \gamma = \frac{5 - 3\sqrt{3}}{2} + \frac{7 + 3\sqrt{3}}{2}i $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">$$ \gamma = \frac{5 - 3\sqrt{3}}{2} + \frac{7 + 3\sqrt{3}}{2}i $$</div>
+                </div>
+            </div>
+        </div>
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ_複素数の応用</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- スライド66：共役複素数と絶対値の計算（|z|² = z z̄ の鉄則） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ④</h2>
+                <span class="badge">講義：共役複素数と絶対値（|z|² = z z̄ の威力を知る）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【鉄則】複素数平面で「絶対値 $|z|$ 」を含む条件式が出たとき、絶対値をそのまま扱おうとすると行き詰まる。<strong>「両辺を2乗して $z \bar{z}$ に分解する」</strong>のが代入計算を回避する最強のアプローチである。
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>［共役複素数 $\bar{z}$ の絶対的性質］</strong><br>
+                    $z = a + bi$ に対し、虚部の符号をひっくり返した $\bar{z} = a - bi$ （実軸対称な点）を用意する。
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 12px; border-radius: 6px; margin: 12px 0; font-size: 14pt; font-weight: bold; text-align: center;">
+                        $$ |z|^2 = z \bar{z} $$
+                    </div>
+                    <strong>［バー（共役）の強力な分配法則］</strong><br>
+                    バーは足し算、引き算、掛け算、割り算のどこへでも自由に伸び縮み・分配ができる。
+                    $$ \overline{z + w} = \bar{z} + \bar{w}, \quad \overline{z \cdot w} = \bar{z} \cdot \bar{w}, \quad \overline{\left(\frac{z}{w}\right)} = \frac{\bar{z}}{\bar{w}} $$
+                    <br>
+                    <strong>［実数条件と純虚数条件の判定アルゴリズム］</strong>
+                    <ul>
+                        <li style="margin-bottom: 8px;"><strong>$z$ が実数 $\iff z = \bar{z}$</strong> （バーを被せても変化しない）</li>
+                        <li style="margin-bottom: 8px;"><strong>$z$ が純虚数 $\iff z = -\bar{z} \quad (z \neq 0)$</strong> （バーを被せるとマイナスがつく）</li>
+                    </ul>
+                    生徒には「 $z = x + yi$ と置いて $xy$ 座標に逃げるのは最終手段。まずはバー（ $\bar{z}$ ）の計算だけで処理できる洗練された解法を身につけよう」と導くのが効果的である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド67：複素数平面における方程式と軌跡（直線と円） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ⑤</h2>
+                <span class="badge">講義：方程式と軌跡（数式を見て「図形」を即答する）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【視覚化】絶対値記号で作られた方程式を見た瞬間、計算せずにその図形（軌跡）を頭の中にイメージする大局観を養う。
+                </div>
+                <div style="margin-top: 15px;">
+                    複素数平面における $|z - \alpha|$ の幾何学的意味は、<strong>「2点 $z$ と $\alpha$ の間の距離」</strong>である。
+                    <br><br>
+
+                    <!-- 円の軌跡 -->
+                    <div style="margin-bottom: 15px;">
+                        <span style="background-color: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #4a5568;">パターン 1：円の方程式</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0; color: #2b6cb0;">
+                            $$ |z - \alpha| = r \quad (r > 0) $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            「定点 $\alpha$ からの距離が常に $r$ であるような点 $z$ の集合」 $\Longrightarrow$ <strong>点 $\alpha$ を中心とする半径 $r$ の円</strong>。
+                        </span>
+                    </div>
+
+                    <!-- 垂直二等分線 -->
+                    <div style="margin-bottom: 10px; border-top: 1px dashed #cbd5e0; padding-top: 12px;">
+                        <span style="background-color: #feebc8; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #c05621;">パターン 2：垂直二等分線の方程式</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0; color: #dd6b20;">
+                            $$ |z - \alpha| = |z - \beta| $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            「点 $\alpha$ からの距離と、点 $\beta$ からの距離が常に等しい点 $z$ の集合」 $\Longrightarrow$ <strong>2点 $\alpha, \beta$ を結ぶ線分の垂直二等分線</strong>。
+                        </span>
+                    </div>
+
+                    <div style="border-top: 1px dashed #cbd5e0; padding-top: 12px; font-size: 11pt;">
+                        ※ 係数がついた $|z - \alpha| = k |z - \beta| \ (k \neq 1)$ の場合は、2点 $\alpha, \beta$ を $k : 1$ に内分・外分する点を直径の両端とする<strong>「アポロニウスの円」</strong>を描く。
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- スライド67.5：アポロニウスの円（図解） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ⑤-2</h2>
+                <span class="badge">講義：アポロニウスの円（距離の比と図解）</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 12px;">
+                    【超頻出】方程式 $|z - \alpha| = k |z - \beta| \quad (k > 0, k \neq 1)$ の図形的な意味。
+                    2点 $\alpha, \beta$ からの距離の比が <strong>$AP : BP = k : 1$ （一定）</strong> である点 $z$ の軌跡は円となる。
+                </div>
+
+                <!-- 修正版：アポロニウスの円 ピュアSVG図解エリア -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin: 10px 0;">
+                    <svg width="340" height="170" viewBox="-10 -10 340 170" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- アポロニウスの円本体（中心: 190, 65 / 半径: 75） -->
+                        <circle cx="190" cy="65" r="75" fill="none" stroke="#2b6cb0" stroke-width="2"/>
+                        
+                        <!-- 中心軸線（直線AB） -->
+                        <line x1="10" y1="65" x2="295" y2="65" stroke="#a0aec0" stroke-width="1.5"/>
+                        
+                        <!-- 点A(α) と 点B(β) -->
+                        <circle cx="30" cy="65" r="4" fill="#1a365d"/>
+                        <text x="18" y="90" font-size="11" fill="#1a365d" font-weight="bold">A(α)</text>
+                        
+                        <circle cx="85" cy="65" r="4" fill="#1a365d"/>
+                        <text x="75" y="90" font-size="11" fill="#1a365d" font-weight="bold">B(β)</text>
+                        
+                        <!-- 赤点：内分点 (115, 65) と 外分点 (265, 65) -->
+                        <circle cx="115" cy="65" r="4.5" fill="#e53e3e"/>
+                        <text x="100" y="90" font-size="10.5" fill="#e53e3e" font-weight="bold">内分点</text>
+                        
+                        <circle cx="265" cy="65" r="4.5" fill="#e53e3e"/>
+                        <text x="250" y="90" font-size="10.5" fill="#e53e3e" font-weight="bold">外分点</text>
+                        
+                        <!-- 直径の両端のガイドライン（上部に配置して被りを回避） -->
+                        <line x1="115" y1="45" x2="265" y2="45" stroke="#dd6b20" stroke-width="1.5" stroke-dasharray="3,3"/>
+                        <text x="165" y="38" font-size="10" fill="#dd6b20" font-weight="bold" text-anchor="middle">直径の両端</text>
+                        
+                        <!-- 円上の点 z (P) への距離ガイド (150, 135) -->
+                        <circle cx="150" cy="130" r="4" fill="#2b6cb0"/>
+                        <text x="160" y="142" font-size="10.5" fill="#2b6cb0" font-weight="bold">z (P)</text>
+                        
+                        <!-- 点A, B から 点z(P) への破線と比率表記 -->
+                        <line x1="30" y1="65" x2="150" y2="130" stroke="#2b6cb0" stroke-width="1.2" stroke-dasharray="3,3"/>
+                        <line x1="85" y1="65" x2="150" y2="130" stroke="#2b6cb0" stroke-width="1.2" stroke-dasharray="3,3"/>
+                        <text x="75" y="115" font-size="10" fill="#2b6cb0" font-weight="bold">k</text>
+                        <text x="122" y="108" font-size="10" fill="#2b6cb0" font-weight="bold">1</text>
+                    </svg>
+                </div>
+
+                <div style="margin-top: 5px;">
+                    <strong>［爆速で図形を決定する2ステップ］</strong><br>
+                    複雑な代入計算（ $z = x+yi$ ）を行わずに、次の手順で円を直描させよ。
+                    <ol style="margin-top: 5px; margin-bottom: 5px;">
+                        <li style="margin-bottom: 4px;">線分 $AB$ を <strong>$k : 1$ に「内分する点」</strong> と <strong>「外分する点」</strong> の2点を求める。</li>
+                        <li style="margin-bottom: 4px;">その2点を <strong>「直径の両端」 とする円</strong> を描いてフィニッシュ。</li>
+                    </ol>
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「 $k = 1$ のときは内分点（中点）は存在するが外分点が存在しなくなる（平行になる）から、円ではなく『垂直二等分線』という直線に化けるんだよ」と教えると、先ほどのスライド67との繋がりが完璧に腑に落ちます。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- スライド68：3点の位置関係（一直線条件と直交条件） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ⑥</h2>
+                <span class="badge">講義：3点の位置関係（商 (γ-α)/(β-α) の正体）</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 15px;">
+                    【超重要】3点 $A(\alpha), B(\beta), C(\gamma)$ の位置関係を調べる時は、<strong>「点 $A$ を原点に重ねた相関比 $\displaystyle \frac{\gamma - \alpha}{\beta - \alpha}$ の値」</strong>を評価するのが鉄則である。
+                </div>
+                <div style="margin-top: 15px;">
+                    この商の複素数が「実数」か「純虚数」かによって、図形的な関係が一瞬で決まる。
+                    <br><br>
+
+                    <!-- 一直線条件 -->
+                    <div style="margin-bottom: 15px;">
+                        <span style="background-color: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #4a5568;">パターン 1：3点が一直線上にある条件（共線条件）</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0; color: #2b6cb0;">
+                            $$ \frac{\gamma - \alpha}{\beta - \alpha} \text{ が実数 } \iff \arg \left( \frac{\gamma - \alpha}{\beta - \alpha} \right) = 0, \pi $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            偏角（角度の差）が $0^\circ$ または $180^\circ$ になるため、<strong>3点 $A, B, C$ は同一線上に並ぶ</strong>。
+                        </span>
+                    </div>
+
+                    <!-- 直交条件 -->
+                    <div style="margin-bottom: 10px; border-top: 1px dashed #cbd5e0; padding-top: 12px;">
+                        <span style="background-color: #feebc8; padding: 2px 8px; border-radius: 4px; font-size: 11pt; font-weight: bold; color: #c05621;">パターン 2：2直線が垂直に交わる条件（直交条件）</span>
+                        <div style="font-size: 14pt; font-weight: bold; margin: 5px 0; color: #dd6b20;">
+                            $$ \frac{\gamma - \alpha}{\beta - \alpha} \text{ が純虚数 } \iff \arg \left( \frac{\gamma - \alpha}{\beta - \alpha} \right) = \pm \frac{\pi}{2} $$
+                        </div>
+                        <span style="font-size: 11pt; color: #4a5568;">
+                            偏角（角度の差）が $\pm 90^\circ$ になるため、<strong>直線 $AB$ と 直線 $AC$ は直交する（ $\angle BAC = 90^\circ$ ）</strong>。
+                        </span>
+                    </div>
+
+                    <div style="border-top: 1px dashed #cbd5e0; padding-top: 10px; font-size: 10.5pt; color: #718096;">
+                        💡 <strong>指導のポイント：</strong>「ベクトルの成分で内積 $0$ を計算するのと同じことを、複素数では『実数か・純虚数か』という1つの分数式で判定できる」と伝えると視野が広がります。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド69：1のn乗根と正n角形 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>複素数平面の本質 ⑦</h2>
+                <span class="badge">講義：1 の n 乗根（単位円に内接する正 n 角形）</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【図形的対称性】方程式 $z^n = 1$ を満たす複素数 $z$（ $1$ の $n$ 乗根）の解は、複素数平面上で<strong>「単位円に内接する正 $n$ 角形の頂点」</strong>に等間隔に並ぶ。
+                </div>
+
+                <!-- ピュアSVG図解エリア（正6角形 z^6 = 1 の例） -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin: 10px 0;">
+                    <svg width="280" height="150" viewBox="-10 -10 280 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 軸 -->
+                        <line x1="10" y1="75" x2="250" y2="75" stroke="#a0aec0" stroke-width="1.5"/>
+                        <line x1="130" y1="10" x2="130" y2="140" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="235" y="70" font-size="9" fill="#718096">実軸</text>
+                        <text x="135" y="20" font-size="9" fill="#718096">虚軸</text>
+                        <text x="120" y="87" font-size="9" fill="#718096">O</text>
+                        
+                        <!-- 単位円 (半径 55) -->
+                        <circle cx="130" cy="75" r="55" fill="none" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="3,3"/>
+                        
+                        <!-- 正6角形 (z^6 = 1 の頂点) -->
+                        <!-- z0=(185,75), z1=(157.5,27.4), z2=(102.5,27.4), z3=(75,75), z4=(102.5,122.6), z5=(157.5,122.6) -->
+                        <polygon points="185,75 157.5,27.4 102.5,27.4 75,75 102.5,122.6 157.5,122.6" fill="none" stroke="#2b6cb0" stroke-width="2"/>
+                        
+                        <!-- 頂点とラベル -->
+                        <circle cx="185" cy="75" r="4" fill="#e53e3e"/>
+                        <text x="190" y="72" font-size="10" fill="#e53e3e" font-weight="bold">z₀=1</text>
+                        
+                        <circle cx="157.5" cy="27.4" r="3.5" fill="#2b6cb0"/>
+                        <text x="162" y="24" font-size="9.5" fill="#2b6cb0" font-weight="bold">z₁=ω</text>
+                        
+                        <circle cx="102.5" cy="27.4" r="3.5" fill="#2b6cb0"/>
+                        <text x="82" y="24" font-size="9.5" fill="#2b6cb0" font-weight="bold">z₂=ω²</text>
+                        
+                        <circle cx="75" cy="75" r="3.5" fill="#2b6cb0"/>
+                        <text x="50" y="72" font-size="9.5" fill="#2b6cb0" font-weight="bold">z₃=ω³</text>
+                        
+                        <circle cx="102.5" cy="122.6" r="3.5" fill="#2b6cb0"/>
+                        <text x="80" y="132" font-size="9.5" fill="#2b6cb0" font-weight="bold">z₄=ω⁴</text>
+                        
+                        <circle cx="157.5" cy="122.6" r="3.5" fill="#2b6cb0"/>
+                        <text x="162" y="132" font-size="9.5" fill="#2b6cb0" font-weight="bold">z₅=ω⁵</text>
+                        
+                        <!-- 角度 2π/n (60度) の表示 -->
+                        <line x1="130" y1="75" x2="157.5" y2="27.4" stroke="#dd6b20" stroke-width="1.2"/>
+                        <path d="M 152 75 A 22 22 0 0 0 142 55" fill="none" stroke="#dd6b20" stroke-width="1.5"/>
+                        <text x="146" y="60" font-size="8.5" fill="#dd6b20" font-weight="bold">2π/n</text>
+                    </svg>
+                </div>
+
+                <div style="margin-top: 5px;">
+                    <strong>［1. 解の一般形と回転 $\omega$ ］</strong><br>
+                    $z^n = 1$ の解は、最小の回転角を持つ解 $\omega = \cos \frac{2\pi}{n} + i \sin \frac{2\pi}{n}$ を用いると、
+                    原点中心に $\frac{2\pi}{n}$ ずつ回転することで **$1, \omega, \omega^2, \dots, \omega^{n-1}$** とすべての頂点（解）を表すことができる。
+                    <br><br>
+                    <strong>［2. 入試で超頻出の「解の総和 ＝ 0」］</strong><br>
+                    正 $n$ 角形の各頂点（ベクトル）を全方位から引っ張り合わせると完全に釣り合う（重心が原点 $O$ にある）ため、次の等式が常に成り立つ。
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 6px 12px; border-radius: 4px; margin: 6px 0; font-size: 11.5pt; font-weight: bold; text-align: center;">
+                        $$ 1 + \omega + \omega^2 + \dots + \omega^{n-1} = 0 $$
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ複素数平面：発展演習セクション（問題＆解説）
+             ========================================== -->
+
+        <!-- 1. 絶対値と共役 z z̄（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】29 共役複素数と絶対値の計算</h2>
+                <span class="badge">複素数平面演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    複素数 $z$ が $|z| = 2$ を満たすとき、 $z + \frac{4}{z}$ は実数であることを証明せよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    $z = x + yi$ と置いて計算すると大変なことになる。条件 $|z| = 2$ を2乗して <strong>$|z|^2 = z\bar{z} = 4$</strong> を作り、 $\frac{4}{z} = \bar{z}$ と書き換えよ。実数条件 <strong>$w = \bar{w}$</strong> を使えば一瞬で証明完了となる。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 絶対値と共役 z z̄（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】29 共役複素数と絶対値の計算</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］条件式 $|z| = 2$ を $z\bar{z}$ に変換</strong><br>
+                    両辺を2乗すると $|z|^2 = 4$ となる。 $|z|^2 = z\bar{z}$ であるから、
+                    $$ z\bar{z} = 4 $$
+                    両辺を $z$ ( $\neq 0$ ) で割ると、 $\frac{4}{z} = \bar{z}$ が得られる。
+                    <br><br>
+                    <strong>［ステップ 2］式に代入して簡単化する</strong><br>
+                    示したい式 $w = z + \frac{4}{z}$ に $\frac{4}{z} = \bar{z}$ を代入する。
+                    $$ w = z + \bar{z} $$
+                    <br>
+                    <strong>［ステップ 3］実数条件 $w = \bar{w}$ の確認</strong><br>
+                    $w$ の共役複素数 $\bar{w}$ を計算する。
+                    $$ \bar{w} = \overline{z + \bar{z}} = \bar{z} + \bar{\bar{z}} = \bar{z} + z = z + \bar{z} $$
+                    よって $w = \bar{w}$ が成り立つため、 $w = z + \frac{4}{z}$ は実数である。（証明終）
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">ポイント</div>
+                    <div style="font-size: 14pt; font-weight: bold;">$$ |z|^2 = z\bar{z} \text{ より } \frac{4}{z} = \bar{z} \implies z + \bar{z} \text{ は常に実数} $$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. アポロニウスの円（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】30 方程式とアポロニウスの円</h2>
+                <span class="badge">複素数平面演習：図形</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    方程式 $|z - 4| = 2|z - 1|$ を満たす点 $z$ の軌跡（どのような図形を描くか）を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    点 $A(4)$ と 点 $B(1)$ からの距離の比が <strong>$AP : BP = 2 : 1$</strong> である点 $z$ の集合である。線分 $AB$ （ $1$ から $4$ までの長さ $3$ の線分）を $2 : 1$ に「内分する点」と「外分する点」を求め、それを直径の両端とする円を即描せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. アポロニウスの円（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】30 方程式とアポロニウスの円</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］両辺を2乗して代数的に解く（記述答案の標準形）</strong><br>
+                    $$ |z - 4|^2 = 4|z - 1|^2 $$
+                    $$ (z - 4)(\bar{z} - 4) = 4(z - 1)(\bar{z} - 1) $$
+                    展開して整理する：
+                    $$ z\bar{z} - 4z - 4\bar{z} + 16 = 4(z\bar{z} - z - \bar{z} + 1) $$
+                    $$ 3z\bar{z} = 12 \quad \implies \quad z\bar{z} = 4 \quad \implies \quad |z|^2 = 4 $$
+                    $$ |z| = 2 $$
+                    <br>
+                    <strong>［ステップ 2］図形的な検算（アポロニウスの円による超速思考）</strong><br>
+                    *   点 $A(4)$ と 点 $B(1)$ を $2 : 1$ に内分する点： $x = \frac{1 \cdot 4 + 2 \cdot 1}{2 + 1} = 2$
+                    *   点 $A(4)$ と 点 $B(1)$ を $2 : 1$ に外分する点： $x = \frac{-1 \cdot 4 + 2 \cdot 1}{2 - 1} = -2$
+                    *   $2$ と $-2$ を直径の両端とする円 $\implies$ <strong>原点中心、半径 $2$ の円</strong>（代数計算と完全一致！）
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 16pt; font-weight: bold;">原点を中心とする半径 2 の円</div>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin: 10px 0;">
+                    <svg width="340" height="150" viewBox="-10 -10 340 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 実軸（x軸） -->
+                        <line x1="10" y1="75" x2="310" y2="75" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="300" y="70" font-size="9" fill="#718096">実軸</text>
+                        
+                        <!-- 虚軸（y軸 / 原点 x=0） -->
+                        <line x1="110" y1="10" x2="110" y2="140" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="115" y="20" font-size="9" fill="#718096">虚軸</text>
+                        <text x="98" y="88" font-size="9" fill="#718096">O</text>
+                        
+                        <!-- アポロニウスの円（原点 110,75 中心 / 半径 r=2 に相当する 50px） -->
+                        <circle cx="110" cy="75" r="50" fill="none" stroke="#2b6cb0" stroke-width="2"/>
+                        
+                        <!-- 与えられた定点 B(1) と A(4) -->
+                        <!-- x=1 (135,75), x=4 (210,75) -->
+                        <circle cx="135" cy="75" r="3.5" fill="#1a365d"/>
+                        <text x="130" y="92" font-size="9.5" fill="#1a365d" font-weight="bold">B(1)</text>
+                        
+                        <circle cx="210" cy="75" r="3.5" fill="#1a365d"/>
+                        <text x="205" y="92" font-size="9.5" fill="#1a365d" font-weight="bold">A(4)</text>
+                        
+                        <!-- 直径の両端：外分点 x=-2 (60,75) と 内分点 x=2 (160,75) -->
+                        <circle cx="60" cy="75" r="4.5" fill="#e53e3e"/>
+                        <text x="35" y="92" font-size="10" fill="#e53e3e" font-weight="bold">外分点(-2)</text>
+                        
+                        <circle cx="160" cy="75" r="4.5" fill="#e53e3e"/>
+                        <text x="150" y="92" font-size="10" fill="#e53e3e" font-weight="bold">内分点(2)</text>
+                        
+                        <!-- 直径の両端ガイドライン（上部） -->
+                        <line x1="60" y1="45" x2="160" y2="45" stroke="#dd6b20" stroke-width="1.5" stroke-dasharray="3,3"/>
+                        <text x="110" y="38" font-size="9.5" fill="#dd6b20" font-weight="bold" text-anchor="middle">直径の両端（幅 4 ＝ 半径 2）</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 3点の位置関係（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】31 3点の位置関係と三角形の形状</h2>
+                <span class="badge">複素数平面演習：最高峰</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 15pt; padding: 20px;">
+                    異なる3点 $A(\alpha), B(\beta), C(\gamma)$ が条件式 $\gamma - \alpha = (1 + \sqrt{3}i)(\beta - \alpha)$ を満たすとき、 $\triangle ABC$ はどのような三角形か。
+                </div>
+                <div style="margin-top: 25px; color: #718096; font-size: 13pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    両辺を $\beta - \alpha$ で割り算し、商 $\frac{\gamma - \alpha}{\beta - \alpha} = 1 + \sqrt{3}i$ を作る。<br>
+                    右辺を極形式（大きさ $r$ と偏角 $\theta$ ）に変換すれば、<strong>「辺の比（長さ倍率）」</strong>と<strong>「角 $A$ の角度」</strong>が一発で特定できる。
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 3点の位置関係（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】31 3点の位置関係と三角形の形状</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］商の極形式表示</strong><br>
+                    商 $\displaystyle \frac{\gamma - \alpha}{\beta - \alpha} = 1 + \sqrt{3}i$ の絶対値と偏角を求める。
+                    $$ \left| \frac{\gamma - \alpha}{\beta - \alpha} \right| = \sqrt{1^2 + (\sqrt{3})^2} = 2 $$
+                    $$ \frac{\gamma - \alpha}{\beta - \alpha} = 2 \left( \frac{1}{2} + \frac{\sqrt{3}}{2}i \right) = 2 \left( \cos \frac{\pi}{3} + i \sin \frac{\pi}{3} \right) $$
+                    <br>
+                    <strong>［ステップ 2］絶対値と偏角の図形的解釈</strong><br>
+                    <strong>絶対値（長さの比）：</strong> $\frac{|\gamma - \alpha|}{|\beta - \alpha|} = 2 \implies \frac{AC}{AB} = 2 \implies AC = 2 AB$
+                    <br><strong>偏角（挟む角）：</strong> $\angle BAC = \arg\left( \frac{\gamma - \alpha}{\beta - \alpha} \right) = \frac{\pi}{3} \quad (60^\circ)$
+                    <br>
+                    <strong>［ステップ 3］三角形の形状判定</strong><br>
+                    挟む角が $60^\circ$ で、辺の比が $AB : AC = 1 : 2$ である。<br>
+                    これは $1 : 2 : \sqrt{3}$ の有名直角三角形の比率そのものであるから、 $\angle B = 90^\circ$ となる。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">$\angle B = 90^\circ, \angle A = 60^\circ, \angle C = 30^\circ$ の直角三角形<br>（または $AB : BC : CA = 1 : \sqrt{3} : 2$ の直角三角形）</div>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin: 8px 0;">
+                    <svg width="320" height="150" viewBox="-10 -10 320 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 三角形 ABC の描画 (A: 40, 110 / B: 120, 110 / C: 120, 20) -->
+                        <polygon points="40,110 120,110 120,20" fill="rgba(43, 108, 176, 0.08)" stroke="#2b6cb0" stroke-width="2"/>
+                        
+                        <!-- 直角記号 at B(120, 110) -->
+                        <path d="M 110 110 L 110 100 L 120 100" fill="none" stroke="#2b6cb0" stroke-width="1.5"/>
+                        
+                        <!-- 各頂点とラベル -->
+                        <circle cx="40" cy="110" r="4" fill="#1a365d"/>
+                        <text x="20" y="125" font-size="11" fill="#1a365d" font-weight="bold">A(α)</text>
+                        
+                        <circle cx="120" cy="110" r="4" fill="#1a365d"/>
+                        <text x="125" y="125" font-size="11" fill="#1a365d" font-weight="bold">B(β)</text>
+                        
+                        <circle cx="120" cy="20" r="4" fill="#e53e3e"/>
+                        <text x="125" y="15" font-size="11" fill="#e53e3e" font-weight="bold">C(γ)</text>
+                        
+                        <!-- 角度 60° (π/3) の扇形ガイド -->
+                        <path d="M 70 110 A 30 30 0 0 0 58 78" fill="none" stroke="#dd6b20" stroke-width="1.8"/>
+                        <text x="72" y="98" font-size="10" fill="#dd6b20" font-weight="bold">60° (π/3)</text>
+                        
+                        <!-- 辺の長さの比率ラベル -->
+                        <text x="75" y="123" font-size="10.5" fill="#2b6cb0" font-weight="bold">比 : 1</text>
+                        <text x="130" y="70" font-size="10.5" fill="#2b6cb0" font-weight="bold">比 : √3</text>
+                        <text x="65" y="55" font-size="11" fill="#e53e3e" font-weight="bold">比 : 2 （倍率）</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 画面下の操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 3</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- スライドを制御するスクリプト -->
+        <!-- スライドを制御するスクリプト（スマホボタン限定版） -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        // PC用のキーボード操作（←、→、スペース、Enter）は維持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+    </script>
+
+    <!-- ==========================================
+         全スライド共通：ポップアップ式スキップ機能（目次）
+         ========================================== -->
+    <!-- 画面右下に常駐するメニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu" style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <!-- 各章へのジャンプボタン（実際のスライドのインデックス番号を指定） -->
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">素数平面（スライド1〜）</button>
+            <button onclick="goToSlide(12)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">複素数平面の応用（スライド13〜）</button>
+        </div>
+    </div>
+
+    <script>
+        // メニューの開閉制御
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        }
+
+        // 指定したスライドインデックス（0スタート）へ直接ジャンプ
+        function goToSlide(slideIndex) {
+            // お使いのスクリプト内の管理変数「currentSlide」を直接更新
+            currentSlide = slideIndex;
+            
+            // 安全策：インデックスの範囲外チェック
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            
+            // お使いのスクリプト内の画面更新関数「updateSlide()」をトリガー
+            updateSlide();
+            
+            // メニューを自動で閉じる
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        // 画面のどこかをクリックしたらメニューを自動で閉じる
+        document.addEventListener('click', function() {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
