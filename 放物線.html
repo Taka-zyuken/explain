@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅲ　極限</title>
+    
+    <!-- 数式を美しく表示するためのMathJaxライブラリ -->
+     <!-- 200行辺りまでテンプレ -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        /* 全体スタイルの定義（明朝体・である調の統一ベース） */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden; /* スライド全体のスクロールを抑止 */
+            line-height: 1.8;
+        }
+
+        /* スライドコンテナ */
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 各スライドの共通デザイン */
+        .slide {
+            display: none; /* 初期状態は非表示 */
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px 60px;
+            overflow-y: auto; /* コンテンツが多い場合はスライド内スクロール */
+        }
+
+        /* アクティブなスライドのみ表示 */
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ヘッダーデザイン */
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        /* コンテンツ部分のレイアウト */
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* 強調用の正解ボックス */
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        /* リストスタイル */
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        /* 操作用ナビゲーションUI */
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        /* ==========================================
+           スマートフォン向けの表示最適化（サイズ縮小）
+           ========================================== */
+        @media screen and (max-width: 768px) {
+            body {
+                line-height: 1.6; /* 行間を少し詰めて視認性を上げる */
+            }
+
+            /* スライド全体の余白を削り、画面を広く使う */
+            .slide {
+                width: 95%;
+                height: 88vh;
+                padding: 20px 20px; /* 横余白を60pxから20pxに縮小 */
+            }
+
+            /* ヘッダーの文字を小さく */
+            .slide-header h2 {
+                font-size: 18pt;
+            }
+            .badge {
+                font-size: 10pt;
+                padding: 2px 8px;
+            }
+
+            /* 本文・問題文の文字サイズをひと回り小さく */
+            .content-box {
+                font-size: 12pt; /* 16ptから12ptに縮小 */
+                margin-bottom: 15px;
+            }
+            .problem-text {
+                padding: 15px;
+                font-size: 13pt;
+                margin-bottom: 15px;
+            }
+
+            /* 正解・結論ボックスの調整 */
+            .answer-box {
+                padding: 10px 15px;
+                margin-top: 15px;
+            }
+            .answer-box div[style*="font-size"] {
+                font-size: 14pt !important; /* スマホのみ大きな正解文字を14ptに抑制 */
+            }
+
+            /* 表（まとめスライド）の文字サイズと余白をスマホ用に最小化 */
+            table {
+                font-size: 11pt !important;
+            }
+            th, td {
+                padding: 8px !important;
+            }
+
+            /* MathJaxの数式全体がスマホ画面からはみ出さないように自動縮小 */
+            .mjx-chtml {
+                font-size: 90% !important; 
+            }
+            .math-block, mjx-container[display="true"] {
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 5px 0;
+            }
+
+            /* 下部ナビゲーションボタンを押しやすいサイズに微調整 */
+            .nav-controls {
+                bottom: 15px;
+                gap: 20px;
+            }
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 11pt;
+            }
+            .page-indicator {
+                font-size: 12pt;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド1：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ_放物線</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+         <!-- ここからいじる -->
+        <!-- ==========================================
+             数Ⅲ平面曲線：放物線（定義と標準形）
+             ========================================== -->
+
+        <!-- スライド73：放物線の定義と標準形（図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ①</h2>
+                <span class="badge">講義：放物線の定義（焦点・準線・1 : 1 の距離）</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【定義】定点 $F$（<strong>焦点</strong>）からの距離と、定直線 $l$（<strong>準線</strong>）からの距離が<strong>等しい（ $PF = PH$ ）</strong>点の軌跡を<strong>放物線</strong>と呼ぶ。
+                </div>
+
+                <!-- ピュアSVG図解エリア（放物線 y² = 4px の定義図） -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin: 8px 0;">
+                    <svg width="320" height="150" viewBox="-10 -10 320 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 軸 -->
+                        <line x1="10" y1="75" x2="300" y2="75" stroke="#a0aec0" stroke-width="1.5"/>
+                        <line x1="120" y1="10" x2="120" y2="140" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="288" y="70" font-size="9" fill="#718096">x</text>
+                        <text x="125" y="20" font-size="9" fill="#718096">y</text>
+                        <text x="110" y="87" font-size="9" fill="#718096">O</text>
+                        
+                        <!-- 準線 l: x = -p (x = 50px) -->
+                        <line x1="50" y1="10" x2="50" y2="140" stroke="#e53e3e" stroke-width="1.8" stroke-dasharray="4,4"/>
+                        <text x="-10" y="25" font-size="9.5" fill="#e53e3e" font-weight="bold">準線 l: x = -p</text>
+                        
+                        <!-- 焦点 F(p, 0) (x = 190px) -->
+                        <circle cx="190" cy="75" r="4" fill="#2b6cb0"/>
+                        <text x="180" y="92" font-size="10" fill="#2b6cb0" font-weight="bold">F(p, 0)</text>
+                        <text x="42" y="87" font-size="9" fill="#e53e3e" font-weight="bold">-p</text>
+                        
+                        <!-- 放物線 y² = 4px の描画 (頂点: 120, 75) -->
+                        <path d="M 230 15 Q 120 75 230 135" fill="none" stroke="#1a365d" stroke-width="2.2"/>
+                        
+                        <!-- 放物線上の点 P(x, y) (x = 190, y = 33) -->
+                        <circle cx="190" cy="42" r="4" fill="#1a365d"/>
+                        <text x="180" y="28" font-size="10.5" fill="#1a365d" font-weight="bold">P(x, y)</text>
+                        
+                        <!-- 焦点 F への距離 PF -->
+                        <line x1="190" y1="42" x2="190" y2="75" stroke="#2b6cb0" stroke-width="1.5"/>
+                        
+                        <!-- 準線 l への垂線 PH (H: 50, 33) -->
+                        <line x1="190" y1="42" x2="50" y2="42" stroke="#e53e3e" stroke-width="1.5"/>
+                        <circle cx="50" cy="42" r="3" fill="#e53e3e"/>
+                        <text x="35" y="42" font-size="9" fill="#e53e3e" font-weight="bold">H</text>
+                        
+                        <!-- 距離イコール表現（PF = PH） -->
+                        <text x="100" y="28" font-size="9.5" fill="#e53e3e" font-weight="bold" text-anchor="middle">距離 L</text>
+                        <text x="202" y="58" font-size="9.5" fill="#2b6cb0" font-weight="bold">距離 L</text>
+                    </svg>
+                </div>
+
+                <div style="margin-top: 5px;">
+                    <strong>［1. 標準形： $y^2 = 4px$ （ $x$ 軸対称）］</strong><br>
+                    焦点 $F(p, 0)$ 、準線 $x = -p$ に対し、定義式 $\sqrt{(x-p)^2 + y^2} = |x - (-p)|$ を2乗して整理すると以下の標準形が得られる。
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 6px 12px; border-radius: 4px; margin: 6px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ y^2 = 4px \quad \implies \quad \text{焦点 } F(p, 0), \quad \text{準線 } x = -p $$
+                    </div>
+
+                    <strong>［2. 向きの切り替え（ $y$ 軸対称パターン）］</strong><br>
+                    $x$ と $y$ を入れ替えた <strong>$x^2 = 4py$</strong> は、数Ⅰ・Ⅱでお馴染みの上下に開く放物線となる。（焦点 $F(0, p)$ 、準線 $y = -p$ ）
+                    <br>
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「『 $4p$ 』の数字を作るのがすべての第一歩。例えば $y^2 = 8x$ なら $4 \times 2 \times x$ だから $p=2$ 。つまり焦点 $(2, 0)$ 、準線 $x = -2$ と一瞬で抜き出せるよ」と教え込むこと。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ平面曲線：楕円（定義と標準形）
+             ========================================== -->
+
+        <!-- スライド74：楕円の定義と標準形（図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ②</h2>
+                <span class="badge">講義：楕円の定義（2焦点からの「距離の和」が一定）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【定義】2つの定点 $F, F'$ （<strong>焦点</strong>）からの<strong>距離の和が一定（ $PF + PF' = 2a$ ）</strong>である点の軌跡を<strong>楕円</strong>と呼ぶ。
+                </div>
+
+                <!-- ピュアSVG図解エリア（楕円の定義と三平方関係） -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin: 6px 0;">
+                    <svg width="320" height="140" viewBox="-10 -10 320 140" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 軸 -->
+                        <line x1="10" y1="70" x2="300" y2="70" stroke="#a0aec0" stroke-width="1.5"/>
+                        <line x1="155" y1="10" x2="155" y2="130" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="290" y="65" font-size="9" fill="#718096">x</text>
+                        <text x="160" y="20" font-size="9" fill="#718096">y</text>
+                        <text x="145" y="82" font-size="9" fill="#718096">O</text>
+                        
+                        <!-- 楕円本体 (a=100, b=50, c=√(100²-50²)=86.6) -->
+                        <ellipse cx="155" cy="70" rx="100" ry="50" fill="none" stroke="#1a365d" stroke-width="2"/>
+                        
+                        <!-- 頂点ラベル (-a, a, -b, b) -->
+                        <text x="50" y="82" font-size="9" fill="#1a365d" font-weight="bold">-a</text>
+                        <text x="250" y="82" font-size="9" fill="#1a365d" font-weight="bold">a</text>
+                        <text x="160" y="23" font-size="9" fill="#1a365d" font-weight="bold">b</text>
+                        <text x="160" y="122" font-size="9" fill="#1a365d" font-weight="bold">-b</text>
+                        
+                        <!-- 焦点 F'( -c, 0 ) と F( c, 0 ) (c=86.6px) -->
+                        <circle cx="68.4" cy="70" r="3.5" fill="#2b6cb0"/>
+                        <text x="58" y="62" font-size="9" fill="#2b6cb0" font-weight="bold">F'(-c,0)</text>
+                        
+                        <circle cx="241.6" cy="70" r="3.5" fill="#2b6cb0"/>
+                        <text x="235" y="62" font-size="9" fill="#2b6cb0" font-weight="bold">F(c,0)</text>
+                        
+                        <!-- Y軸上の頂点(0, b)への斜辺（長さ a ）の三角形 -->
+                        <line x1="68.4" y1="70" x2="155" y2="20" stroke="#dd6b20" stroke-width="1.5" stroke-dasharray="3,3"/>
+                        <line x1="241.6" y1="70" x2="155" y2="20" stroke="#dd6b20" stroke-width="1.5" stroke-dasharray="3,3"/>
+                        <circle cx="155" cy="20" r="3.5" fill="#dd6b20"/>
+                        <text x="100" y="40" font-size="9.5" fill="#dd6b20" font-weight="bold">斜辺 a</text>
+                        <text x="195" y="40" font-size="9.5" fill="#dd6b20" font-weight="bold">斜辺 a</text>
+                    </svg>
+                </div>
+
+                <div>
+                    <strong>［1. 標準形： $\displaystyle \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1 \quad (a > b > 0)$ ］</strong><br>
+                    $x$ 軸上の頂点が $(\pm a, 0)$ 、 $y$ 軸上の頂点が $(0, \pm b)$ となる横長の楕円を描く。
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 5px 10px; border-radius: 4px; margin: 4px 0; font-size: 11.5pt; font-weight: bold; text-align: center;">
+                        $$ \text{焦点 } F(\sqrt{a^2-b^2}, 0), \quad F'(-\sqrt{a^2-b^2}, 0) \quad \Big( c^2 = a^2 - b^2 \Big) $$
+                    </div>
+
+                    <strong>［2. 焦点を求める「三平方の記憶法」］</strong><br>
+                    「長軸の半分 $a$ 、短軸の半分 $b$ 、焦点位置 $c$ 」で直角三角形を作ると、<strong>斜辺が $a$ </strong> となる（上図のオレンジ破線）。ここから $c = \sqrt{a^2 - b^2}$ の関係が一発で導ける。
+                    <br>
+                    <span style="font-size: 10pt; color: #4a5568;">
+                        💡 <strong>縦長の楕円（ $b > a$ ）の場合：</strong>長軸が $y$ 軸側になるため、焦点は $(0, \pm \sqrt{b^2 - a^2})$ となり、距離の和は $2b$ に化ける。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             数Ⅲ平面曲線：双曲線（定義と標準形）
+             ========================================== -->
+
+        <!-- スライド75：双曲線の定義と標準形（図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ③</h2>
+                <span class="badge">講義：双曲線の定義（2焦点からの「距離の差」と漸近線）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【定義】2つの定点 $F, F'$ （<strong>焦点</strong>）からの<strong>距離の差が一定（ $|PF - PF'| = 2a$ ）</strong>である点の軌跡を<strong>双曲線</strong>と呼ぶ。
+                </div>
+
+                <!-- 修正版：双曲線と漸近線（数学的に正しい漸近挙動） -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin: 6px 0;">
+                    <svg width="320" height="150" viewBox="-10 -10 320 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 軸 (原点: 155, 75) -->
+                        <line x1="10" y1="75" x2="300" y2="75" stroke="#a0aec0" stroke-width="1.5"/>
+                        <line x1="155" y1="10" x2="155" y2="140" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="290" y="70" font-size="9" fill="#718096">x</text>
+                        <text x="160" y="20" font-size="9" fill="#718096">y</text>
+                        <text x="145" y="87" font-size="9" fill="#718096">O</text>
+                        
+                        <!-- 漸近線 y = ±(b/a)x (a=50, b=40 -> 傾き ±0.8: 原点155,75を通る) -->
+                        <line x1="60" y1="133" x2="250" y2="17" stroke="#e53e3e" stroke-width="1.5" stroke-dasharray="4,4"/>
+                        <line x1="60" y1="17" x2="250" y2="133" stroke="#e53e3e" stroke-width="1.5" stroke-dasharray="4,4"/>
+                        <text x="150" y="20" font-size="9.5" fill="#e53e3e" font-weight="bold">漸近線 y = (b/a)x</text>
+                        
+                        <!-- 双曲線本体 (漸近線の内側に収まり、遠くで近づく正確なBezier曲線) -->
+                        <!-- 右側 (頂点 205, 75 : a=50) -->
+                        <path d="M 272 10 C 230 45, 205 60, 205 75 C 205 90, 230 105, 272 140" fill="none" stroke="#1a365d" stroke-width="2.2"/>
+                        
+                        <!-- 左側 (頂点 105, 75 : -a=-50) -->
+                        <path d="M 38 10 C 80 45, 105 60, 105 75 C 105 90, 80 105, 38 140" fill="none" stroke="#1a365d" stroke-width="2.2"/>
+                        
+                        <!-- 頂点 (-a, 0), (a, 0) -->
+                        <circle cx="105" cy="75" r="3.5" fill="#1a365d"/>
+                        <text x="95" y="90" font-size="9.5" fill="#1a365d" font-weight="bold">-a</text>
+                        
+                        <circle cx="205" cy="75" r="3.5" fill="#1a365d"/>
+                        <text x="205" y="90" font-size="9.5" fill="#1a365d" font-weight="bold">a</text>
+                        
+                        <!-- 焦点 F', F (c = √(50²+40²) = 64 -> x = 155±64 = 91, 219) -->
+                        <circle cx="91" cy="75" r="3.5" fill="#2b6cb0"/>
+                        <text x="75" y="66" font-size="9" fill="#2b6cb0" font-weight="bold">F'(-c,0)</text>
+                        
+                        <circle cx="219" cy="75" r="3.5" fill="#2b6cb0"/>
+                        <text x="215" y="66" font-size="9" fill="#2b6cb0" font-weight="bold">F(c,0)</text>
+                    </svg>
+                </div>
+
+                <div>
+                    <strong>［1. 標準形： $\displaystyle \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1$ （左右に開く形）］</strong><br>
+                    楕円の公式の「プラス（ $+$ ）」が「マイナス（ $-$ ）」に反転した形。
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 5px 10px; border-radius: 4px; margin: 4px 0; font-size: 11pt; font-weight: bold; text-align: center;">
+                        $$ \text{漸近線： } y = \pm \frac{b}{a}x, \quad \text{焦点： } F(\sqrt{a^2+b^2}, 0), \ F'(-\sqrt{a^2+b^2}, 0) $$
+                    </div>
+
+                    <strong>［2. 上下に開く双曲線（右辺が $-1$ ）］</strong><br>
+                    右辺が <strong>$-1$</strong> となる $\displaystyle \frac{x^2}{a^2} - \frac{y^2}{b^2} = -1$ は、$y$ 軸方向に開く双曲線となり、焦点は $(0, \pm \sqrt{a^2+b^2})$ 、距離の差は $2b$ となる（漸近線の式は全く同じ $y = \pm \frac{b}{a}x$ ）。
+                    <br>
+                    <span style="font-size: 10pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「双曲線を描く時の鉄則は、まず最初に $y = \pm \frac{b}{a}x$ の『漸近線（ガイドライン）』を点線で引くこと。グラフはこの線に吸い付くように伸びていくよ」と手順を型化させよ。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ平面曲線：証明＆演習セクション（全6問）
+             ========================================== -->
+
+        <!-- 1. 放物線の標準形証明（問題＆解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【証明】32 放物線の標準形の導出</h2>
+                <span class="badge">二次曲線：証明</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="font-size: 14pt; padding: 15px;">
+                    焦点 $F(p, 0)$ 、準線 $x = -p \quad (p \neq 0)$ とし、放物線上の任意の点を $P(x, y)$ とするとき、定義に従って方程式 $y^2 = 4px$ を導出せよ。
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>［証明のプロセス］</strong><br>
+                    点 $P(x, y)$ から準線 $x = -p$ へ下ろした垂線の足を $H(-p, y)$ とする。<br>
+                    放物線の定義「焦点までの距離 $PF$ ＝ 準線までの距離 $PH$ 」より：
+                    $$ PF = PH $$
+                    三平方の定理および軸方向の距離の公式を適用する：
+                    $$ \sqrt{(x - p)^2 + (y - 0)^2} = |x - (-p)| $$
+                    両辺を2乗してルートと絶対値を外す：
+                    $$ (x - p)^2 + y^2 = (x + p)^2 $$
+                    左辺と右辺を展開する：
+                    $$ x^2 - 2px + p^2 + y^2 = x^2 + 2px + p^2 $$
+                    両辺の $x^2$ と $p^2$ が相殺され、 $-2px$ を右辺に移項すると：
+                    $$ y^2 = 4px \quad (\text{証明終}) $$
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 放物線の演習（問題＆解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【演習】33 放物線の基本演習</h2>
+                <span class="badge">二次曲線：演習</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="font-size: 14.5pt; padding: 15px;">
+                    焦点が点 $(3, 0)$ 、準線が直線 $x = -3$ である放物線の方程式を求めよ。また、点 $(3, 6)$ における接線の方程式を求めよ。
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>［解答のステップ］</strong><br>
+                    <strong>① 放物線の方程式：</strong><br>
+                    焦点 $(p, 0) = (3, 0)$ より $p = 3$ である。<br>
+                    標準形 $y^2 = 4px$ に代入して：
+                    $$ y^2 = 4 \times 3 \times x \implies \mathbf{y^2 = 12x} $$
+                    <br>
+                    <strong>② 接線の方程式（公式 $y_1 y = 2p(x + x_1)$ の適用）：</strong><br>
+                    放物線 $y^2 = 4px$ 上の点 $(x_1, y_1)$ における接線の公式に $(x_1, y_1) = (3, 6), p = 3$ を代入する。
+                    $$ 6y = 2 \times 3 \times (x + 3) \implies 6y = 6(x + 3) \implies \mathbf{y = x + 3} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">方程式： $y^2 = 12x$ , 接線： $y = x + 3$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 楕円の標準形証明（問題＆解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【証明】34 楕円の標準形の導出</h2>
+                <span class="badge">二次曲線：証明</span>
+            </div>
+            <div class="content-box" style="font-size: 12.5pt;">
+                <div class="problem-text" style="font-size: 13.5pt; padding: 12px;">
+                    2焦点 $F(c, 0), F'(-c, 0) \quad (c > 0)$ からの距離の和が $2a \quad (a > c)$ である点 $P(x, y)$ の軌跡が $\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1 \quad (b^2 = a^2 - c^2)$ となることを導出せよ。
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>［証明のプロセス］</strong><br>
+                    定義より $PF + PF' = 2a$ であるから：
+                    $$ \sqrt{(x - c)^2 + y^2} + \sqrt{(x + c)^2 + y^2} = 2a $$
+                    一方のルートを右辺に移項して両辺を2乗する：
+                    $$ (x - c)^2 + y^2 = \left( 2a - \sqrt{(x + c)^2 + y^2} \right)^2 $$
+                    $$ x^2 - 2cx + c^2 + y^2 = 4a^2 - 4a\sqrt{(x + c)^2 + y^2} + x^2 + 2cx + c^2 + y^2 $$
+                    共通項を整理し、ルートを含む項だけを左辺にまとめて $4$ で割る：
+                    $$ a\sqrt{(x + c)^2 + y^2} = a^2 + cx $$
+                    再び両辺を2乗して整理する：
+                    $$ a^2 (x^2 + 2cx + c^2 + y^2) = a^4 + 2a^2 cx + c^2 x^2 $$
+                    $$ (a^2 - c^2)x^2 + a^2 y^2 = a^2 (a^2 - c^2) $$
+                    $a > c > 0$ より $a^2 - c^2 > 0$ なので、 $b^2 = a^2 - c^2$ と置くと：
+                    $$ b^2 x^2 + a^2 y^2 = a^2 b^2 $$
+                    両辺を $a^2 b^2$ で割ると： $\mathbf{\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1} \quad (\text{証明終})$
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 楕円の演習（問題＆解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【演習】35 楕円の基本演習</h2>
+                <span class="badge">二次曲線：演習</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="font-size: 14.5pt; padding: 15px;">
+                    楕円 $\frac{x^2}{25} + \frac{y^2}{9} = 1$ の焦点の座標、長軸の長さ、短軸の長さを求めよ。
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>［解答のステップ］</strong><br>
+                    方程式より $a^2 = 25, b^2 = 9$ であるから、 $a = 5, b = 3 \quad (a > b)$ となる。<br><br>
+                    <strong>① 焦点の座標 $F(\pm c, 0)$ ：</strong><br>
+                    三平方の関係式 $c^2 = a^2 - b^2$ に代入する：
+                    $$ c^2 = 25 - 9 = 16 \implies c = 4 $$
+                    よって、焦点の座標は $(4, 0), (-4, 0)$ である。<br><br>
+                    <strong>② 長軸および短軸の長さ：</strong><br>
+                    長軸の長さ： $2a = 2 \times 5 = \mathbf{10}$
+                    <br>短軸の長さ： $2b = 2 \times 3 = \mathbf{6}$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">焦点： $(4, 0), (-4, 0)$ , 長軸の長さ： $10$ , 短軸の長さ： $6$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 双曲線の標準形証明（問題＆解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【証明】36 双曲線の標準形の導出</h2>
+                <span class="badge">二次曲線：証明</span>
+            </div>
+            <div class="content-box" style="font-size: 12.5pt;">
+                <div class="problem-text" style="font-size: 13.5pt; padding: 12px;">
+                    2焦点 $F(c, 0), F'(-c, 0) \quad (c > 0)$ からの距離の差が $2a \quad (c > a > 0)$ である点 $P(x, y)$ の軌跡が $\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1 \quad (b^2 = c^2 - a^2)$ となることを導出せよ。
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>［証明のプロセス］</strong><br>
+                    定義より $|PF - PF'| = 2a$ であるから：
+                    $$ \sqrt{(x - c)^2 + y^2} - \sqrt{(x + c)^2 + y^2} = \pm 2a $$
+                    一方のルートを右辺に移項し、両辺を2乗して整理する：
+                    $$ (x - c)^2 + y^2 = 4a^2 \pm 4a\sqrt{(x + c)^2 + y^2} + (x + c)^2 + y^2 $$
+                    整理して $4$ で割ると：
+                    $$ \pm a\sqrt{(x + c)^2 + y^2} = cx + a^2 $$
+                    両辺を再び2乗する：
+                    $$ a^2 (x^2 + 2cx + c^2 + y^2) = c^2 x^2 + 2a^2 cx + a^4 $$
+                    $$ (c^2 - a^2)x^2 - a^2 y^2 = a^2 (c^2 - a^2) $$
+                    $c > a > 0$ より $c^2 - a^2 > 0$ なので、 $b^2 = c^2 - a^2$ と置くと：
+                    $$ b^2 x^2 - a^2 y^2 = a^2 b^2 $$
+                    両辺を $a^2 b^2$ で割ると： $\mathbf{\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1} \quad (\text{証明終})$
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 双曲線の演習（問題＆解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【演習】37 双曲線の基本演習</h2>
+                <span class="badge">二次曲線：演習</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div class="problem-text" style="font-size: 14.5pt; padding: 15px;">
+                    双曲線 $\frac{x^2}{16} - \frac{y^2}{9} = 1$ の焦点の座標、および漸近線の方程式を求めよ。
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>［解答のステップ］</strong><br>
+                    方程式より $a^2 = 16, b^2 = 9$ であるから、 $a = 4, b = 3$ となる。<br><br>
+                    <strong>① 焦点の座標 $F(\pm c, 0)$ ：</strong><br>
+                    双曲線の関係式 $c^2 = a^2 + b^2$ （和の関係）に代入する：
+                    $$ c^2 = 16 + 9 = 25 \implies c = 5 $$
+                    よって、焦点の座標は $(5, 0), (-5, 0)$ である。<br><br>
+                    <strong>② 漸近線の方程式：</strong><br>
+                    公式 $y = \pm \frac{b}{a}x$ に $a = 4, b = 3$ を代入する：
+                    $$ \mathbf{y = \pm \frac{3}{4}x} $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">焦点： $(5, 0), (-5, 0)$ , 漸近線： $y = \pm \frac{3}{4}x$</div>
+                </div>
+            </div>
+        </div>
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ_二次曲線応用</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             数Ⅲ平面曲線：離心率（e による二次曲線の統一的定義）
+             ========================================== -->
+
+        <!-- スライド76：離心率の定義と二次曲線の分類 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ④</h2>
+                <span class="badge">講義：離心率（e）による二次曲線の統一的把握</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【統一的定義】定点 $F$（焦点）と定直線 $l$（準線）に対し、<strong>距離の比 $e = \frac{PF}{PH}$（離心率）</strong> が一定である点 $P$ の軌跡として、すべての二次曲線は1つの形式で定義できる。
+                </div>
+
+                <!-- ピュアSVG図解エリア（離心率 e の定義図） -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin: 8px 0;">
+                    <svg width="300" height="130" viewBox="-10 -10 300 130" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 準線 l -->
+                        <line x1="40" y1="10" x2="40" y2="120" stroke="#e53e3e" stroke-width="1.8" stroke-dasharray="4,4"/>
+                        <text x="10" y="25" font-size="9" fill="#e53e3e" font-weight="bold">準線 l</text>
+                        
+                        <!-- 焦点 F -->
+                        <circle cx="180" cy="65" r="4" fill="#2b6cb0"/>
+                        <text x="175" y="82" font-size="9.5" fill="#2b6cb0" font-weight="bold">焦点 F</text>
+                        
+                        <!-- 点 P -->
+                        <circle cx="120" cy="30" r="4" fill="#1a365d"/>
+                        <text x="125" y="25" font-size="10" fill="#1a365d" font-weight="bold">P</text>
+                        
+                        <!-- 垂線の足 H -->
+                        <circle cx="40" cy="30" r="3" fill="#e53e3e"/>
+                        <text x="28" y="28" font-size="9" fill="#e53e3e" font-weight="bold">H</text>
+                        
+                        <!-- 距離 PH (d1) と PF (d2) -->
+                        <line x1="40" y1="30" x2="120" y2="30" stroke="#e53e3e" stroke-width="1.5"/>
+                        <line x1="120" y1="30" x2="180" y2="65" stroke="#2b6cb0" stroke-width="1.5"/>
+                        
+                        <text x="75" y="23" font-size="9" fill="#e53e3e" font-weight="bold" text-anchor="middle">PH</text>
+                        <text x="155" y="42" font-size="9" fill="#2b6cb0" font-weight="bold">PF</text>
+                        
+                        <!-- 離心率の定義式表示 -->
+                        <rect x="210" y="30" width="75" height="40" rx="4" fill="#fffaf0" stroke="#dd6b20" stroke-width="1.5"/>
+                        <text x="247" y="55" font-size="11" fill="#dd6b20" font-weight="bold" text-anchor="middle">e = PF / PH</text>
+                    </svg>
+                </div>
+
+                <div>
+                    <strong>［離心率 $e$ の値による二次曲線の完全分類］</strong>
+                    <div style="margin-top: 5px;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 11pt; text-align: center;">
+                            <thead>
+                                <tr style="background-color: #edf2f7; border-bottom: 2px solid #cbd5e0;">
+                                    <th style="padding: 6px; color: #1a365d;">離心率 $e$ の値</th>
+                                    <th style="padding: 6px; color: #1a365d;">図形の種類</th>
+                                    <th style="padding: 6px; color: #1a365d;">幾何学的特徴</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 6px; font-weight: bold; color: #2b6cb0;">$e = 0$</td>
+                                    <td style="padding: 6px; font-weight: bold;">円</td>
+                                    <td style="padding: 6px; text-align: left;">潰れのない完全な円（楕円の極限）</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                    <td style="padding: 6px; font-weight: bold; color: #2b6cb0;">$0 < e < 1$</td>
+                                    <td style="padding: 6px; font-weight: bold;">楕円</td>
+                                    <td style="padding: 6px; text-align: left;">$PF < PH$ （閉じた曲線になる）</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 6px; font-weight: bold; color: #e53e3e;">$e = 1$</td>
+                                    <td style="padding: 6px; font-weight: bold;">放物線</td>
+                                    <td style="padding: 6px; text-align: left;">$PF = PH$ （距離が等しい）</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                    <td style="padding: 6px; font-weight: bold; color: #2b6cb0;">$e > 1$</td>
+                                    <td style="padding: 6px; font-weight: bold;">双曲線</td>
+                                    <td style="padding: 6px; text-align: left;">$PF > PH$ （左右に開いた曲線になる）</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="margin-top: 8px;">
+                        <strong>［標準形における離心率の計算式］</strong><br>
+                        楕円（ $\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$ ）の離心率： <strong>$e = \frac{c}{a} = \frac{\sqrt{a^2-b^2}}{a} < 1$</strong><br>
+                        双曲線（ $\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1$ ）の離心率： <strong>$e = \frac{c}{a} = \frac{\sqrt{a^2+b^2}}{a} > 1$</strong>
+                        <br>
+                        <span style="font-size: 10pt; color: #4a5568;">
+                            💡 <strong>指導のポイント：</strong>「 $e$ は『どれくらい円から離れて潰れているか（偏りの度合い）』を表す数値なんだよ。 $e = 0$ なら真ん丸、 $1$ 未満なら楕円、 $1$ になると開ききって放物線、 $1$ を超えると双曲線になるんだ」と教えるとイメージが一発で定着します。
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- スライド76.5：離心率の動的変化（円・楕円・放物線・双曲線の完全連動） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ④-2</h2>
+                <span class="badge">動的図解：離心率 e による二次曲線の連続変化</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                
+                <!-- インタラクティブ描画エリア -->
+                <div style="display: flex; flex-direction: column; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin: 5px 0;">
+                    
+                    <!-- リアルタイム数値＆図形名表示 -->
+                    <div style="font-size: 15pt; font-weight: bold; margin-bottom: 8px; color: #1a365d;">
+                        離心率 $e = $ <span id="e-val-display" style="color: #dd6b20; font-size: 17pt;">0.00</span> 
+                        （<span id="shape-name-display" style="color: #2b6cb0; font-size: 17pt;">円</span>）
+                    </div>
+
+                    <!-- SVG描画キャンバス (原点: 150, 75) -->
+                    <svg id="conic-canvas" width="320" height="150" viewBox="-10 -10 320 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 軸 -->
+                        <line x1="10" y1="75" x2="290" y2="75" stroke="#a0aec0" stroke-width="1.5"/>
+                        <line x1="150" y1="10" x2="150" y2="140" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="280" y="70" font-size="9" fill="#718096">x</text>
+                        <text x="155" y="20" font-size="9" fill="#718096">y</text>
+                        
+                        <!-- 動的に書き換わる図形パス -->
+                        <path id="dynamic-shape" d="" fill="none" stroke="#2b6cb0" stroke-width="2.5"/>
+                        
+                        <!-- 焦点 F の表示 -->
+                        <circle id="focus-point" cx="150" cy="75" r="3.5" fill="#e53e3e"/>
+                        <text id="focus-label" x="155" y="90" font-size="9" fill="#e53e3e" font-weight="bold">F</text>
+                    </svg>
+
+                    <!-- コントローラー（スライダー） -->
+                    <div style="margin-top: 8px; width: 85%; text-align: center;">
+                        <input type="range" id="e-range-slider" min="0" max="1.8" step="0.05" value="0" style="width: 100%;">
+                        <div style="font-size: 10pt; color: #4a5568; margin-top: 4px; font-weight: bold;">
+                            つまみを右に動かすと： 円 (e=0) $\to$ 楕円 (0<e<1) $\to$ 放物線 (e=1) $\to$ 双曲線 (e>1)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- リアルタイム演算JavaScript -->
+                <script>
+                    (function() {
+                        const slider = document.getElementById('e-range-slider');
+                        const valDisplay = document.getElementById('e-val-display');
+                        const nameDisplay = document.getElementById('shape-name-display');
+                        const shapePath = document.getElementById('dynamic-shape');
+                        const focusPt = document.getElementById('focus-point');
+                        const focusLbl = document.getElementById('focus-label');
+
+                        const cx = 150, cy = 75; // キャンバスの中心（原点）
+
+                        function updateShape() {
+                            const e = parseFloat(slider.value);
+                            valDisplay.innerText = e.toFixed(2);
+
+                            let dStr = "";
+                            const p = 35; // 基準スケール
+
+                            if (e === 0) {
+                                // 円 (e = 0)
+                                nameDisplay.innerText = "円";
+                                nameDisplay.style.color = "#2b6cb0";
+                                const r = 40;
+                                dStr = `M ${cx - r} ${cy} A ${r} ${r} 0 1 0 ${cx + r} ${cy} A ${r} ${r} 0 1 0 ${cx - r} ${cy}`;
+                                focusPt.setAttribute('cx', cx);
+                                focusLbl.setAttribute('x', cx + 5);
+
+                            } else if (e < 1) {
+                                // 楕円 (0 < e < 1)
+                                nameDisplay.innerText = "楕円";
+                                nameDisplay.style.color = "#2c7a7b";
+                                const a = p / (1 - e * e);
+                                const b = a * Math.sqrt(1 - e * e);
+                                const c = e * a;
+                                const rx = Math.min(a, 120);
+                                const ry = Math.min(b, 60);
+                                dStr = `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 0 ${cx - rx} ${cy}`;
+                                focusPt.setAttribute('cx', cx + c);
+                                focusLbl.setAttribute('x', cx + c + 5);
+
+                            } else if (e === 1) {
+                                // 放物線 (e = 1)
+                                nameDisplay.innerText = "放物線";
+                                nameDisplay.style.color = "#e53e3e";
+                                // y^2 = 4px (頂点を左側に配置)
+                                const vx = cx - 40;
+                                dStr = `M ${vx + 120} ${cy - 60} Q ${vx} ${cy} ${vx + 120} ${cy + 60}`;
+                                focusPt.setAttribute('cx', vx + 20);
+                                focusLbl.setAttribute('x', vx + 25);
+
+                            } else {
+                                // 双曲線 (e > 1)
+                                nameDisplay.innerText = "双曲線";
+                                nameDisplay.style.color = "#805ad5";
+                                const a = p / (e * e - 1);
+                                const c = e * a;
+                                // 右側の枝
+                                const rx1 = cx - 10 + Math.min(a, 30);
+                                const dRight = `M ${rx1 + 80} ${cy - 60} Q ${rx1} ${cy} ${rx1 + 80} ${cy + 60}`;
+                                // 左側の枝
+                                const rx2 = cx + 10 - Math.min(a, 30);
+                                const dLeft = `M ${rx2 - 80} ${cy - 60} Q ${rx2} ${cy} ${rx2 - 80} ${cy + 60}`;
+                                
+                                dStr = `${dRight} ${dLeft}`;
+                                focusPt.setAttribute('cx', cx + Math.min(c, 70));
+                                focusLbl.setAttribute('x', cx + Math.min(c, 70) + 5);
+                            }
+
+                            shapePath.setAttribute('d', dStr);
+                        }
+
+                        slider.addEventListener('input', updateShape);
+                        updateShape(); // 初期描画
+                    })();
+                </script>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ平面曲線：媒介変数表示（パラメーター表示）
+             ========================================== -->
+
+        <!-- スライド77：二次曲線の媒介変数表示一覧 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ⑤</h2>
+                <span class="badge">講義：二次曲線の媒介変数表示（三角関数とパラメータ）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【極意】曲線上の動点 $P(x, y)$ を1つの変数（ $\theta$ や $t$ ）で表すことで、<strong>「2変数 $(x, y)$ の問題を1変数 $(\theta, t)$ の問題へ落とし込む」</strong>ことができる。微積分や最大・最小問題での最強のツールである。
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11pt; text-align: center;">
+                        <thead>
+                            <tr style="background-color: #edf2f7; border-bottom: 2px solid #cbd5e0;">
+                                <th style="padding: 6px; color: #1a365d; width: 22%;">曲線</th>
+                                <th style="padding: 6px; color: #1a365d; width: 30%;">標準形</th>
+                                <th style="padding: 6px; color: #1a365d; width: 48%;">媒介変数表示（パラメーター表示）</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px; font-weight: bold; color: #2b6cb0;">円</td>
+                                <td style="padding: 8px;">$x^2 + y^2 = r^2$</td>
+                                <td style="padding: 8px; font-weight: bold; text-align: left; padding-left: 20px;">
+                                    $\begin{cases} x = r \cos \theta \\ y = r \sin \theta \end{cases}$
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 8px; font-weight: bold; color: #2c7a7b;">楕円</td>
+                                <td style="padding: 8px;">$\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$</td>
+                                <td style="padding: 8px; font-weight: bold; text-align: left; padding-left: 20px; color: #2c7a7b;">
+                                    $\begin{cases} x = a \cos \theta \\ y = b \sin \theta \end{cases}$
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px; font-weight: bold; color: #805ad5;">双曲線</td>
+                                <td style="padding: 8px;">$\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1$</td>
+                                <td style="padding: 8px; font-weight: bold; text-align: left; padding-left: 20px; color: #805ad5;">
+                                    $\begin{cases} x = \frac{a}{\cos \theta} \\ y = b \tan \theta \end{cases}$
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 8px; font-weight: bold; color: #e53e3e;">放物線</td>
+                                <td style="padding: 8px;">$y^2 = 4px$</td>
+                                <td style="padding: 8px; font-weight: bold; text-align: left; padding-left: 20px; color: #e53e3e;">
+                                    $\begin{cases} x = pt^2 \\ y = 2pt \end{cases}$
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <strong>［背景にある三角関数の相互関係公式］</strong><br>
+                    *   楕円： $\cos^2 \theta + \sin^2 \theta = 1$ に $\cos \theta = \frac{x}{a}, \sin \theta = \frac{y}{b}$ を代入すると標準形になる。<br>
+                    *   双曲線： $1 + \tan^2 \theta = \frac{1}{\cos^2 \theta} \implies \frac{1}{\cos^2 \theta} - \tan^2 \theta = 1$ に代入すると標準形になる。
+                    <br>
+                    <span style="font-size: 10pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「楕円上の点が出たら、迷わず $(a \cos \theta, b \sin \theta)$ と置いてごらん。文字が2つ（ $x, y$ ）から1つ（ $\theta$ ）に減るから、最大・最小問題が三角関数の合成などで一発解法に化けるよ」と教え込むのが鉄則です。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ平面曲線：媒介変数表示の演習セクション
+             ========================================== -->
+
+        <!-- 1. 楕円の媒介変数表示と最大・最小（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】38 媒介変数表示と値の最大・最小</h2>
+                <span class="badge">平面曲線演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    点 $P(x, y)$ が楕円 $\frac{x^2}{16} + \frac{y^2}{9} = 1$ 上を動くとき、 $x + 2y$ の最大値およびそのときの点 $P$ の座標を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    $x, y$ のまま条件式を扱おうとすると難航する。<br>
+                    楕円の媒介変数表示 <strong>$x = 4\cos\theta, \ y = 3\sin\theta \ (0 \leqq \theta < 2\pi)$</strong> と置いて $x + 2y$ に代入し、三角関数の合成公式 $a\sin\theta + b\cos\theta = \sqrt{a^2+b^2}\sin(\theta+\alpha)$ を作動させよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 楕円の媒介変数表示と最大・最小（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】38 媒介変数表示と値の最大・最小</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］媒介変数 $\theta$ で 1変数化する</strong><br>
+                    点 $P(x, y)$ は楕円 $\frac{x^2}{4^2} + \frac{y^2}{3^2} = 1$ 上の点であるから、 $\theta \ (0 \leqq \theta < 2\pi)$ を用いて以下のように置ける。
+                    $$ x = 4 \cos \theta, \quad y = 3 \sin \theta $$
+                    これを $k = x + 2y$ に代入する：
+                    $$ k = 4 \cos \theta + 6 \sin \theta = 6 \sin \theta + 4 \cos \theta $$
+                    <br>
+                    <strong>［ステップ 2］三角関数の合成を適用する</strong><br>
+                    $k = \sqrt{6^2 + 4^2} \sin(\theta + \alpha) = \sqrt{52} \sin(\theta + \alpha) = 2\sqrt{13} \sin(\theta + \alpha)$<br>
+                    ただし、 $\cos \alpha = \frac{6}{2\sqrt{13}} = \frac{3}{\sqrt{13}}, \ \sin \alpha = \frac{4}{2\sqrt{13}} = \frac{2}{\sqrt{13}}$ である。
+                    <br><br>
+                    <strong>［ステップ 3］最大値と座標の特定</strong><br>
+                    $\sin(\theta + \alpha) = 1$ のとき、 $k$ は最大値 **$2\sqrt{13}$** をとる。<br>
+                    このとき $\theta + \alpha = \frac{\pi}{2} \implies \theta = \frac{\pi}{2} - \alpha$ であるから：
+                    *   $x = 4 \cos\left(\frac{\pi}{2} - \alpha\right) = 4 \sin \alpha = 4 \times \frac{2}{\sqrt{13}} = \frac{8}{\sqrt{13}} = \frac{8\sqrt{13}}{13}$
+                    *   $y = 3 \sin\left(\frac{\pi}{2} - \alpha\right) = 3 \cos \alpha = 3 \times \frac{3}{\sqrt{13}} = \frac{9}{\sqrt{13}} = \frac{9\sqrt{13}}{13}$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        最大値： $2\sqrt{13}$ , 点 $P$ の座標： $\left( \frac{8\sqrt{13}}{13}, \frac{9\sqrt{13}}{13} \right)$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. パラメータ消去と軌跡の復元（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】39 パラメータの消去と軌跡</h2>
+                <span class="badge">平面曲線演習：標準</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    媒介変数 $t$ によって $\begin{cases} x = 2t^2 + 1 \\ y = 4t \end{cases}$ と表される点 $P(x, y)$ は、どのような曲線を描くか。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    $y = 4t$ から $t = \frac{y}{4}$ と変形し、 $x$ の式へ代入して $t$ を消去せよ。<br>
+                    ただし、実数 $t$ に対する **$x$ の変域制限（ $x \geqq 1$ ）** を見落とさないよう注意せよ！
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. パラメータ消去と軌跡の復元（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】39 パラメータの消去と軌跡</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 14pt;">
+                <div>
+                    <strong>［ステップ 1］パラメータ $t$ の消去</strong><br>
+                    $y = 4t$ より、 $t = \frac{y}{4}$ となる。<br>
+                    これを $x = 2t^2 + 1$ に代入する：
+                    $$ x = 2 \left( \frac{y}{4} \right)^2 + 1 = 2 \times \frac{y^2}{16} + 1 = \frac{y^2}{8} + 1 $$
+                    両辺から $1$ を引いて $8$ 倍すると：
+                    $$ y^2 = 8(x - 1) $$
+                    これは放物線 $y^2 = 8x$ を $x$ 軸方向に $+1$ だけ平行移動した放物線である。
+                    <br><br>
+                    <strong>［ステップ 2］定義域・変域のチェック（罠の回避）</strong><br>
+                    $t$ はすべての実数をとるとき、 $t^2 \geqq 0$ である。<br>
+                    よって、 $x = 2t^2 + 1 \geqq 1$ となり、放物線全体（頂点 $(1, 0)$ より右側）がくまなく描かれる。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        放物線 $y^2 = 8(x - 1)$ （または 頂点 $(1, 0)$ 、焦点 $(3, 0)$ の放物線）
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ平面曲線：離心率の演習セクション
+             ========================================== -->
+
+        <!-- 1. 標準形からの離心率の算出（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】40 離心率 e の算出</h2>
+                <span class="badge">平面曲線演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の二次曲線の離心率 $e$ をそれぞれ求めよ。<br>
+                    (1) 楕円 $\frac{x^2}{25} + \frac{y^2}{9} = 1$<br>
+                    (2) 双曲線 $\frac{x^2}{16} - \frac{y^2}{9} = 1$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    離心率の万能公式は <strong>$e = \frac{c}{a}$ （中心から焦点までの距離 $\div$ 頂点までの距離）</strong> である。<br>
+                    楕円は $c = \sqrt{a^2 - b^2}$ （ $e < 1$ ）、双曲線は $c = \sqrt{a^2 + b^2}$ （ $e > 1$ ）で焦点 $c$ を割り出せ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 標準形からの離心率の算出（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】40 離心率 e の算出</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［(1) 楕円の離心率］</strong><br>
+                    $a^2 = 25, b^2 = 9 \implies a = 5, b = 3$ である。<br>
+                    焦点までの距離 $c = \sqrt{a^2 - b^2} = \sqrt{25 - 9} = \sqrt{16} = 4$<br>
+                    よって、離心率 $e$ は：
+                    $$ e = \frac{c}{a} = \mathbf{\frac{4}{5}} \quad (< 1 \text{ を確認}) $$
+                    <br>
+                    <strong>［(2) 双曲線の離心率］</strong><br>
+                    $a^2 = 16, b^2 = 9 \implies a = 4, b = 3$ である。<br>
+                    焦点までの距離 $c = \sqrt{a^2 + b^2} = \sqrt{16 + 9} = \sqrt{25} = 5$<br>
+                    よって、離心率 $e$ は：
+                    $$ e = \frac{c}{a} = \mathbf{\frac{5}{4}} \quad (> 1 \text{ を確認}) $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 15pt; font-weight: bold;">
+                        (1) $e = \frac{4}{5}$ , (2) $e = \frac{5}{4}$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 定義からの軌跡決定（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】41 焦点・準線・離心率からの軌跡決定</h2>
+                <span class="badge">平面曲線演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    点 $F(2, 0)$（焦点）からの距離と、直線 $x = -2$（準線）からの距離の比が $1 : 2$ である点 $P(x, y)$ の軌跡を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    離心率 $e = \frac{PF}{PH} = \frac{1}{2} \ ( < 1 )$ であるから、導き出される図形は絶対に<strong>「楕円」</strong>になる。<br>
+                    定義式 $2 PF = PH \iff 4 PF^2 = PH^2$ に距離の公式を代入して整理せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 定義からの軌跡決定（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】41 焦点・準線・離心率からの軌跡決定</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［ステップ 1］定義式の立式］</strong><br>
+                    点 $P(x, y)$ と焦点 $F(2, 0)$ の距離 $PF = \sqrt{(x - 2)^2 + y^2}$<br>
+                    点 $P(x, y)$ と準線 $x = -2$ の距離 $PH = |x - (-2)| = |x + 2|$<br>
+                    条件より $PF : PH = 1 : 2 \implies PH = 2 PF$ となる。
+                    <br><br>
+                    <strong>［ステップ 2］両辺を2乗して整理する］</strong><br>
+                    $$ (x + 2)^2 = 4 \left( (x - 2)^2 + y^2 \right) $$
+                    $$ x^2 + 4x + 4 = 4(x^2 - 4x + 4 + y^2) $$
+                    $$ x^2 + 4x + 4 = 4x^2 - 16x + 16 + 4y^2 $$
+                    $$ 3x^2 - 20x + 4y^2 = -12 $$
+                    平方完成して標準形へ変形する：
+                    $$ 3\left(x - \frac{10}{3}\right)^2 - \frac{100}{3} + 4y^2 = -12 $$
+                    $$ 3\left(x - \frac{10}{3}\right)^2 + 4y^2 = \frac{64}{3} $$
+                    両辺を $\frac{64}{3}$ で割ると：
+                    $$ \frac{\left(x - \frac{10}{3}\right)^2}{\frac{64}{9}} + \frac{y^2}{\frac{16}{3}} = 1 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        楕円 $\frac{\left(x - \frac{10}{3}\right)^2}{\frac{64}{9}} + \frac{y^2}{\frac{16}{3}} = 1$ （中心 $\left(\frac{10}{3}, 0\right)$ の楕円）
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅲ_極座標方程式</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ平面曲線：極座標と極方程式
+             ========================================== -->
+
+        <!-- スライド78：極座標の定義と直交座標との変換（図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ⑥</h2>
+                <span class="badge">講義：極座標の定義と相互変換（r, θ と x, y）</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【視点の変更】平面上の点 $P$ の位置を、原点 $O$ (<strong>極</strong>) からの距離 $r$ (<strong>動径</strong>) と、基準線 $OX$ (<strong>始線</strong>) からの回転角 $\theta$ (<strong>偏角</strong>) のペア $[r, \theta]$ で表すシステム。
+                </div>
+
+                <!-- ピュアSVG図解エリア（極座標の定義と直交座標の関係） -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin: 8px 0;">
+                    <svg width="300" height="150" viewBox="-10 -10 300 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 軸 -->
+                        <line x1="10" y1="120" x2="280" y2="120" stroke="#a0aec0" stroke-width="1.5"/> <!-- 始線 OX -->
+                        <line x1="40" y1="120" x2="40" y2="10" stroke="#cbd5e0" stroke-width="1" stroke-dasharray="2,2"/> <!-- y軸相当 -->
+                        <text x="270" y="115" font-size="9" fill="#718096">始線 X</text>
+                        <text x="28" y="128" font-size="10" fill="#1a365d" font-weight="bold">極 O</text>
+                        
+                        <!-- 点 P [r, θ] (r=180px, θ=30度 -> x=156, y=78 on canvas coordinates: x=196, y=42) -->
+                        <circle cx="196" cy="42" r="4.5" fill="#1a365d"/>
+                        <text x="202" y="38" font-size="11" fill="#1a365d" font-weight="bold">点 P (x, y) ＝ [r, θ]</text>
+                        
+                        <!-- 動径 r -->
+                        <line x1="40" y1="120" x2="196" y2="42" stroke="#2b6cb0" stroke-width="2"/>
+                        <text x="90" y="75" font-size="10.5" fill="#2b6cb0" font-weight="bold">動径 r</text>
+                        
+                        <!-- 偏角 θ -->
+                        <path d="M 70 120 A 30 30 0 0 0 66 94" fill="none" stroke="#dd6b20" stroke-width="1.8"/>
+                        <text x="75" y="115" font-size="10" fill="#dd6b20" font-weight="bold">偏角 θ</text>
+                        
+                        <!-- 直交座標との関係ガイド -->
+                        <line x1="196" y1="42" x2="196" y2="120" stroke="#718096" stroke-width="1" stroke-dasharray="3,3"/>
+                        <text x="190" y="132" font-size="9" fill="#718096">x = r cos θ</text>
+                        <line x1="40" y1="42" x2="196" y2="42" stroke="#718096" stroke-width="1" stroke-dasharray="3,3"/>
+                        <text x="30" y="45" font-size="9" fill="#718096" text-anchor="end">y = r sin θ</text>
+                    </svg>
+                </div>
+
+                <div>
+                    <strong>［極座標 $[r, \theta]$ と直交座標 $(x, y)$ の相互変換公式］</strong><br>
+                    図の直角三角形の関係から、以下の公式は自明である（複素数平面の極形式と完全に同一）。
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 8px 15px; border-radius: 4px; margin: 8px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ [1] \ \begin{cases} x = r \cos \theta \\ y = r \sin \theta \end{cases} \quad \iff \quad [2] \ \begin{cases} r^2 = x^2 + y^2 \\ \tan \theta = \frac{y}{x} \end{cases} $$
+                    </div>
+                    <span style="font-size: 10.5pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「極方程式（ $r = f(\theta)$ ）の問題が出たら、迷わずこの変換公式を使って $x, y$ の式へ戻すのが基本戦略だよ。逆に $x^2+y^2$ を見たら $r^2$ へ置き換える感覚を養おう」と伝えること。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド79：基本図形（円・直線）の極方程式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ⑦</h2>
+                <span class="badge">講義：基本図形の極方程式（円・直線の r と θ 表示）</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【極方程式】平面上の図形を動径 $r$ と偏角 $\theta$ の関係式 $r = f(\theta)$ で表したもの。<br>
+                    円や直線といった基本図形も、直交座標とは全く異なるシンプルな形になる。
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11pt; text-align: center;">
+                        <thead>
+                            <tr style="background-color: #edf2f7; border-bottom: 2px solid #cbd5e0;">
+                                <th style="padding: 8px; color: #1a365d; width: 25%;">図形</th>
+                                <th style="padding: 8px; color: #1a365d; width: 35%;">直交座標表示</th>
+                                <th style="padding: 8px; color: #1a365d; width: 40%;">極方程式</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 10px; font-weight: bold; color: #2b6cb0;">極 O 中心の円</td>
+                                <td style="padding: 10px;">$x^2 + y^2 = a^2$</td>
+                                <td style="padding: 10px; font-weight: bold; font-size: 13pt;">$r = a \quad (r > 0)$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 10px; font-weight: bold; color: #2b6cb0;">点 (a, 0) 中心の円</td>
+                                <td style="padding: 10px;">$(x-a)^2 + y^2 = a^2$</td>
+                                <td style="padding: 10px; font-weight: bold; font-size: 13pt; color: #2c7a7b;">$r = 2a \cos \theta$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 10px; font-weight: bold; color: #e53e3e;">極 O を通る直線</td>
+                                <td style="padding: 10px;">$y = (\tan \alpha) x$</td>
+                                <td style="padding: 10px; font-weight: bold; font-size: 13pt;">$\theta = \alpha$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                <td style="padding: 10px; font-weight: bold; color: #e53e3e;">x = a となる直線</td>
+                                <td style="padding: 10px;">$x = a$</td>
+                                <td style="padding: 10px; font-weight: bold; font-size: 13pt; color: #dd6b20;">$r \cos \theta = a$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［導出の原理（代数的な置き換え）］</strong><br>
+                    変換公式 $x = r \cos \theta, y = r \sin \theta$ を直交座標の式に代入するだけで導ける。
+                    <ul>
+                        <li style="margin-bottom: 6px;">
+                            $(x-a)^2 + y^2 = a^2 \implies x^2 - 2ax + a^2 + y^2 = a^2 \implies (x^2+y^2) - 2ax = 0$<br>
+                            $r^2 - 2a(r \cos \theta) = 0 \implies r(r - 2a \cos \theta) = 0 \implies \mathbf{r = 2a \cos \theta}$ （極 $O$ を含むため $r \neq 0$ ）
+                        </li>
+                        <li>
+                            $x = a \implies \mathbf{r \cos \theta = a}$ （始線に垂直な直線）
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド80：二次曲線の統一極方程式（焦点が極 O） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ⑧</h2>
+                <span class="badge">講義：二次曲線の統一極方程式（焦点 O、準線 l からの距離の比）</span>
+            </div>
+            <div class="content-box" style="font-size: 12pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 10px 15px;">
+                    【ケプラーの法則】<strong>焦点 $F$（例えば太陽）を極 $O$</strong> に配置したとき、すべての二次曲線（楕円軌道など）は、離心率 $e$ と準線 $l$ までの距離 $h$ を用いて1つの美しい極方程式で統一表示できる。
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>［統一極方程式の導出（焦点 $O$、準線 $x=h$ ）］</strong><br>
+                    極 $O$ (焦点) から距離 $h$ の位置にある準線 $l: x = h$ (直交座標) とする。<br>
+                    離心率の定義 $|PF| = e|PH|$ （ただし極 $O$ が $F$）より：
+                    $$ r = e |h - x| = e |h - r \cos \theta| $$
+                    点 $P$ は焦点 $O$ と準線 $l$ の間にある（ $r \cos \theta < h$ ）と仮定して絶対値を外すと：
+                    $$ r = e(h - r \cos \theta) = eh - er \cos \theta $$
+                    $r$ について整理すると：
+                    $$ r + er \cos \theta = eh \implies r(1 + e \cos \theta) = eh $$
+                    <div style="background-color: #fffaf0; border-left: 5px solid #dd6b20; padding: 10px; border-radius: 6px; margin: 12px 0; font-size: 14pt; font-weight: bold; text-align: center;">
+                        $$ r = \frac{eh}{1 + e \cos \theta} \quad (\text{または } r = \frac{ep}{1 - e \cos \theta}) $$
+                    </div>
+                    この式1つで、離心率 $e$ の値に応じて以下の図形をすべて表す。<br>
+                    *   <strong>$0 \leqq e < 1$ ：楕円</strong> （惑星の軌道）<br>
+                    *   <strong>$e = 1$ ：放物線</strong> （彗星の軌道）<br>
+                    *   <strong>$e > 1$ ：双曲線</strong> （非回帰彗星の軌道）
+                </div>
+            </div>
+        </div>
+        <!-- スライド80：二次曲線の統一極方程式とケプラーの運動（図解挿入版） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ⑧</h2>
+                <span class="badge">講義：ケプラーの運動と統一極方程式（焦点 O、準線 l）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【ケプラーの第一法則】<strong>太陽（焦点 $F$）を極 $O$</strong> に置いた天体の運動軌跡は、離心率 $e$ と準線 $l$ を用いて1つの統一極方程式で完璧に表現される。
+                </div>
+
+                <!-- ピュアSVG図解エリア（ケプラーの天体運動と極方程式） -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin: 6px 0;">
+                    <svg width="320" height="150" viewBox="-10 -10 320 150" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 始線（x軸） -->
+                        <line x1="10" y1="75" x2="300" y2="75" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="290" y="70" font-size="9" fill="#718096">始線</text>
+                        
+                        <!-- 準線 l: x = h (x = 260px) -->
+                        <line x1="260" y1="10" x2="260" y2="140" stroke="#e53e3e" stroke-width="1.5" stroke-dasharray="4,4"/>
+                        <text x="263" y="20" font-size="9" fill="#e53e3e" font-weight="bold">準線 l</text>
+                        
+                        <!-- 楕円軌道 (焦点: 80, 75 / 太陽) -->
+                        <ellipse cx="140" cy="75" rx="100" ry="50" fill="none" stroke="#2b6cb0" stroke-width="1.8" stroke-dasharray="2,2"/>
+                        
+                        <!-- 極 O (太陽 / 焦点 F) -->
+                        <circle cx="80" cy="75" r="5" fill="#dd6b20"/>
+                        <text x="90" y="92" font-size="9.5" fill="#dd6b20" font-weight="bold">極 O (太陽)</text>
+                        
+                        <!-- 惑星 P [r, θ] (軌道上の点: 130, 31) -->
+                        <circle cx="138" cy="24" r="4" fill="#1a365d"/>
+                        <text x="110" y="18" font-size="10" fill="#1a365d" font-weight="bold">惑星 P [r, θ]</text>
+                        
+                        <!-- 動径 r (太陽から惑星への距離) -->
+                        <line x1="80" y1="75" x2="138" y2="24" stroke="#2b6cb0" stroke-width="2"/>
+                        <text x="80" y="48" font-size="9.5" fill="#2b6cb0" font-weight="bold">動径 r</text>
+                        
+                        <!-- 偏角 θ -->
+                        <path d="M 110 75 A 30 30 0 0 0 102 56" fill="none" stroke="#dd6b20" stroke-width="1.5"/>
+                        <text x="112" y="65" font-size="9" fill="#dd6b20" font-weight="bold">θ</text>
+                        
+                        <!-- 準線への垂線 PH (H: 260, 31) -->
+                        <line x1="138" y1="24" x2="260" y2="24" stroke="#e53e3e" stroke-width="1.2" stroke-dasharray="3,3"/>
+                        <circle cx="260" cy="24" r="2.5" fill="#e53e3e"/>
+                        <text x="248" y="18" font-size="8.5" fill="#e53e3e" font-weight="bold">H</text>
+                        
+                        <!-- 太陽から準線までの距離 h -->
+                        <line x1="80" y1="125" x2="260" y2="125" stroke="#718096" stroke-width="1.2"/>
+                        <line x1="80" y1="75" x2="80" y2="130" stroke="#718096" stroke-width="1" stroke-dasharray="2,2"/>
+                        <line x1="260" y1="75" x2="260" y2="130" stroke="#718096" stroke-width="1" stroke-dasharray="2,2"/>
+                        <text x="170" y="120" font-size="9" fill="#718096" text-anchor="middle">距離 h</text>
+                    </svg>
+                </div>
+
+                <div>
+                    <strong>［導出のプロセス（離心率の定義 $r = e \cdot PH$ ）］</strong><br>
+                    1. 惑星 $P$ から準線 $l$ への距離は $PH = h - r \cos \theta$<br>
+                    2. 離心率の定義式 $r = e \cdot PH \implies r = e (h - r \cos \theta)$ に代入して展開<br>
+                    3. $r$ について整理すると、天体運動を司る**極方程式**が得られる：
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 6px 12px; border-radius: 4px; margin: 4px 0; font-size: 13pt; font-weight: bold; text-align: center;">
+                        $$ r = \frac{eh}{1 + e \cos \theta} $$
+                    </div>
+                    *   <strong>$0 \leqq e < 1$ ：楕円軌道</strong>（地球などの多くの惑星）<br>
+                    *   <strong>$e = 1$ ：放物線軌道</strong> / <strong>$e > 1$ ：双曲線軌道</strong>（一度きり通過する非回帰彗星）
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ平面曲線：放物線の応用（平行移動・接線・光学性）
+             ========================================== -->
+
+        <!-- スライド81：放物線の平行移動と接線公式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ⑨</h2>
+                <span class="badge">講義：放物線の応用（平行移動・接線公式の型）</span>
+            </div>
+            <div class="content-box" style="font-size: 11.5pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 8px 12px;">
+                    【発展】頂点が原点からずれた放物線や、曲線上の点における「接線の方程式」を素早く処理する型をマスターする。
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <strong>［1. 頂点が $(x_0, y_0)$ の平行移動形］</strong><br>
+                    標準形 $y^2 = 4px$ を $x$ 軸方向に $x_0$、 $y$ 軸方向に $y_0$ だけ平行移動した方程式：
+                    <div style="background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 5px 12px; border-radius: 4px; margin: 4px 0; font-size: 12pt; font-weight: bold; text-anchor: middle;">
+                        $$ (y - y_0)^2 = 4p(x - x_0) \implies \text{焦点 } (x_0 + p, y_0), \quad \text{準線 } x = x_0 - p $$
+                    </div>
+
+                    <strong>［2. 放物線 $y^2 = 4px$ の接線公式］</strong><br>
+                    放物線上の点 $P(x_1, y_1)$ における接線の方程式は、置き換えルール（ $y^2 \to y_1 y$ 、 $x \to \frac{x + x_1}{2}$ ）により導かれる：
+                    <div style="background-color: #edf2f7; border-left: 4px solid #2b6cb0; padding: 5px 12px; border-radius: 4px; margin: 4px 0; font-size: 12pt; font-weight: bold; text-align: center;">
+                        $$ y_1 y = 2p(x + x_1) $$
+                    </div>
+                    <span style="font-size: 10pt; color: #4a5568;">
+                        💡 <strong>指導のポイント：</strong>「 $y^2 = 4px$ に $y_1 y = 2p(x + x_1)$ を適用するとき、接線の $x$ 切片が必ず $(-x_1, 0)$ になる（原点に関して $x_1$ と左右対称になる）」という性質を覚えておくと、図を描くスピードが劇的に上がります。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド82：放物線の光学性（反射性質）図解付き -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>平面曲線（二次曲線） ⑩</h2>
+                <span class="badge">講義：放物線の光学性（パラボラアンテナの原理）</span>
+            </div>
+            <div class="content-box" style="font-size: 11pt;">
+                <div class="problem-text" style="background-color: #f7fafc; border-left: 5px solid #1a365d; padding: 6px 12px;">
+                    【物理・応用】軸に平行に入射した光線は、放物線上の点で反射したあと<strong>「必ず焦点 $F$ を通過する」</strong>（パラボラアンテナやサーチライトの原理）。
+                </div>
+
+                <!-- ピュアSVG図解エリア（放物線の反射性質） -->
+                <div style="display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; margin: 4px 0;">
+                    <svg width="320" height="140" viewBox="-10 -10 320 140" style="background: white; border-radius: 6px; border: 1px solid #cbd5e0;">
+                        <!-- 軸（x軸 / 原点・頂点: 240, 65） -->
+                        <line x1="10" y1="65" x2="300" y2="65" stroke="#a0aec0" stroke-width="1.5"/>
+                        <text x="15" y="60" font-size="8.5" fill="#718096">軸</text>
+        
+                        <!-- 左に開く放物線（頂点: 240, 65） -->
+                        <path d="M 100 5 Q 440 65 100 125" fill="none" stroke="#1a365d" stroke-width="2.2"/>
+        
+                        <!-- 焦点 F(p, 0)（放物線の内側: x = 190, y = 65） -->
+                        <circle cx="190" cy="65" r="3.5" fill="#2b6cb0"/>
+                        <text x="180" y="80" font-size="9" fill="#2b6cb0" font-weight="bold">焦点 F</text>
+                        
+                        <!-- 上側：入射光 (左から右へ) -> 反射点 P(200, 25) -> 焦点 F(190, 65) へ -->
+                        <line x1="10" y1="25" x2="200" y2="25" stroke="#e53e3e" stroke-width="1.5"/>
+                        <polyline points="120,20 130,25 120,30" fill="none" stroke="#e53e3e" stroke-width="1.5"/> <!-- 進む矢印 -->
+                        
+                        <!-- 反射光 (P から F へ) -->
+                        <line x1="200" y1="25" x2="190" y2="65" stroke="#e53e3e" stroke-width="1.5"/>
+                        <polyline points="190,42 194,51 200,45" fill="none" stroke="#e53e3e" stroke-width="1.5"/> <!-- 反射矢印 -->
+                        
+                        <circle cx="200" cy="25" r="3.5" fill="#1a365d"/>
+                        <text x="205" y="20" font-size="9" fill="#1a365d" font-weight="bold">反射点 P</text>
+
+                        <!-- 下側：入射光 -> 焦点 F へ -->
+                        <line x1="10" y1="105" x2="200" y2="105" stroke="#e53e3e" stroke-width="1.5"/>
+                        <line x1="200" y1="105" x2="190" y2="65" stroke="#e53e3e" stroke-width="1.5"/>
+                        
+                        <!-- 接線 L (点 T と 点 P を結ぶ) -->
+                        <line x1="20" y1="65" x2="230" y2="18" stroke="#dd6b20" stroke-width="1.2" stroke-dasharray="3,3"/>
+                        <text x="45" y="52" font-size="8.5" fill="#dd6b20" font-weight="bold">接線</text>
+                    </svg>
+                </div>
+
+                <div>
+                    <strong>［証明の幾何学的ポイント（なぜ焦点に集まるのか）］</strong><br>
+                    点 $P(x_1, y_1)$ における接線が $x$ 軸と交わる点を $T(-x_1, 0)$ とする。<br>
+                    焦点 $F(p, 0)$ に対し、線分 $TF$ の長さは $x_1 + p$ となる。<br>
+                    一方、定義より点 $P$ から焦点 $F$ への距離 $PF$ も準線 $x=-p$ までの距離と等しいため $x_1 + p$ となる。<br>
+                    $\implies \mathbf{TF = PF}$ より $\triangle TFP$ は二等辺三角形となり、「入射角 ＝ 反射角」が幾何学的に証明される。
+                </div>
+            </div>
+        </div>
+        <!-- ==========================================
+             数Ⅲ平面曲線：極座標・極方程式の演習セクション
+             ========================================== -->
+
+        <!-- 1. 極方程式から直交座標への変換と図形同定（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】42 極方程式が表す図形</h2>
+                <span class="badge">平面曲線演習：基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    次の極方程式は、どのような図形を表すか。直交座標 $x, y$ の方程式に変換して答えよ。<br><br>
+                    (1) $r = 4 \cos \theta$<br>
+                    (2) $r \cos\left(\theta - \frac{\pi}{3}\right) = 2$
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    (1) 両辺に $r$ を掛けて $r^2 = 4r \cos \theta$ と変形し、$r^2 = x^2 + y^2$ と $r \cos \theta = x$ を代入せよ。<br>
+                    (2) 左辺を加法定理で展開してから、$r \cos \theta = x$ と $r \sin \theta = y$ を代入せよ。
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 極方程式から直交座標への変換と図形同定（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】42 極方程式が表す図形</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13.5pt;">
+                <div>
+                    <strong>［(1) の解説］</strong><br>
+                    両辺に $r$ を掛けると：
+                    $$ r^2 = 4r \cos \theta $$
+                    $r^2 = x^2 + y^2$ および $r \cos \theta = x$ を代入する：
+                    $$ x^2 + y^2 = 4x \implies x^2 - 4x + y^2 = 0 $$
+                    平方完成すると：
+                    $$ (x - 2)^2 + y^2 = 4 $$
+                    したがって、<strong>中心 $(2, 0)$、半径 $2$ の円</strong>を表す。
+                    <br><br>
+                    <strong>［(2) の解説］</strong><br>
+                    左辺に加法定理を適用して展開する：
+                    $$ r \left( \cos \theta \cos \frac{\pi}{3} + \sin \theta \sin \frac{\pi}{3} \right) = 2 $$
+                    $$ r \left( \frac{1}{2} \cos \theta + \frac{\sqrt{3}}{2} \sin \theta \right) = 2 $$
+                    両辺に $2$ を掛け、 $r \cos \theta = x, r \sin \theta = y$ を代入する：
+                    $$ r \cos \theta + \sqrt{3} r \sin \theta = 4 \implies x + \sqrt{3}y = 4 $$
+                    したがって、<strong>直線 $x + \sqrt{3}y - 4 = 0$</strong> を表す。
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        (1) 中心 $(2, 0)$、半径 $2$ の円 (2) 直線 $x + \sqrt{3}y - 4 = 0$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 二次曲線の極方程式の同定（問題） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【問題】43 二次曲線の極方程式</h2>
+                <span class="badge">平面曲線演習：応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-size: 16pt; padding: 25px;">
+                    極方程式 $r = \frac{6}{2 - \cos \theta}$ が表す二次曲線の種類（楕円・放物線・双曲線）を答えよ。また、直交座標 $x, y$ における方程式を求めよ。
+                </div>
+                <div style="margin-top: 30px; color: #718096; font-size: 14pt;">
+                    <strong>💡 ヒント：</strong><br>
+                    分母の定数項を $1$ にするために、分母・分子を $2$ で割って統一形式 <strong>$r = \frac{ep}{1 - e \cos \theta}$</strong> の形を作ると、離心率 $e$ の値が一瞬でわかる！
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 二次曲線の極方程式の同定（解説） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>【解説】43 二次曲線の極方程式</h2>
+                <span class="badge">思考プロセス</span>
+            </div>
+            <div class="content-box" style="font-size: 13pt;">
+                <div>
+                    <strong>［ステップ 1］離心率 $e$ による図形の判別］</strong><br>
+                    与えられた式の分母・分子を $2$ で割ると：
+                    $$ r = \frac{3}{1 - \frac{1}{2} \cos \theta} $$
+                    統一標準形 $r = \frac{ep}{1 - e \cos \theta}$ と比較すると、離心率は <strong>$e = \frac{1}{2}$</strong> である。<br>
+                    $e < 1$ であるため、この曲線は<strong>楕円</strong>であることが即座にわかる。
+                    <br><br>
+                    <strong>［ステップ 2］直交座標表示への変形］</strong><br>
+                    分母を払う： $r(2 - \cos \theta) = 6 \implies 2r - r \cos \theta = 6$<br>
+                    $r \cos \theta = x$ を代入して移項する： $2r = x + 6$<br>
+                    両辺を2乗する：
+                    $$ 4r^2 = (x + 6)^2 \implies 4(x^2 + y^2) = x^2 + 12x + 36 $$
+                    $$ 3x^2 - 12x + 4y^2 = 36 $$
+                    $x$ について平方完成する：
+                    $$ 3(x - 2)^2 - 12 + 4y^2 = 36 \implies 3(x - 2)^2 + 4y^2 = 48 $$
+                    両辺を $48$ で割ると：
+                    $$ \frac{(x - 2)^2}{16} + \frac{y^2}{12} = 1 $$
+                </div>
+                <div class="answer-box">
+                    <div class="answer-label">正解</div>
+                    <div style="font-size: 14pt; font-weight: bold;">
+                        図形：楕円, 方程式： $\frac{(x - 2)^2}{16} + \frac{y^2}{12} = 1$ （中心 $(2, 0)$ の楕円）
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 画面下の操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 3</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- スライドを制御するスクリプト -->
+        <!-- スライドを制御するスクリプト（スマホボタン限定版） -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        // PC用のキーボード操作（←、→、スペース、Enter）は維持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+    </script>
+
+    <!-- ==========================================
+         全スライド共通：ポップアップ式スキップ機能（目次）
+         ========================================== -->
+    <!-- 画面右下に常駐するメニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu" style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <!-- 各章へのジャンプボタン（実際のスライドのインデックス番号を指定） -->
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">放物線（スライド1〜）</button>
+            <button onclick="goToSlide(10)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">二次曲線の応用（スライド11〜）</button>
+            <button onclick="goToSlide(22)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">極座標方程式（スライド23〜）</button>
+        </div>
+    </div>
+
+    <script>
+        // メニューの開閉制御
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        }
+
+        // 指定したスライドインデックス（0スタート）へ直接ジャンプ
+        function goToSlide(slideIndex) {
+            // お使いのスクリプト内の管理変数「currentSlide」を直接更新
+            currentSlide = slideIndex;
+            
+            // 安全策：インデックスの範囲外チェック
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            
+            // お使いのスクリプト内の画面更新関数「updateSlide()」をトリガー
+            updateSlide();
+            
+            // メニューを自動で閉じる
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        // 画面のどこかをクリックしたらメニューを自動で閉じる
+        document.addEventListener('click', function() {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
