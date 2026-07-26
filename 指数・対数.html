@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅱ 指数関数・対数関数</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド1：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅱ_指数関数・対数関数</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2：1. 指数の拡張 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. 指数の拡張（整数・有理数へ）</h2>
+                <span class="badge">概念拡張</span>
+            </div>
+            <div class="content-box">
+                <p>正の整数だった指数を、<b>$0$、負の整数、分数（有理数）</b>まで拡張する。</p>
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 指数の基本定義 ($a > 0$)</b></p>
+                    <ul>
+                        <li><b>$0$ の指数：</b> $a^0 = 1$</li>
+                        <li><b>負の指数：</b> $a^{-n} = \frac{1}{a^n}$</li>
+                        <li><b>累乗根（分数指数）：</b> $a^{\frac{1}{n}} = \sqrt[n]{a} \quad (a^{\frac{m}{n}} = \sqrt[n]{a^m})$</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">ポイント</div>
+                <div>指数が整数や有理数に拡張されても、中学で習った<b>指数法則</b>がそのまま成り立つ。</div>
+            </div>
+        </div>
+
+        <!-- スライド3：2. 指数法則 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 指数法則</h2>
+                <span class="badge">基本公式</span>
+            </div>
+            <div class="content-box">
+                <p>$a > 0, b > 0$ で、実数 $r, s$ に対し、以下の法則が成り立つ。</p>
+                <div class="problem-text">
+                    $$a^r \cdot a^s = a^{r+s}$$<br>
+                    $$a^r \div a^s = \frac{a^r}{a^s} = a^{r-s}$$<br>
+                    $$(a^r)^s = a^{rs}$$<br>
+                    $$(ab)^r = a^r b^r$$<br>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド4：3. 指数関数のグラフ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>3. 指数関数 $y = a^x$ のグラフ</h2>
+                <span class="badge">グラフ・底の条件</span>
+            </div>
+            <div class="content-box">
+                <p>底 $a$ の値（$a > 1$ か $0 < a < 1$ か）によってグラフの形が大きく変化する。</p>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px;">
+                    <!-- SVGグラフ -->
+                    <div style="flex: 1; min-width: 250px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="240" height="180" viewBox="-10 -20 240 180">
+                            <line x1="10" y1="130" x2="220" y2="130" stroke="#a0aec0" stroke-width="1.5" />
+                            <line x1="110" y1="10" x2="110" y2="160" stroke="#a0aec0" stroke-width="1.5" />
+                            <text x="210" y="145" fill="#4a5568" font-size="11">x</text>
+                            <text x="95" y="20" fill="#4a5568" font-size="11">y</text>
+                            <text x="98" y="143" fill="#4a5568" font-size="10">O</text>
+                            
+                            <!-- y = 1 の点 -->
+                            <circle cx="110" cy="90" r="3" fill="#1a365d" />
+                            <text x="112" y="106" fill="#1a365d" font-size="10" font-weight="bold">(0,1)</text>
+                            
+                            <!-- a > 1 (単調増加) -->
+                            <path d="M 20 128 Q 110 100 200 20" stroke="#2b6cb0" stroke-width="2.5" fill="none" />
+                            <text x="170" y="35" fill="#2b6cb0" font-size="10" font-weight="bold">a > 1</text>
+                            
+                            <!-- 0 < a < 1 (単調減少) -->
+                            <path d="M 20 20 Q 110 100 200 128" stroke="#e53e3e" stroke-width="2.5" fill="none" />
+                            <text x="25" y="35" fill="#e53e3e" font-size="10" font-weight="bold">0 < a < 1</text>
+                        </svg>
+                    </div>
+
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="padding: 15px; font-size: 11pt; font-weight: normal;">
+                            <ul>
+                                <li>必ず点 <b>$(0, 1)$</b> を通る。</li>
+                                <li>$x$ 軸（直線 $y = 0$）が<b>漸近線</b>となる。</li>
+                                <li><b style="color: #2b6cb0;">$a > 1$ のとき：</b> $x$ が増加すると $y$ も増加（単調増加）</li>
+                                <li><b style="color: #e53e3e;">$0 < a < 1$ のとき：</b> $x$ が増加すると $y$ は減少（単調減少）</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5：4. 指数方程式・不等式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 指数方程式・指数不等式</h2>
+                <span class="badge">解法手順</span>
+            </div>
+            <div class="content-box">
+                <p>指数方程式・不等式は、<b>底を統一する</b>のが基本原則である。</p>
+                
+                <!-- 2次方程式型の置き換え図解 -->
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #e1e8ed; border-radius: 8px; padding: 20px 24px; font-weight: normal;">
+                    <p style="font-size: 14pt; font-weight: bold; color: #1a365d; margin-bottom: 12px; display: flex; align-items: center;">
+                        <span style="font-size: 0.9em; margin-right: 8px;">■</span> $a^x = t$ の置き換え（2次方程式型）
+                    </p>
+                    
+                    <p style="font-size: 11pt; margin-bottom: 12px; line-height: 1.7;">
+                        $4^x - 2^x - 6 = 0$ のように $a^x$ の2次式になっている場合は、$t = a^x$ と置いて $t$ の2次方程式に変換する。
+                    </p>
+
+                    <!-- 注意書き（警告ボックス） -->
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #dd6b20; padding: 10px 14px; border-radius: 4px; font-size: 10.5pt; color: #2d3748; margin-bottom: 16px;">
+                        ⚠️ 置き換えた変数 $t$ の範囲制限 <b>$t > 0$（正の値のみ）</b> に注意する。
+                    </div>
+
+                    <!-- 下段：図解 -->
+                    <div style="display: flex; justify-content: center; width: 100%; padding: 8px 0;">
+                        <svg width="340" height="100" viewBox="0 0 340 100" style="max-width: 100%; height: auto;">
+                            <!-- 元の指数表現 -->
+                            <rect x="5" y="5" width="130" height="90" rx="8" fill="#ffffff" stroke="#cbd5e0" stroke-width="1.5" />
+                            <text x="70" y="30" text-anchor="middle" fill="#1a365d" font-size="12" font-weight="bold">x の指数方程式</text>
+                            <text x="70" y="54" text-anchor="middle" fill="#2b6cb0" font-size="13" font-weight="bold">4ˣ - 2ˣ - 6 = 0</text>
+                            <text x="70" y="75" text-anchor="middle" fill="#2b6cb0" font-size="11" font-weight="bold">(2ˣ)² - 2ˣ - 6 = 0</text>
+                            
+                            <!-- 矢印 -->
+                            <path d="M 143 50 L 192 50" stroke="#dd6b20" stroke-width="2.5" marker-end="url(#arrow)" />
+                            <text x="167.5" y="38" text-anchor="middle" fill="#dd6b20" font-size="11" font-weight="bold">t = 2ˣ</text>
+                            
+                            <defs>
+                                <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#dd6b20" />
+                                </marker>
+                            </defs>
+                            
+                            <!-- t の 2次方程式表現 -->
+                            <rect x="205" y="5" width="130" height="90" rx="8" fill="#fffaf0" stroke="#fbd38d" stroke-width="1.5" />
+                            <text x="270" y="30" text-anchor="middle" fill="#c05621" font-size="12" font-weight="bold">t の 2次方程式</text>
+                            <text x="270" y="54" text-anchor="middle" fill="#dd6b20" font-size="14" font-weight="bold">t² - t - 6 = 0</text>
+                            <text x="270" y="75" text-anchor="middle" fill="#e53e3e" font-size="11" font-weight="bold">(t > 0)</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6：5. 対数の定義 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>5. 対数（$\log$）の定義</h2>
+                <span class="badge">概念理解</span>
+            </div>
+            <div class="content-box">
+                <p>対数とは、<b>「底を何乗したらその数になるか」を表す数</b>である。</p>
+                
+                <div class="problem-text" style="text-align: center; font-size: 18pt; background: #fffaf0; border-color: #fbd38d;">
+                    $$a^p = M \iff p = \log_a M$$
+                </div>
+
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 対数の必須条件</b></p>
+                    <ul>
+                        <li><b>底の条件：</b> $a > 0, \quad a \neq 1$</li>
+                        <li><b>真数条件：</b> $M > 0$ （真数は必ず正の値）</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">言葉の整理</div>
+                <div>$\log_a M$ において、$a$ を<b>底（てい）</b>、$M$ を<b>真数（しんすう）</b>と呼ぶ。</div>
+            </div>
+        </div>
+
+        <!-- スライド7：6. 対数の性質 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>6. 対数の性質（計算公式）</h2>
+                <span class="badge">基本公式</span>
+            </div>
+            <div class="content-box">
+                <p>$a > 0, a \neq 1, M > 0, N > 0$ で、実数 $k$ に対し以下が成り立つ。</p>
+                <div class="problem-text">
+                    $$\log_a 1 = 0$$<br>
+                    $$\quad \log_a a = 1$$<br>
+                    $$\log_a (MN) = \log_a M + \log_a N$$<br>
+                    $$\log_a \left(\frac{M}{N}\right) = \log_a M - \log_a N$$<br>
+                    $$\log_a (M^k) = k \log_a M$$<br>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">注意</div>
+                <div>$\log_a (M + N)$ を分解することはできない。真数の掛け算が対数の足し算になる点に注意。</div>
+            </div>
+        </div>
+
+        <!-- スライド8：7. 底の変換公式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>7. 底の変換公式</h2>
+                <span class="badge">計算テクニック</span>
+            </div>
+            <div class="content-box">
+                <p>底が揃っていない対数同士を計算する際、<b>新しい底 $c$ に統一する</b>公式である。</p>
+                <div class="problem-text" style="text-align: center; font-size: 18pt;">
+                    $$\log_a b = \frac{\log_c b}{\log_c a}$$
+                </div>
+                <p style="font-size: 11pt; margin-top: 15px;">（ただし、$a, b, c > 0$ かつ $a \neq 1, c \neq 1$）</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">ポイント</div>
+                <div>元の「底 $a$」が分母の真数に、元の「真数 $b$」が分子の真数に移動する。</div>
+            </div>
+        </div>
+
+        <!-- スライド9：8. 対数関数のグラフ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>8. 対数関数 $y = \log_a x$ のグラフ</h2>
+                <span class="badge">グラフ・逆関数</span>
+            </div>
+            <div class="content-box">
+                <p>対数関数 $y = \log_a x$ は、指数関数 $y = a^x$ の<b>逆関数（$y=x$ に関して対称）</b>である。</p>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px;">
+                    <!-- SVGグラフ -->
+                    <div style="flex: 1; min-width: 250px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="240" height="180" viewBox="-10 -20 240 180">
+                            <line x1="10" y1="110" x2="220" y2="110" stroke="#a0aec0" stroke-width="1.5" />
+                            <line x1="40" y1="10" x2="40" y2="160" stroke="#a0aec0" stroke-width="1.5" />
+                            <text x="210" y="145" fill="#4a5568" font-size="11">x</text>
+                            <text x="25" y="20" fill="#4a5568" font-size="11">y</text>
+                            <text x="28" y="143" fill="#4a5568" font-size="10">O</text>
+                            
+                            <!-- x = 1 の点 -->
+                            <circle cx="100" cy="110" r="3" fill="#1a365d" />
+                            <text x="105" y="116" fill="#1a365d" font-size="10" font-weight="bold">(1,0)</text>
+                            
+                            <!-- a > 1 (単調増加) -->
+                            <path d="M 45 160 Q 55 120 200 60" stroke="#2b6cb0" stroke-width="2.5" fill="none" />
+                            <text x="160" y="55" fill="#2b6cb0" font-size="10" font-weight="bold">a > 1</text>
+                            
+                            <!-- 0 < a < 1 (単調減少) -->
+                            <path d="M 45 10 Q 55 120 200 150" stroke="#e53e3e" stroke-width="2.5" fill="none" />
+                            <text x="160" y="160" fill="#e53e3e" font-size="10" font-weight="bold">0 < a < 1</text>
+                        </svg>
+                    </div>
+
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="padding: 15px; font-size: 11pt; font-weight: normal;">
+                            <ul>
+                                <li>必ず点 <b>$(1, 0)$</b> を通る。</li>
+                                <li>$y$ 軸（直線 $x = 0$）が<b>漸近線</b>となる。</li>
+                                <li><b style="color: #2b6cb0;">$a > 1$ のとき：</b> 単調増加（$x_1 < x_2 \iff \log_a x_1 < \log_a x_2$）</li>
+                                <li><b style="color: #e53e3e;">$0 < a < 1$ のとき：</b> 単調減少（不等号の向きが<b>逆転</b>する）</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド10：9. 対数方程式・不等式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>9. 対数方程式・対数不等式</h2>
+                <span class="badge">解法手順・罠</span>
+            </div>
+            <div class="content-box">
+                <p>対数不等式を解く際は、<b>真数条件の確認</b>と<b>底による不等号の向きの判定</b>が最重要である。</p>
+                
+                <div class="problem-text" style="background-color: #fffaf0; border-left: 5px solid #dd6b20;">
+                    <p style="color: #dd6b20; margin-bottom: 5px;"><b>⚠️ 解法の絶対手順</b></p>
+                    <ol style="margin-left: 20px; font-weight: normal; font-size: 11pt;">
+                        <li><b>Step 1【真数条件】：</b> 式を解く前に、必ず（真数）$> 0$ の範囲を求める。</li>
+                        <li><b>Step 2【底の統一】：</b> 両辺の対数の底を揃える。</li>
+                        <li><b>Step 3【大小比較】：</b> 
+                            <ul>
+                                <li>$a > 1$ のとき $\Rightarrow$ 不等号は<b>そのまま</b></li>
+                                <li>$0 < a < 1$ のとき $\Rightarrow$ 不等号の向きを<b>逆転</b>させる！</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド11：10. 常用対数と桁数 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>10. 常用対数と桁数</h2>
+                <span class="badge">応用</span>
+            </div>
+            <div class="content-box">
+                <p><b>$10$ を底とする対数 $\log_{10} N$</b> を常用対数と呼ぶ。</p>
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 桁数決定の原理</b></p>
+                    $$\text{正の数 } N \text{ が } n \text{ 桁の整数} \iff 10^{n-1} \leqq N < 10^n$$
+                    $$\iff n-1 \leqq \log_{10} N < n$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">例</div>
+                <div>$\log_{10} N = 15.3$ のとき、$15 \leqq \log_{10} N < 16$ となるため、$N$ は <b>$16$ 桁の数</b>である。</div>
+            </div>
+        </div>
+
+        <!-- スライド12：演習問題［1］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［1］：指数の計算</h2>
+                <span class="badge">基本演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    次の計算をせよ。
+                    $$(1)\quad 8^{\frac{2}{3}} \times 2^{-1} \qquad (2)\quad \sqrt[3]{81} \div \sqrt[3]{3}$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    (1) $8^{\frac{2}{3}} \times 2^{-1} = (2^3)^{\frac{2}{3}} \times 2^{-1} = 2^2 \times 2^{-1} = 2^{2-1} = \mathbf{2}$<br>
+                    (2) $\sqrt[3]{81} \div \sqrt[3]{3} = 81^{\frac{1}{3}} \div 3^{\frac{1}{3}} = (3^4)^{\frac{1}{3}} \div 3^{\frac{1}{3}} = 3^{\frac{4}{3} - \frac{1}{3}} = 3^1 = \mathbf{3}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド13：演習問題［2］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［2］：指数方程式</h2>
+                <span class="badge">標準演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    方程式 $4^x - 2^{x+1} - 8 = 0$ を解け。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    $(2^x)^2 - 2 \cdot 2^x - 8 = 0$ と変形し、$t = 2^x\ (t > 0)$ と置く。<br>
+                    $t^2 - 2t - 8 = 0 \Rightarrow (t-4)(t+2) = 0$<br>
+                    $t > 0$ より $t = 4 \quad \Rightarrow \quad 2^x = 4 \quad \therefore \mathbf{x = 2}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド14：演習問題［3］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［3］：対数の計算</h2>
+                <span class="badge">基本演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    次の値を求めよ。
+                    $$(1)\quad \log_2 24 - \log_2 3 \qquad (2)\quad \log_3 8 \cdot \log_2 9$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    (1) $\log_2 24 - \log_2 3 = \log_2\left(\frac{24}{3}\right) = \log_2 8 = \mathbf{3}$<br>
+                    (2) 底の変換公式より $\log_3 8 = \frac{\log_2 8}{\log_2 3} = \frac{3}{\log_2 3}$、$\log_2 9 = \log_2(3^2) = 2\log_2 3$<br>
+                    したがって、$(\text{与式}) = \frac{3}{\log_2 3} \cdot 2\log_2 3 = \mathbf{6}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド15：演習問題［4］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［4］：対数不等式</h2>
+                <span class="badge">標準演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    不等式 $\log_{\frac{1}{2}} (x - 1) \gt -2$ を解け。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    ① <b>真数条件：</b> $x - 1 > 0 \Rightarrow \mathbf{x > 1}$ ─── ①<br>
+                    ② 右辺の対数化： $-2 = \log_{\frac{1}{2}} \left(\frac{1}{2}\right)^{-2} = \log_{\frac{1}{2}} 4$<br>
+                    ③ 底は $\frac{1}{2} < 1$ より、<b>不等号の向きが逆転</b>する：<br>
+                    $x - 1 < 4 \Rightarrow \mathbf{x < 5}$ ─── ②<br>
+                    ①, ② の共通範囲を求めて、$\mathbf{1 < x < 5}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド16：演習問題［5］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［5］：常用対数と桁数</h2>
+                <span class="badge">応用演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $2^{30}$ は何桁の整数か。ただし、$\log_{10} 2 = 0.3010$ とする。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    常用対数をとると、
+                    $$\log_{10} (2^{30}) = 30 \cdot \log_{10} 2 = 30 \times 0.3010 = \mathbf{9.03}$$
+                    $9 \leqq \log_{10} (2^{30}) < 10$ となるため、$10^9 \leqq 2^{30} < 10^{10}$ が成り立つ。<br>
+                    したがって、$2^{30}$ は <b>$10$ 桁の整数</b> である。
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 16</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 指数の拡張・法則</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. 指数関数と方程式</button>
+            <button onclick="goToSlide(5)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. 対数の定義・性質</button>
+            <button onclick="goToSlide(8)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 対数関数・方程式</button>
+            <button onclick="goToSlide(10)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 常用対数</button>
+            <button onclick="goToSlide(11)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">7. 演習問題</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

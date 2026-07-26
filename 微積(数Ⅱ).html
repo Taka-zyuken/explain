@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅱ 微分法・積分法</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド1：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 36pt; color: #1a365d; margin-bottom: 20px;">数学Ⅱ_微分法・積分法</h1>
+                <p style="font-size: 18pt; color: #4a5568;">初学者用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2：1. 平均変化率と微分係数 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. 平均変化率と微分係数</h2>
+                <span class="badge">極限の概念</span>
+            </div>
+            <div class="content-box">
+                <p>関数の変化の割合から、<b>瞬間的な変化の割合（接線の傾き）</b>を導出する。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <p style="margin-bottom: 8px;"><b>■ 平均変化率（2点を通る割線の傾き）</b></p>
+                            $$\frac{\Delta y}{\Delta x} = \frac{f(a+h) - f(a)}{h}$$
+                            <p style="margin-top: 12px; margin-bottom: 8px;"><b>■ 微分係数 $f'(a)$ （点 $a$ での接線の傾き）</b></p>
+                            $$f'(a) = \lim_{h \to 0} \frac{f(a+h) - f(a)}{h}$$
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（接線の傾き） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="170" viewBox="-10 -10 220 170">
+                            <!-- 軸 -->
+                            <line x1="10" y1="140" x2="200" y2="140" stroke="#a0aec0" stroke-width="1.5" />
+                            <line x1="30" y1="10" x2="30" y2="155" stroke="#a0aec0" stroke-width="1.5" />
+                            <!-- 曲線 y = f(x) -->
+                            <path d="M 40 130 Q 110 110 180 20" stroke="#2b6cb0" stroke-width="2.5" fill="none" />
+                            <!-- 接線 -->
+                            <line x1="40" y1="125" x2="180" y2="25" stroke="#e53e3e" stroke-width="2" stroke-dasharray="4" />
+                            <!-- 接点 -->
+                            <circle cx="110" cy="75" r="4" fill="#e53e3e" />
+                            <line x1="110" y1="75" x2="110" y2="140" stroke="#cbd5e0" stroke-width="1" stroke-dasharray="2" />
+                            <text x="107" y="153" fill="#1a365d" font-size="11" font-weight="bold">a</text>
+                            <text x="120" y="70" fill="#e53e3e" font-size="10" font-weight="bold">傾き f'(a)</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">まとめ</div>
+                <div>微分係数 $f'(a)$ は、曲線 $y = f(x)$ 上の点 $(a, f(a))$ における<b>接線の傾き</b>を表す。</div>
+            </div>
+        </div>
+
+        <!-- スライド3：2. 導関数と微分の計算 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 導関数と微分の計算</h2>
+                <span class="badge">基本公式</span>
+            </div>
+            <div class="content-box">
+                <p>関数 $f(x)$ から導関数 $f'(x)$ を求める操作を<b>微分する</b>という。</p>
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 導関数の公式</b></p>
+                    $$(x^n)' = n x^{n-1} \quad (n = 1, 2, 3, \dots)$$
+                    $$(c)' = 0 \quad (c \text{ は定数})$$
+                    $$\left\{ k \cdot f(x) + l \cdot g(x) \right\}' = k \cdot f'(x) + l \cdot g'(x)$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">計算例</div>
+                <div>$y = 3x^3 - 5x^2 + 4$ を微分すると、$y' = 3 \cdot (3x^2) - 5 \cdot (2x) + 0 = \mathbf{9x^2 - 10x}$</div>
+            </div>
+        </div>
+
+        <!-- スライド4：3. 接線の方程式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>3. 接線の方程式</h2>
+                <span class="badge">標準解法</span>
+            </div>
+            <div class="content-box">
+                <p>曲線 $y = f(x)$ 上の点 $(a, f(a))$ における接線の方程式は以下で与えられる。</p>
+                <div class="problem-text" style="text-align: center; font-size: 18pt; background: #fffaf0; border-color: #fbd38d;">
+                    $$y - f(a) = f'(a)(x - a)$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">ポイント</div>
+                <div>接線を作るには、<b>① 接点の $x$ 座標 $a$</b>、<b>② 接点の $y$ 座標 $f(a)$</b>、<b>③ 接線の傾き $f'(a)$</b> の3つが必要である。</div>
+            </div>
+        </div>
+
+        <!-- スライド5：4. 関数の増減と極値 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 関数の増減と極値（極大・極小）</h2>
+                <span class="badge">グラフの描画</span>
+            </div>
+            <div class="content-box">
+                <p>導関数 $f'(x)$ の<b>符号（＋ / －）</b>を調べることで、元の関数 $f(x)$ の増減がわかる。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <ul>
+                                <li>$f'(x) > 0$ の区間 $\Rightarrow f(x)$ は<b>増加</b>（↗）</li>
+                                <li>$f'(x) < 0$ の区間 $\Rightarrow f(x)$ は<b>減少</b>（↘）</li>
+                                <li>$f'(x) = 0$ となる前後で符号が：
+                                    <ul>
+                                        <li><b>正 $\to$ 負：</b> <b style="color: #e53e3e;">極大</b> となる</li>
+                                        <li><b>負 $\to$ 正：</b> <b style="color: #2b6cb0;">極小</b> となる</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（極大・極小） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="160" viewBox="0 0 220 160">
+                            <!-- 3次関数曲線 -->
+                            <path d="M 20 130 C 60 10, 80 10, 110 80 C 140 150, 160 150, 200 30" stroke="#1a365d" stroke-width="2.5" fill="none" />
+                            <!-- 極大点 -->
+                            <circle cx="72" cy="35" r="4" fill="#e53e3e" />
+                            <text x="55" y="30" fill="#e53e3e" font-size="11" font-weight="bold">極大</text>
+                            <!-- 極小点 -->
+                            <circle cx="145" cy="125" r="4" fill="#2b6cb0" />
+                            <text x="145" y="135" fill="#2b6cb0" font-size="11" font-weight="bold">極小</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6：5. 増減表の書き方 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>5. 増減表の書き方手順</h2>
+                <span class="badge">手順の標準化</span>
+            </div>
+            <div class="content-box">
+                <p>3次関数のグラフを描くための<b>標準手順（4ステップ）</b>である。</p>
+                <div class="problem-text">
+                    <ol style="margin-left: 20px; font-weight: normal; font-size: 11pt;">
+                        <li><b>Step 1：</b> 導関数 $f'(x)$ を計算する。</li>
+                        <li><b>Step 2：</b> $f'(x) = 0$ となる $x$ の値を求める。</li>
+                        <li><b>Step 3：</b> 増減表を作成し、$f'(x)$ の符号（＋/－）と $f(x)$ の矢印（↗/↘）を記入する。</li>
+                        <li><b>Step 4：</b> 極値および $y$ 切片を打ち、滑らかな曲線で結ぶ。</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド7：6. 不定積分 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>6. 不定積分</h2>
+                <span class="badge">微分の逆演算</span>
+            </div>
+            <div class="content-box">
+                <p>微分すると $f(x)$ になる関数 $F(x)$ を求める操作を<b>積分する</b>という。</p>
+                <div class="problem-text">
+                    $$\int f(x) \, dx = F(x) + C \quad (C \text{ は積分定数})$$
+                    <p style="margin-top: 15px; margin-bottom: 8px;"><b>■ 不定積分の公式</b></p>
+                    $$\int x^n \, dx = \frac{1}{n+1} x^{n+1} + C \quad (n = 0, 1, 2, \dots)$$<br>
+                    $$\int k \, dx = kx + C \quad (k \text{ は定数})$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">注意</div>
+                <div>不定積分では、微分すると消えてしまう定数項を表す <b>$+ C$（積分定数）</b> を絶対に忘れないこと。</div>
+            </div>
+        </div>
+
+        <!-- スライド8：7. 定積分とその性質 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>7. 定積分とその性質</h2>
+                <span class="badge">基本公式</span>
+            </div>
+            <div class="content-box">
+                <p>区間 $[a, b]$ を指定した積分を<b>定積分</b>と呼び、数値として算出される。</p>
+                <div class="problem-text">
+                    $$\int_{a}^{b} f(x) \, dx = \left[ F(x) \right]_{a}^{b} = F(b) - F(a)$$
+                    <p style="margin-top: 15px; margin-bottom: 8px;"><b>■ 定積分の基本性質</b></p>
+                    $$\int_{a}^{a} f(x) \, dx = 0$$<br>
+                    $$\int_{b}^{a} f(x) \, dx = -\int_{a}^{b} f(x) \, dx$$<br>
+                    $$\int_{a}^{c} f(x) \, dx + \int_{c}^{b} f(x) \, dx = \int_{a}^{b} f(x) \, dx$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9：8. 定積分と面積の関係 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>8. 定積分と面積</h2>
+                <span class="badge">面積計算</span>
+            </div>
+            <div class="content-box">
+                <p>曲線と $x$ 軸で囲まれた部分の面積 $S$ は、定積分で求められる。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <ul>
+                                <li><b>$f(x) \geqq 0$（軸の上側）のとき：</b>
+                                    $$S = \int_{a}^{b} f(x) \, dx$$
+                                </li>
+                                <li><b>$f(x) \leqq 0$（軸の下側）のとき：</b>
+                                    $$S = -\int_{a}^{b} f(x) \, dx$$
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（面積） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="150" viewBox="0 0 220 150">
+                            <line x1="10" y1="120" x2="200" y2="120" stroke="#a0aec0" stroke-width="1.5" />
+                            <!-- 曲線 -->
+                            <path d="M 43 130 Q 110 15 177 130" stroke="#2b6cb0" stroke-width="2" fill="none" />
+                            <!-- 塗りつぶし領域 -->
+                            <path d="M 50 120 Q 110 30 170 120 Z" fill="rgba(66, 153, 225, 0.3)" />
+                            <line x1="50" y1="120" x2="50" y2="125" stroke="#1a365d" stroke-width="1.5" />
+                            <line x1="170" y1="120" x2="170" y2="125" stroke="#1a365d" stroke-width="1.5" />
+                            <text x="47" y="140" fill="#1a365d" font-size="11" font-weight="bold">a</text>
+                            <text x="167" y="140" fill="#1a365d" font-size="11" font-weight="bold">b</text>
+                            <text x="105" y="65" fill="#2b6cb0" font-size="12" font-weight="bold">面積 S</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド10：9. 2曲線間の面積と1/6公式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>9. 2曲線間の面積と $1/6$ 公式</h2>
+                <span class="badge">裏ワザ・高速化</span>
+            </div>
+            <div class="content-box">
+                <p>2つの曲線 $y = f(x)$ と $y = g(x)$（$f(x) \geqq g(x)$）で囲まれた面積は<b>「上 － 下」</b>で計算する。</p>
+
+                <!-- 1/6公式ブロック -->
+                <div class="problem-text" style="background-color: #fffaf0; border: 1px solid #fbd38d; border-left: 5px solid #dd6b20;">
+                    <p style="color: #dd6b20; font-size: 13pt; margin-bottom: 8px;"><b>■ 放物線と直線（または放物線）で囲まれた面積の $1/6$ 公式</b></p>
+                    $$\int_{\alpha}^{\beta} (x - \alpha)(x - \beta) \, dx = -\frac{1}{6}(\beta - \alpha)^3$$
+                    $$\Rightarrow S = \frac{|a|}{6}(\beta - \alpha)^3$$
+                    <p style="font-size: 10.5pt; font-weight: normal; margin-top: 8px;">※ $\alpha, \beta$ は2曲線の交点の $x$ 座標（$\alpha < \beta$）、$a$ は2次式を引いたときの $x^2$ の係数。</p>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">時短テクニック</div>
+                <div>共通テストや記述試験での検算において、放物線で囲まれた面積は $1/6$ 公式を使うことで圧倒的に速く正確に計算できる。</div>
+            </div>
+        </div>
+        <!-- スライド11：1/6公式の証明 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1/6 公式の証明</h2>
+                <span class="badge">計算公式の導出</span>
+            </div>
+            <div class="content-box">
+                <p>$\int_{\alpha}^{\beta} (x - \alpha)(x - \beta) \, dx = -\frac{1}{6}(\beta - \alpha)^3$ の証明手順。</p>
+                
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #e1e8ed; font-weight: normal; font-size: 11pt; padding: 18px 24px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 8px;">【証明の変形テクニック】</p>
+                    <p style="margin-bottom: 12px;">
+                        $(x - \beta)$ を <b>$(x - \alpha) - (\beta - \alpha)$</b> と変形して被積分関数を展開する。
+                    </p>
+
+                    <div style="background: #ffffff; padding: 12px 16px; border-radius: 6px; border: 1px solid #cbd5e0; margin-bottom: 12px;">
+                        $$\begin{align*}
+                        (x - \alpha)(x - \beta) &= (x - \alpha)\left\{ (x - \alpha) - (\beta - \alpha) \right\} \\
+                        &= (x - \alpha)^2 - (\beta - \alpha)(x - \alpha)
+                        \end{align*}$$
+                    </div>
+
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 8px;">【定積分の実行】</p>
+                    $$\begin{align*}
+                    \int_{\alpha}^{\beta} (x - \alpha)(x - \beta) \, dx 
+                    &= \int_{\alpha}^{\beta} \left\{ (x - \alpha)^2 - (\beta - \alpha)(x - \alpha) \right\} dx \\
+                    &= \left[ \frac{1}{3}(x - \alpha)^3 - \frac{\beta - \alpha}{2}(x - \alpha)^2 \right]_{\alpha}^{\beta} \\
+                    &= \left( \frac{1}{3}(\beta - \alpha)^3 - \frac{1}{2}(\beta - \alpha)^3 \right) - 0 \\
+                    &= \left( \frac{2 - 3}{6} \right)(\beta - \alpha)^3 = \mathbf{-\frac{1}{6}(\beta - \alpha)^3} \quad \blacksquare
+                    \end{align*}$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">証明のポイント</div>
+                <div>展開してから普通に積分するよりも、$(x - \alpha)$ の一まりとして積分した方が、下端 $\alpha$ を代入した時に全項が $0$ になって計算が激変する。</div>
+            </div>
+        </div>
+
+        <!-- スライド11：演習問題［1］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［1］：微分係数と導関数</h2>
+                <span class="badge">基本演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    関数 $f(x) = 2x^3 - 3x^2 + 1$ について、導関数 $f'(x)$ および $x = 2$ における微分係数 $f'(2)$ の値を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    導関数：$f'(x) = 2 \cdot (3x^2) - 3 \cdot (2x) + 0 = \mathbf{6x^2 - 6x}$<br>
+                    $x = 2$ を代入して：$f'(2) = 6(2)^2 - 6(2) = 24 - 12 = \mathbf{12}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド12：演習問題［2］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［2］：接線の方程式</h2>
+                <span class="badge">標準演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    曲線 $y = x^2 - 4x + 3$ 上の点 $(3, 0)$ における接線の方程式を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    $y' = 2x - 4$ より、$x = 3$ における接線の傾き $m$ は：<br>
+                    $m = 2(3) - 4 = 2$<br>
+                    点 $(3, 0)$ を通り傾き $2$ の直線の方程式：<br>
+                    $y - 0 = 2(x - 3) \quad \Rightarrow \quad \mathbf{y = 2x - 6}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド13：演習問題［3］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［3］：関数の極値</h2>
+                <span class="badge">標準演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    関数 $f(x) = x^3 - 3x$ の極値を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    $f'(x) = 3x^2 - 3 = 3(x+1)(x-1)$<br>
+                    $f'(x) = 0$ となるのは $x = -1, 1$<br>
+                    ・$x = -1$ で極大値 $f(-1) = (-1)^3 - 3(-1) = \mathbf{2}$<br>
+                    ・$x = 1$ で極小値 $f(1) = 1^3 - 3(1) = \mathbf{-2}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド14：演習問題［4］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［4］：定積分の計算</h2>
+                <span class="badge">基本演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    定積分 $\int_{1}^{3} (3x^2 - 4x + 1) \, dx$ を計算せよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    $$\int_{1}^{3} (3x^2 - 4x + 1) \, dx = \left[ x^3 - 2x^2 + x \right]_{1}^{3}$$
+                    $$= (27 - 18 + 3) - (1 - 2 + 1) = 12 - 0 = \mathbf{12}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド15：演習問題［5］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［5］：面積の計算（1/6公式）</h2>
+                <span class="badge">標準演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    放物線 $y = x^2 - 2x$ と $x$ 軸で囲まれた部分の面積 $S$ を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    放物線と $x$ 軸の交点は $x(x-2) = 0 \Rightarrow x = 0, 2$<br>
+                    $1/6$ 公式を適用すると：
+                    $$S = \frac{|1|}{6}(2 - 0)^3 = \frac{8}{6} = \mathbf{\frac{4}{3}}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド16：演習問題［6］ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［6］：2曲線間の面積</h2>
+                <span class="badge">応用演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    放物線 $y = x^2$ と直線 $y = x + 2$ で囲まれた部分の面積 $S$ を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 12pt;">
+                    交点の $x$ 座標：$x^2 = x + 2 \Rightarrow x^2 - x - 2 = 0 \Rightarrow (x-2)(x+1) = 0 \Rightarrow x = -1, 2$<br>
+                    区間 $[-1, 2]$ で $x + 2 \geqq x^2$ であるため、$1/6$ 公式より：
+                    $$S = \frac{1}{6} \{2 - (-1)\}^3 = \frac{1}{6} (3)^3 = \frac{27}{6} = \mathbf{\frac{9}{2}}$$
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 16</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 微分係数・導関数</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. 接線・増減と極値</button>
+            <button onclick="goToSlide(6)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. 不定積分・定積分</button>
+            <button onclick="goToSlide(8)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 面積・1/6公式</button>
+            <button onclick="goToSlide(10)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 演習問題</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
