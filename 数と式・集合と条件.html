@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅰ 数と式・集合と条件</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド0 (1/10)：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 34pt; color: #1a365d; margin-bottom: 20px;">数学Ⅰ_数と式・集合と条件</h1>
+                <p style="font-size: 18pt; color: #4a5568;">展開・因数分解・絶対値・集合・命題・必要十分条件</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド1 (2/10)：1. 展開と因数分解の発展展開 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. 展開・因数分解の極意</h2>
+                <span class="badge">数と式</span>
+            </div>
+            <div class="content-box">
+                <p>複雑な多項式は「置き換え」と「最低次数の文字での整理」が鉄則。</p>
+                
+                <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 最低次数の文字について整理する手順</p>
+                    2つ以上の文字を含む式は、<b>最も次数が低い文字に着目して降順に整理</b>する。<br>
+                    例： $x^2 + xy - 2y^2 + 3x + 3y + 2$ （$x, y$ ともに2次 $\to$ $x$ で整理）<br>
+                    $$= x^2 + (y + 3)x - (2y^2 - 3y - 2) = x^2 + (y + 3)x - (2y + 1)(y - 2)$$
+                    たすき掛けにより $\mathbf{(x + 2y + 1)(x - y + 2)}$ と因数分解できる。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">3次の因数分解公式（数学Ⅰ発展）</div>
+                <div>
+                    ・ $a^3 + b^3 = (a + b)(a^2 - ab + b^2)$<br>
+                    ・ $a^3 - b^3 = (a - b)(a^2 + ab + b^2)$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2 (3/10)：2. 実数と絶対値記号の扱い -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 実数と絶対値記号の外し方</h2>
+                <span class="badge">数の性質</span>
+            </div>
+            <div class="content-box">
+                <p>絶対値 $|a|$ は<b>「原点からの距離」</b>を表し、中身の正負で場合分けして外す。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            $$\mathbf{|a| = \begin{cases} a & (a \geqq 0 \text{ のとき}) \\ -a & (a < 0 \text{ のとき}) \end{cases}}$$
+                            <p style="margin-top: 10px; color: #e53e3e; font-weight: bold;">⚠️ 最重要注意点：</p>
+                            $\sqrt{a^2} = |a|$ である。（単に $a$ としない！）<br>
+                            例： $\sqrt{(-3)^2} = |-3| = 3$
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（絶対値と数直線） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="120" viewBox="0 0 220 120" style="max-width: 100%; height: auto;">
+                            <line x1="20" y1="70" x2="200" y2="70" stroke="#1a365d" stroke-width="2" />
+                            <circle cx="110" cy="70" r="4" fill="#1a365d" />
+                            <text x="110" y="90" text-anchor="middle" fill="#1a365d" font-size="10" font-weight="bold">O (0)</text>
+
+                            <circle cx="170" cy="70" r="4" fill="#2b6cb0" />
+                            <text x="170" y="90" text-anchor="middle" fill="#2b6cb0" font-size="10" font-weight="bold">A (3)</text>
+
+                            <circle cx="50" cy="70" r="4" fill="#e53e3e" />
+                            <text x="50" y="90" text-anchor="middle" fill="#e53e3e" font-size="10" font-weight="bold">B (-3)</text>
+
+                            <!-- 距離アーチ -->
+                            <path d="M 110 55 Q 140 25 170 55" fill="none" stroke="#2b6cb0" stroke-width="1.5" />
+                            <text x="140" y="32" text-anchor="middle" fill="#2b6cb0" font-size="9" font-weight="bold">距離 3</text>
+
+                            <path d="M 50 55 Q 80 25 110 55" fill="none" stroke="#e53e3e" stroke-width="1.5" />
+                            <text x="80" y="32" text-anchor="middle" fill="#e53e3e" font-size="9" font-weight="bold">距離 3</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">1次不等式の方針</div>
+                <div>$|x| < k \iff -k < x < k$ 、 $|x| > k \iff x < -k, \ k < x$ と瞬時に変換できる。</div>
+            </div>
+        </div>
+
+        <!-- スライド3 (4/10)：3. 集合の基本とベン図・ド・モルガンの法則 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>3. 集合とド・モルガンの法則</h2>
+                <span class="badge">論理の基礎</span>
+            </div>
+            <div class="content-box">
+                <p>範囲や集まりを視覚的に表現するベン図と、補集合の基本法則。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <ul>
+                                <li><b>共通部分 $A \cap B$：</b> かつ（両方に入る）</li>
+                                <li><b>和集合 $A \cup B$：</b> または（少なくとも一方）</li>
+                                <li><b style="color: #e53e3e;">ド・モルガンの法則：</b>
+                                    $$\overline{A \cup B} = \overline{A} \cap \overline{B}, \quad \overline{A \cap B} = \overline{A} \cup \overline{B}$$
+                                    （バーを千切ると記号 $\cap, \cup$ が逆転する！）
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（ベン図） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="130" viewBox="0 0 220 130" style="max-width: 100%; height: auto;">
+                            <!-- 全体集合 U -->
+                            <rect x="10" y="10" width="200" height="110" fill="none" stroke="#a0aec0" stroke-width="1.5" rx="4" />
+                            <text x="20" y="25" fill="#a0aec0" font-size="10" font-weight="bold">U</text>
+
+                            <!-- 集合 A -->
+                            <circle cx="85" cy="65" r="40" fill="#ebf8ff" opacity="0.7" stroke="#2b6cb0" stroke-width="1.5" />
+                            <text x="65" y="65" fill="#2b6cb0" font-size="10" font-weight="bold">A</text>
+
+                            <!-- 集合 B -->
+                            <circle cx="135" cy="65" r="40" fill="#feefed" opacity="0.7" stroke="#e53e3e" stroke-width="1.5" />
+                            <text x="150" y="65" fill="#e53e3e" font-size="10" font-weight="bold">B</text>
+
+                            <!-- 交わり A ∩ B -->
+                            <text x="110" y="68" text-anchor="middle" fill="#1a365d" font-size="9" font-weight="bold">A∩B</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">個数定理</div>
+                <div>$n(A \cup B) = n(A) + n(B) - n(A \cap B)$ （重なっている部分を1回引く）</div>
+            </div>
+        </div>
+
+        <!-- スライド4：4. 命題と同値・必要条件と十分条件（修正版） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 命題と必要十分条件</h2>
+                <span class="badge">最重要概念</span>
+            </div>
+            <div class="content-box">
+                <p>命題 $p \implies q$ の真偽と、矢印の向きによる条件の判定。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 必要条件・十分条件の見分け方（矢印フロー）</p>
+                            
+                            <!-- 修正部分：MathJax標準の overset/underset で矢印の上下にテキストを配置 -->
+                            <div style="text-align: center; margin: 15px 0; font-size: 12pt;">
+                                $$p \ \overset{\text{主語から出る}}{\underset{\text{十分条件}}{\Longrightarrow}} \ q \ \overset{\text{主語に入る}}{\underset{\text{必要条件}}{\Longrightarrow}} \ p$$
+                            </div>
+
+                            <ul>
+                                <li>$p \implies q$ が真 $\iff$ $p$ は<br>$q$ であるための<b>十分条件</b></li>
+                                <li>$q \implies p$ が真 $\iff$ $p$ は<br>$q$ であるための<b>必要条件</b></li>
+                                <li>双方が真 $\iff$ <b>必要十分条件<br>（同値：$p \iff q$）</b></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（包含関係 P ⊂ Q） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="130" viewBox="0 0 220 130" style="max-width: 100%; height: auto;">
+                            <!-- 集合 Q (外側) -->
+                            <ellipse cx="110" cy="65" rx="90" ry="50" fill="#feefed" stroke="#e53e3e" stroke-width="1.5" />
+                            <text x="175" y="65" fill="#e53e3e" font-size="11" font-weight="bold">Q</text>
+
+                            <!-- 集合 P (内側) -->
+                            <circle cx="85" cy="65" r="30" fill="#ebf8ff" stroke="#2b6cb0" stroke-width="1.5" />
+                            <text x="85" y="68" text-anchor="middle" fill="#2b6cb0" font-size="11" font-weight="bold">P</text>
+
+                            <text x="110" y="118" text-anchor="middle" fill="#1a365d" font-size="9.5" font-weight="bold">p ⇒ q が真 ⟺ P ⊂ Q</text>
+                        </svg>
+                    </div>
+                </div>
+                <p style="margin-bottom: 10px;">「$p \implies q$」と「$q \implies p$」の矢印の真偽をそれぞれ確認するのが判定の鉄則。</p>
+
+                <!-- 例題1：x = 2 と x² = 4 -->
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #cbd5e0; padding: 15px; font-weight: normal; font-size: 10.5pt; margin-bottom: 12px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 例題1： $p: x = 2$ と $q: x^2 = 4$</p>
+                    <div style="line-height: 1.8;">
+                        ① <b>$p \implies q$ （$x = 2 \implies x^2 = 4$）：</b><br>
+                        $\quad x = 2$ ならば確実に $x^2 = 4$ になるので <b style="color: #2b6cb0;">【真】</b> （$\to$ <b>十分条件</b>を満たす）<br>
+                        ② <b>$q \implies p$ （$x^2 = 4 \implies x = 2$）：</b><br>
+                        $\quad x = -2$ の可能性（反例）があるため <b style="color: #e53e3e;">【偽】</b> （$\to$ 必要条件を満たさない）<br>
+                        <span style="font-weight: bold; color: #1a365d;">結論： $x = 2$ は $x^2 = 4$ であるための 「十分条件であるが必要条件でない」</span>
+                    </div>
+                </div>
+
+                <!-- 例題2：日常の例（東京と日本） -->
+                <div class="problem-text" style="background-color: #fffaf0; border: 1px solid #fbd38d; padding: 15px; font-weight: normal; font-size: 10.5pt; margin-bottom: 0;">
+                    <p style="font-weight: bold; color: #dd6b20; margin-bottom: 5px;">💡 日常の例（集合の大きさイメージ）： 「東京にいる」と「日本にいる」</p>
+                    <div style="line-height: 1.8;">
+                        ・ <b>東京にいるなら $\implies$ 日本にいる：</b> 絶対に成り立つ（十分）<br>
+                        ・ <b>日本にいるなら $\implies$ 東京にいる：</b> 大阪や北海道かも（偽・成り立たない）<br>
+                        <span style="color: #4a5568;">$\to$ <b>狭い範囲（東京）</b> は <b>広い範囲（日本）</b> に入るための <b>「十分条件」！</b></span><br>
+                        <span style="color: #4a5568;">$\to$ <b>広い範囲（日本）</b> は <b>狭い範囲（東京）</b> に入るための <b>「必要条件」！</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 下部判定まとめ -->
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">判別の3ステップ</div>
+                <div style="font-size: 9.5pt; line-height: 1.6;">
+                    <b>1. 主語を確認する</b>（「〜は、…であるための」の「〜は」の部分）<br>
+                    <b>2. 「主語 $\implies$ 相手」の真偽チェック</b> $\to$ 真なら<b>十分条件</b>（主語から矢印が出る）<br>
+                    <b>3. 「相手 $\implies$ 主語」の真偽チェック</b> $\to$ 真なら<b>必要条件</b>（主語に矢印が入る）
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">集合の包含関係との連動</div>
+                <div>条件 $p, q$ を満たす集合を $P, Q$ とすると、<b>命題 $p \implies q$ が真であることは $P \subset Q$（$P$ が $Q$ にすっぽり包まれる）と同値</b>である。</div>
+            </div>
+        </div>
+
+        <!-- スライド5 (6/10)：5. 逆・裏・対偶と背理法 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>5. 逆・裏・対偶と背理法</h2>
+                <span class="badge">証明の技法</span>
+            </div>
+            <div class="content-box">
+                <p>命題の変形と、証明が難しい場合の迂回証明アプローチ。</p>
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 四角関係（逆・裏・対偶）</b></p>
+                    ・ 命題 $p \implies q$ の<b>逆</b>： $q \implies p$<br>
+                    ・ 命題 $p \implies q$ の<b>裏</b>： $\overline{p} \implies \overline{q}$<br>
+                    ・ 命題 $p \implies q$ の<b>対偶</b>： $\mathbf{\overline{q} \implies \overline{p}}$
+                    <p style="margin-top: 12px; margin-bottom: 8px; color: #e53e3e;"><b>★ 最重要原理：元命題とその対偶の真偽は完全に一致する！</b></p>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">背理法の基本ステップ</div>
+                <div>
+                    1. 結論の否定（「〜でない」と仮定）を仮定する。<br>
+                    2. 矛盾（矛盾・与えられた条件との食い違い）を導き出す。<br>
+                    3. したがって元の結論が正しいと主張する。（例：$\sqrt{2}$ が無理数であることの証明）
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6 (7/10)：演習問題［1］因数分解 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［1］：複雑な因数分解</h2>
+                <span class="badge">基本演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    次の式を因数分解せよ。<br>
+                    $$a(b^2 - c^2) + b(c^2 - a^2) + c(a^2 - b^2)$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    どの文字（$a, b, c$）についても2次なので、<b>$a$ について降順に整理</b>する。<br>
+                    与式 $= (c - b)a^2 + (b^2 - c^2)a + (bc^2 - b^2c)$<br>
+                    $= -(b - c)a^2 + (b - c)(b + c)a - bc(b - c)$<br>
+                    共通因数 $(b - c)$ で括り出す：<br>
+                    $= (b - c) \big( -a^2 + (b + c)a - bc \big) = -(b - c) \big( a^2 - (b + c)a + bc \big)$<br>
+                    $= -(b - c)(a - b)(a - c) = \mathbf{(a - b)(b - c)(c - a)}$ （輪環の順に整理）
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド7 (8/10)：演習問題［2］絶対値の方程式・不等式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［2］：絶対値と場合分け</h2>
+                <span class="badge">標準演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    方程式 $|x - 2| + |x + 1| = 5$ を解け。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    中身が $0$ になる境界 $x = -1, 2$ で<b>3つの区間に場合分け</b>する。<br>
+                    ① <b>$x < -1$ のとき：</b> 両方マイナスで外れる<br>
+                    $\quad -(x - 2) - (x + 1) = 5 \implies -2x + 1 = 5 \implies x = -2$ （$x < -1$ を満たす）<br>
+                    ② <b>$-1 \leqq x < 2$ のとき：</b> 前マイナス・後プラス<br>
+                    $\quad -(x - 2) + (x + 1) = 5 \implies 3 = 5$ （不能・解なし）<br>
+                    ③ <b>$x \geqq 2$ のとき：</b> 両方プラスで外れる<br>
+                    $\quad (x - 2) + (x + 1) = 5 \implies 2x - 1 = 5 \implies x = 3$ （$x \geqq 2$ を満たす）<br>
+                    以上より、求める解は $\mathbf{x = -2, \ 3}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8 (9/10)：演習問題［3］必要十分条件の判定 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［3］：必要十分条件の判定</h2>
+                <span class="badge">頻出演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $x, y$ を実数とするとき、$x^2 + y^2 = 0$ は $x = 0$ かつ $y = 0$ であるための何条件か。<br>
+                    （必要十分条件／必要条件であるが十分条件でない／十分条件であるが必要条件でない／いずれでもない）
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    条件 $p: x^2 + y^2 = 0$ 、 条件 $q: x = 0 \text{ かつ } y = 0$ とする。<br>
+                    ・ <b>$p \implies q$ の検証：</b><br>
+                    $\quad x, y$ は実数なので $x^2 \geqq 0, y^2 \geqq 0$。足して $0$ になるには $x^2 = 0$ かつ $y^2 = 0$ しかない。<br>
+                    $\quad$ よって $x = 0$ かつ $y = 0$ となり、<b>真（十分条件を満たす）</b>。<br>
+                    ・ <b>$q \implies p$ の検証：</b><br>
+                    $\quad x = 0, y = 0$ のとき $0^2 + 0^2 = 0$ となり、<b>真（必要条件を満たす）</b>。<br>
+                    双方ともに真であるため、正解は <b>必要十分条件</b> である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9 (10/10)：演習問題［4］背理法による証明 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［4］：背理法を用いた証明</h2>
+                <span class="badge">応用演習</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $\sqrt{2}$ が無理数であることを用いて、 $1 + \sqrt{2}$ は無理数であることを証明せよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>【証明】</b><br>
+                    $1 + \sqrt{2}$ が有理数であると仮定し、それを $r$（有理数）とおく。<br>
+                    $$1 + \sqrt{2} = r \ \implies \ \sqrt{2} = r - 1$$
+                    ここで、$r$ は有理数なので $r - 1$ も有理数である。<br>
+                    しかし、この等式は<b>左辺の $\sqrt{2}$ が無理数であることに矛盾する</b>。<br>
+                    したがって、最初の仮定「$1 + \sqrt{2}$ が有理数である」は誤りであり、<br>
+                    $1 + \sqrt{2}$ は <b>無理数である</b>。 $\quad \blacksquare$
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 10</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 展開・因数分解の極意</button>
+            <button onclick="goToSlide(2)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. 実数と絶対値記号</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. 集合とド・モルガン</button>
+            <button onclick="goToSlide(4)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 命題と必要十分条件</button>
+            <button onclick="goToSlide(5)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 逆・裏・対偶と背理法</button>
+            <button onclick="goToSlide(6)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">7. 演習［1］因数分解</button>
+            <button onclick="goToSlide(7)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">8. 演習［2］絶対値と場合分け</button>
+            <button onclick="goToSlide(8)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">9. 演習［3］必要十分条件</button>
+            <button onclick="goToSlide(9)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">10. 演習［4］背理法の証明</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学Ⅰ 2次関数</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド0 (1/10)：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 34pt; color: #1a365d; margin-bottom: 20px;">数学Ⅰ_2次関数</h1>
+                <p style="font-size: 18pt; color: #4a5568;">平方完成・移動・最大最小・方程式・不等式・解の配置</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド1 (2/10)：1. 平方完成とグラフの移動 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. 平方完成と平行移動・対称移動</h2>
+                <span class="badge">関数の基本</span>
+            </div>
+            <div class="content-box">
+                <p>2次関数のグラフの特徴（頂点と軸）を把握するため、基本形に変形する。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 一般形から標準形への平方完成</p>
+                            $$y = ax^2 + bx + c \ \implies \ \mathbf{y = a(x - p)^2 + q}$$
+                            頂点： $\mathbf{(p, q)}$ 、 軸： 直線 $\mathbf{x = p}$<br><br>
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 平行移動の公式（$x$軸方向 $p$、$y$軸方向 $q$）</p>
+                            $x \to x - p$ 、 $y \to y - q$ に置き換える。
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（放物線の頂点と軸） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="130" viewBox="0 0 220 130" style="max-width: 100%; height: auto;">
+                            <!-- 軸 x = p -->
+                            <line x1="110" y1="10" x2="110" y2="120" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="3,3" />
+                            <text x="115" y="20" fill="#a0aec0" font-size="9" font-weight="bold">軸: x=p</text>
+
+                            <!-- 放物線 -->
+                            <path d="M 40 20 Q 110 110 180 20" fill="none" stroke="#2b6cb0" stroke-width="2.5" />
+
+                            <!-- 頂点 (p, q) -->
+                            <circle cx="110" cy="95" r="4" fill="#e53e3e" />
+                            <text x="110" y="115" text-anchor="middle" fill="#e53e3e" font-size="10" font-weight="bold">頂点 (p, q)</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">対称移動のまとめ</div>
+                <div>
+                    ・ $x$軸に関して対称 $\implies y \to -y$<br>
+                    ・ $y$軸に関して対称 $\implies x \to -x$<br>
+                    ・ 原点に関して対称 $\implies x \to -x, \ y \to -y$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド：2次関数の最大・最小（軸の場合分け図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 2次関数の最大・最小（軸の場合分け）</h2>
+                <span class="badge">最重要テーマ</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 10px;">下に凸の放物線 $y = (x-a)^2 + q$ における定義域 $0 \leqq x \leqq 2$ での<b>最小値の3パターン</b>。</p>
+
+                <!-- テキスト解説と3パターンSVG図解の横並び -->
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    
+                    <!-- 左側：場合分けのテキスト -->
+                    <div style="flex: 1; min-width: 260px;">
+                        <div class="problem-text" style="padding: 12px 15px; font-weight: normal; font-size: 10pt; margin-bottom: 0;">
+                            <div style="margin-bottom: 10px;">
+                                <b style="color: #2b6cb0;">① $a < 0$ （軸が左外）：</b><br>
+                                定義域の左端 $x = 0$ で最小をとる。
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <b style="color: #e53e3e;">② $0 \leqq a \leqq 2$ （軸が内側）：</b><br>
+                                頂点 $x = a$ で最小をとる（最小値 $q$）。
+                            </div>
+                            <div>
+                                <b style="color: #dd6b20;">③ $a > 2$ （軸が右外）：</b><br>
+                                定義域の右端 $x = 2$ で最小をとる。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：3パターン比較のSVG図解 -->
+                    <div style="flex: 1.3; min-width: 290px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="300" height="170" viewBox="0 0 300 170" style="max-width: 100%; height: auto;">
+                            <!-- 背景：定義域 0 <= x <= 2 の領域表示（縦の帯） -->
+                            <!-- パターン① -->
+                            <rect x="25" y="20" width="30" height="110" fill="#f0f4f8" rx="2" />
+                            <line x1="25" y1="20" x2="25" y2="130" stroke="#a0aec0" stroke-width="1.5" />
+                            <line x1="55" y1="20" x2="55" y2="130" stroke="#a0aec0" stroke-width="1.5" />
+                            
+                            <path d="M -15 50 Q 15 120 35 50" fill="none" stroke="#2b6cb0" stroke-width="2" />
+                            <line x1="15" y1="15" x2="15" y2="135" stroke="#2b6cb0" stroke-width="1" stroke-dasharray="2,2" />
+                            <circle cx="25" cy="77" r="3.5" fill="#e53e3e" />
+                            
+                            <text x="15" y="147" text-anchor="middle" fill="#2b6cb0" font-size="8" font-weight="bold">a<0</text>
+                            <text x="40" y="147" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">① 左外</text>
+
+                            <!-- 境界仕切り線 -->
+                            <line x1="90" y1="15" x2="90" y2="150" stroke="#edf2f7" stroke-width="2" />
+
+                            <!-- パターン② -->
+                            <rect x="125" y="20" width="30" height="110" fill="#f0f4f8" rx="2" />
+                            <line x1="125" y1="20" x2="125" y2="130" stroke="#a0aec0" stroke-width="1.5" />
+                            <line x1="155" y1="20" x2="155" y2="130" stroke="#a0aec0" stroke-width="1.5" />
+
+                            <path d="M 115 50 Q 140 120 165 50" fill="none" stroke="#e53e3e" stroke-width="2" />
+                            <line x1="140" y1="15" x2="140" y2="135" stroke="#e53e3e" stroke-width="1" stroke-dasharray="2,2" />
+                            <circle cx="140" cy="85" r="3.5" fill="#e53e3e" />
+
+                            <text x="140" y="147" text-anchor="middle" fill="#e53e3e" font-size="8" font-weight="bold">0≦a≦2</text>
+                            <text x="140" y="160" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">② 内側(頂点)</text>
+
+                            <!-- 境界仕切り線 -->
+                            <line x1="190" y1="15" x2="190" y2="150" stroke="#edf2f7" stroke-width="2" />
+
+                            <!-- パターン③ -->
+                            <rect x="225" y="20" width="30" height="110" fill="#f0f4f8" rx="2" />
+                            <line x1="225" y1="20" x2="225" y2="130" stroke="#a0aec0" stroke-width="1.5" />
+                            <line x1="255" y1="20" x2="255" y2="130" stroke="#a0aec0" stroke-width="1.5" />
+
+                            <path d="M 250 50 Q 275 120 300 50" fill="none" stroke="#dd6b20" stroke-width="2" />
+                            <line x1="275" y1="15" x2="275" y2="135" stroke="#dd6b20" stroke-width="1" stroke-dasharray="2,2" />
+                            <circle cx="255" cy="65" r="3.5" fill="#e53e3e" />
+
+                            <text x="275" y="147" text-anchor="middle" fill="#dd6b20" font-size="8" font-weight="bold">a>2</text>
+                            <text x="240" y="147" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">③ 右外</text>
+
+                            <!-- 全体共通ラベル（定義域） -->
+                            <text x="25" y="12" font-size="7.5" fill="#718096">0</text>
+                            <text x="55" y="12" font-size="7.5" fill="#718096">2</text>
+                            <text x="125" y="12" font-size="7.5" fill="#718096">0</text>
+                            <text x="155" y="12" font-size="7.5" fill="#718096">2</text>
+                            <text x="225" y="12" font-size="7.5" fill="#718096">0</text>
+                            <text x="255" y="12" font-size="7.5" fill="#718096">2</text>
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">最大値・最小値の判別テクニック</div>
+                <div style="font-size: 10pt;">
+                    最小値（下に凸）をとる点は、赤点で示した通り<b>「グラフの最下点（頂点）」が定義域のグレーの帯に入っているかどうか</b>でパッと見分けられます。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド3 (4/10)：3. 2次方程式・2次不等式と判別式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>3. 2次方程式・不等式と判別式 D</h2>
+                <span class="badge">グラフと視覚化</span>
+            </div>
+            <div class="content-box">
+                <p>2次不等式の解は、<b>グラフ $y = ax^2+bx+c$ と $x$軸の位置関係</b>から捉える。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 12px;">
+                            判別式 $D = b^2 - 4ac$ の符号による分類（$a > 0$）：
+                            <ul>
+                                <li><b>$D > 0$：</b> $x$軸と異なる2点で交わる（$\alpha, \beta$）
+                                    $$ax^2+bx+c < 0 \iff \mathbf{\alpha < x < \beta}$$
+                                    $$ax^2+bx+c > 0 \iff \mathbf{x < \alpha, \ \beta < x}$$
+                                </li>
+                                <li><b>$D = 0$：</b> 接する $\implies (x-\alpha)^2 \leqq 0$ 等</li>
+                                <li><b>$D < 0$：</b> 浮いている $\implies$ すべての実数／解なし</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（D>0, D=0, D<0 のグラフ） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="150" viewBox="0 0 220 150" style="max-width: 100%; height: auto;">
+                            <!-- x軸 -->
+                            <line x1="10" y1="70" x2="210" y2="70" stroke="#1a365d" stroke-width="1.5" />
+
+                            <!-- D > 0 (交わる) -->
+                            <path d="M 20 50 Q 50 130 80 50" fill="none" stroke="#2b6cb0" stroke-width="2" />
+                            <text x="50" y="140" text-anchor="middle" fill="#2b6cb0" font-size="9" font-weight="bold">D > 0</text>
+
+                            <!-- D = 0 (接する) -->
+                            <path d="M 85 40 Q 115 100 145 40" fill="none" stroke="#dd6b20" stroke-width="2" />
+                            <text x="115" y="140" text-anchor="middle" fill="#dd6b20" font-size="9" font-weight="bold">D = 0</text>
+
+                            <!-- D < 0 (浮いている) -->
+                            <path d="M 150 20 Q 180 70 210 20" fill="none" stroke="#e53e3e" stroke-width="2" />
+                            <text x="180" y="140" text-anchor="middle" fill="#e53e3e" font-size="9" font-weight="bold">D < 0</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">常に不等式が成り立つ条件（絶対不等式）</div>
+                <div>すべての実数 $x$ で $ax^2 + bx + c > 0$ が成立する条件 $\iff \mathbf{a > 0 \ \text{かつ} \ D < 0}$ （上に開いて浮いている状態）</div>
+            </div>
+        </div>
+
+        <!-- スライド4 (5/10)：4. 解の配置（解の存在範囲） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 2次方程式の解の配置問題</h2>
+                <span class="badge">応用・頻出</span>
+            </div>
+            <div class="content-box">
+                <p>2次方程式 $f(x) = 0$ の解が指定された範囲にある条件は<b>3つの視点</b>で絞り込む。</p>
+
+                <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 解の配置を絞り込む 3大条件（「D・軸・端点」）</p>
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li><b>判別式 $D$：</b> 解が存在するか（実数解条件 $D \geqq 0$ や $D > 0$）</li>
+                        <li><b>軸の位置：</b> グラフの軸 $x = -\frac{b}{2a}$ が指定範囲のどこにあるか</li>
+                        <li><b>端点での $y$ の値（境界値 $f(k)$）：</b> 境界 $x = k$ における $f(k)$ の正負</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">例：「2解がともに k より大きい」条件</div>
+                <div>① $D \geqq 0$ 、 ② 軸 $> k$ 、 ③ $f(k) > 0$ の <b>3つの共通範囲（かつ）</b> を求める。</div>
+            </div>
+        </div>
+
+        <!-- スライド5 (6/10)：演習問題［1］平方完成と頂点 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［1］：頂点と平行移動</h2>
+                <span class="badge">基本レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    放物線 $y = 2x^2 - 8x + 5$ の頂点の座標を求めよ。また、この放物線を $x$軸方向に $3$、$y$軸方向に $-2$ だけ平行移動した放物線の方程式を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>■ 平方完成：</b><br>
+                    $y = 2(x^2 - 4x) + 5 = 2(x - 2)^2 - 8 + 5 = 2(x - 2)^2 - 3$<br>
+                    よって、頂点の座標は $\mathbf{(2, -3)}$<br><br>
+                    <b>■ 平行移動：</b><br>
+                    移動後の頂点は $(2+3, \ -3-2) = (5, -5)$ となる。<br>
+                    $x^2$ の係数 $2$ は変化しないため、求める方程式は：<br>
+                    $$y = 2(x - 5)^2 - 5 \quad \left(\text{展開形: } \mathbf{y = 2x^2 - 20x + 45}\right)$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6 (7/10)：演習問題［2］軸が動く最大・最小 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［2］：軸が動く2次関数の最小値</h2>
+                <span class="badge">標準・頻出</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $0 \leqq x \leqq 2$ における関数 $f(x) = (x - a)^2 + 1$ の最小値を $a$ の値で場合分けして求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    下に凸で軸は $x = a$。定義域 $0 \leqq x \leqq 2$ と軸の位置で3つに場合分けする。<br>
+                    ① <b>$a < 0$ のとき（軸が左外）：</b><br>
+                    $\quad x = 0$ で最小値をとる $\implies \mathbf{\text{最小値 } a^2 + 1 \quad (x=0)}$<br>
+                    ② <b>$0 \leqq a \leqq 2$ のとき（軸が内側）：</b><br>
+                    $\quad$ 頂点 $x = a$ で最小値をとる $\implies \mathbf{\text{最小値 } 1 \quad (x=a)}$<br>
+                    ③ <b>$a > 2$ のとき（軸が右外）：</b><br>
+                    $\quad x = 2$ で最小値をとる $\implies \mathbf{\text{最小値 } (2-a)^2 + 1 = a^2 - 4a + 5 \quad (x=2)}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド7 (8/10)：演習問題［3］2次不等式の解法 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［3］：文字を含む2次不等式</h2>
+                <span class="badge">標準レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $x$ についての不等式 $x^2 - (a + 2)x + 2a < 0$ を解け。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    因数分解すると $(x - 2)(x - a) < 0$ となる。<br>
+                    2つの境界値 $2$ と $a$ の大小関係で場合分けする。<br>
+                    ① <b>$a < 2$ のとき：</b> $\mathbf{a < x < 2}$<br>
+                    ② <b>$a = 2$ のとき：</b> $(x - 2)^2 < 0$ となり、これを満たす実数は存在しない $\implies \mathbf{\text{解なし}}$<br>
+                    ③ <b>$a > 2$ のとき：</b> $\mathbf{2 < x < a}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8 (9/10)：演習問題［4］解の配置問題 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［4］：解の配置（正の解2つ）</h2>
+                <span class="badge">応用・最重要</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    2次方程式 $x^2 - 2mx + m + 6 = 0$ が、異なる2つの正の解をもつような定数 $m$ の値の範囲を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    $f(x) = x^2 - 2mx + m + 6$ とおく。軸は $x = m$。<br>
+                    「異なる2つの正の解」をもつ条件は、次の3条件が同時に成り立つこと：<br>
+                    ① <b>判別式：</b> $D/4 = (-m)^2 - (m + 6) > 0 \implies m^2 - m - 6 > 0 \implies (m-3)(m+2) > 0$<br>
+                    $\quad \implies m < -2, \ 3 < m \ \cdots \text{①'}$<br>
+                    ② <b>軸の位置：</b> 軸 $m > 0 \ \cdots \text{②'}$<br>
+                    ③ <b>端点（$y$切片）：</b> $f(0) = m + 6 > 0 \implies m > -6 \ \cdots \text{③'}$<br>
+                    ①', ②', ③' の共通範囲を求めると、 $\mathbf{3 < m}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9 (10/10)：まとめ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2次関数のまとめ</h2>
+                <span class="badge">総括</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-weight: normal; font-size: 11pt;">
+                    <ol style="margin-left: 20px; line-height: 2;">
+                        <li><b>平方完成：</b> 頂点 $(p, q)$ と軸 $x=p$ を掴むことが全てのスタート。</li>
+                        <li><b>最大・最小：</b> 軸が定義域の「内か外か（最小）」「中央より左右どちらか（最大）」で場合分け。</li>
+                        <li><b>2次不等式：</b> 式の形だけでなく、常にグラフと $x$軸の交わり（判別式 $D$）を視覚化する。</li>
+                        <li><b>解の配置：</b> 「$D$ の符号」「軸の位置」「端点 $f(k)$ の符号」の3セットで攻める。</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">学習のアドバイス</div>
+                <div>2次関数は数Ⅰ・数Ⅱ・数Ⅲすべての土台となる単元です。数式だけで処理しようとせず、<b>常に簡単なグラフの概形を描いて考える癖</b>をつけましょう。</div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 10</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 平方完成とグラフの移動</button>
+            <button onclick="goToSlide(2)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. 2次関数の最大・最小</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. 2次方程式・不等式と判別式</button>
+            <button onclick="goToSlide(4)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 解の配置問題</button>
+            <button onclick="goToSlide(5)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 演習［1］頂点と平行移動</button>
+            <button onclick="goToSlide(6)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">7. 演習［2］動く軸と最小値</button>
+            <button onclick="goToSlide(7)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">8. 演習［3］文字含む2次不等式</button>
+            <button onclick="goToSlide(8)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">9. 演習［4］解の配置問題</button>
+            <button onclick="goToSlide(9)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">10. まとめ</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

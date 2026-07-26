@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学A 図形の性質</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド0 (1/10)：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 34pt; color: #1a365d; margin-bottom: 20px;">数学A_図形の性質</h1>
+                <p style="font-size: 18pt; color: #4a5568;">三角形の五心・チェバメネラウス・円の性質・方べきの定理・空間図形</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド1 (2/10)：1. 三角形の五心（全図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. 三角形の五心（重心・内心・外心・垂心・傍心）</h2>
+                <span class="badge">平面図形の基本</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;">三角形が持つ 5 つの重要な中心点の定義と、それぞれの線分の交差イメージ。</p>
+
+                <!-- 5つの図解カードを横並びで配置（レスポンシブ対応） -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; margin-bottom: 8px;">
+
+                    <!-- 1. 重心 (G) -->
+                    <div style="flex: 1; min-width: 170px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 6px; padding: 6px; text-align: center;">
+                        <span style="font-size: 8.5pt; font-weight: bold; color: #1a365d;">■ 重心 (G)</span>
+                        <div style="font-size: 7.5pt; color: #4a5568; margin-bottom: 2px;">中線の交点（<b>2 : 1</b> に内分）</div>
+                        <svg width="150" height="90" viewBox="0 0 150 90" style="max-width: 100%; height: auto;">
+                            <!-- △ABC -->
+                            <polygon points="65,10 15,80 135,80" fill="none" stroke="#1a365d" stroke-width="1.5" />
+                            <!-- 中線 -->
+                            <line x1="65" y1="10" x2="75" y2="80" stroke="#2b6cb0" stroke-width="1.2" stroke-dasharray="2,2" />
+                            <line x1="15" y1="80" x2="100" y2="45" stroke="#2b6cb0" stroke-width="1.2" stroke-dasharray="2,2" />
+                            <line x1="135" y1="80" x2="40" y2="45" stroke="#2b6cb0" stroke-width="1.2" stroke-dasharray="2,2" />
+                            <!-- 点G -->
+                            <circle cx="70" cy="56.6" r="3" fill="#e53e3e" />
+                            <text x="73" y="58" fill="#e53e3e" font-size="8" font-weight="bold">G</text>
+                            <!-- 2:1 ラベル -->
+                            <text x="73" y="32" fill="#2b6cb0" font-size="7" font-weight="bold">2</text>
+                            <text x="78" y="72" fill="#2b6cb0" font-size="7" font-weight="bold">1</text>
+                        </svg>
+                    </div>
+
+                    <!-- 2. 内心 (I) -->
+                    <div style="flex: 1; min-width: 170px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 6px; padding: 6px; text-align: center;">
+                        <span style="font-size: 8.5pt; font-weight: bold; color: #1a365d;">■ 内心 (I)</span>
+                        <div style="font-size: 7.5pt; color: #4a5568; margin-bottom: 2px;">角の二等分線の交点（内接円）</div>
+                        <svg width="150" height="90" viewBox="0 0 150 90" style="max-width: 100%; height: auto;">
+                            <!-- △ABC -->
+                            <polygon points="65,10 15,80 135,80" fill="none" stroke="#1a365d" stroke-width="1.5" />
+                            <!-- 内接円 -->
+                            <circle cx="68" cy="52" r="27" fill="none" stroke="#e53e3e" stroke-width="1.2" />
+                            <!-- 角の二等分線 -->
+                            <line x1="65" y1="10" x2="65" y2="80" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <line x1="15" y1="80" x2="110" y2="35" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <line x1="135" y1="80" x2="20" y2="35" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <!-- 点I -->
+                            <circle cx="68" cy="52" r="2.5" fill="#e53e3e" />
+                            <text x="72" y="58" fill="#e53e3e" font-size="8" font-weight="bold">I</text>
+                        </svg>
+                    </div>
+
+                    <!-- 3. 外心 (O) -->
+                    <div style="flex: 1; min-width: 170px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 6px; padding: 6px; text-align: center;">
+                        <span style="font-size: 8.5pt; font-weight: bold; color: #1a365d;">■ 外心 (O)</span>
+                        <div style="font-size: 7.5pt; color: #4a5568; margin-bottom: 2px;">垂直二等分線の交点（外接円）</div>
+                        <svg width="150" height="90" viewBox="0 0 150 90" style="max-width: 100%; height: auto;">
+                            <!-- 外接円 -->
+                            <circle cx="75" cy="48" r="41" fill="none" stroke="#e53e3e" stroke-width="1.2" />
+                            <!-- △ABC -->
+                            <polygon points="75,7 37,63 113,63" fill="none" stroke="#1a365d" stroke-width="1.5" />
+                            <!-- 垂直二等分線 -->
+                            <line x1="75" y1="48" x2="75" y2="80" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <line x1="75" y1="48" x2="20" y2="15" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <line x1="75" y1="48" x2="130" y2="15" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <!-- 点O -->
+                            <circle cx="75" cy="48" r="2.5" fill="#e53e3e" />
+                            <text x="81" y="51" fill="#e53e3e" font-size="8" font-weight="bold">O</text>
+                        </svg>
+                    </div>
+
+                    <!-- 4. 垂心 (H) -->
+                    <div style="flex: 1; min-width: 170px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 6px; padding: 6px; text-align: center;">
+                        <span style="font-size: 8.5pt; font-weight: bold; color: #1a365d;">■ 垂心 (H)</span>
+                        <div style="font-size: 7.5pt; color: #4a5568; margin-bottom: 2px;">各頂点からの垂線の交点</div>
+                        <svg width="150" height="90" viewBox="0 0 150 90" style="max-width: 100%; height: auto;">
+                            <!-- △ABC -->
+                            <polygon points="55,10 15,80 135,80" fill="none" stroke="#1a365d" stroke-width="1.5" />
+                            <!-- 垂線 -->
+                            <line x1="55" y1="10" x2="55" y2="80" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <line x1="15" y1="80" x2="88" y2="33" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <line x1="135" y1="80" x2="38" y2="40" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <!-- 点H -->
+                            <circle cx="55" cy="50" r="2.5" fill="#e53e3e" />
+                            <text x="61" y="53" fill="#e53e3e" font-size="8" font-weight="bold">H</text>
+                        </svg>
+                    </div>
+
+                    <!-- 5. 傍心 (I_A) -->
+                    <div style="flex: 1; min-width: 170px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 6px; padding: 6px; text-align: center;">
+                        <span style="font-size: 8.5pt; font-weight: bold; color: #1a365d;">■ 傍心 (I_A)</span>
+                        <div style="font-size: 7.5pt; color: #4a5568; margin-bottom: 2px;">1内角と2外角の二等分線</div>
+                        <svg width="150" height="90" viewBox="0 0 150 90" style="max-width: 100%; height: auto;">
+                            <!-- 傍接円 -->
+                            <circle cx="110" cy="55" r="22" fill="none" stroke="#e53e3e" stroke-width="1.2" />
+                            <!-- △ABC & 延長線 -->
+                            <polygon points="35,15 15,55 60,55" fill="none" stroke="#1a365d" stroke-width="1.5" />
+                            <line x1="35" y1="15" x2="75" y2="78" stroke="#cbd5e0" stroke-width="1" />
+                            <line x1="15" y1="55" x2="135" y2="55" stroke="#cbd5e0" stroke-width="1" />
+                            <!-- 二等分線 -->
+                            <line x1="35" y1="15" x2="110" y2="55" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <line x1="60" y1="55" x2="110" y2="55" stroke="#718096" stroke-width="1" stroke-dasharray="2,2" />
+                            <!-- 点I_A -->
+                            <circle cx="110" cy="55" r="2.5" fill="#e53e3e" />
+                            <text x="115" y="58" fill="#e53e3e" font-size="8" font-weight="bold">I_A</text>
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 5px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">💡 角の二等分線定理（内心・傍心の計算に必須）</div>
+                <div style="font-size: 9.5pt;">
+                    $\triangle\text{ABC}$ の $\angle\text{A}$ の二等分線と辺 $\text{BC}$ の交点を $\text{D}$ とすると：<br>
+                    $$\mathbf{\text{BD} : \text{DC} = \text{AB} : \text{AC}} \quad \text{（「左の辺 : 右の辺」$=$「左の底辺 : 右の底辺」）}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2 (3/10)：2. チェバの定理とメネラウスの定理（図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. チェバの定理とメネラウスの定理</h2>
+                <span class="badge">比の計算の鉄則</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;">三角形と直線・交点における辺の比の掛け算に関する強力な定理。</p>
+
+                <!-- 公式とSVG図解の2列配置 -->
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-bottom: 8px;">
+
+                    <!-- チェバの定理エリア -->
+                    <div style="flex: 1; min-width: 270px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px; text-align: center;">
+                        <span style="font-size: 9pt; font-weight: bold; color: #1a365d;">■ チェバの定理（内部の1点 O で交わる）</span>
+                        <div style="font-size: 10pt; margin: 4px 0;">
+                            $$\frac{\text{BP}}{\text{PC}} \cdot \frac{\text{CQ}}{\text{QA}} \cdot \frac{\text{AR}}{\text{RB}} = 1$$
+                        </div>
+                        <svg width="220" height="110" viewBox="0 0 220 110" style="max-width: 100%; height: auto;">
+                            <!-- △ABC -->
+                            <polygon points="110,12 30,90 190,90" fill="none" stroke="#1a365d" stroke-width="1.8" />
+                            
+                            <!-- 内部交線 AP, BQ, CR -->
+                            <line x1="110" y1="12" x2="110" y2="90" stroke="#718096" stroke-width="1.2" stroke-dasharray="2,2" />
+                            <line x1="30" y1="90" x2="155" y2="46" stroke="#718096" stroke-width="1.2" stroke-dasharray="2,2" />
+                            <line x1="190" y1="90" x2="65" y2="46" stroke="#718096" stroke-width="1.2" stroke-dasharray="2,2" />
+
+                            <!-- 頂点・交点ラベル -->
+                            <text x="110" y="8" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">A</text>
+                            <text x="20" y="94" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">B</text>
+                            <text x="200" y="94" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">C</text>
+                            
+                            <text x="110" y="103" text-anchor="middle" fill="#e53e3e" font-size="8" font-weight="bold">P</text>
+                            <text x="163" y="47" text-anchor="start" fill="#e53e3e" font-size="8" font-weight="bold">Q</text>
+                            <text x="57" y="47" text-anchor="end" fill="#e53e3e" font-size="8" font-weight="bold">R</text>
+
+                            <!-- 中心点 O -->
+                            <circle cx="110" cy="58" r="2" fill="#2b6cb0" />
+                            <text x="116" y="60" fill="#2b6cb0" font-size="7.5" font-weight="bold">O</text>
+
+                            <!-- 一筆書き矢印（周上） -->
+                            <path d="M 45,93 L 95,93" stroke="#e53e3e" stroke-width="1.2" marker-end="url(#arrow)" />
+                            <path d="M 125,93 L 175,93" stroke="#e53e3e" stroke-width="1.2" marker-end="url(#arrow)" />
+                        </svg>
+                    </div>
+
+                    <!-- メネラウスの定理エリア -->
+                    <div style="flex: 1; min-width: 270px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px; text-align: center;">
+                        <span style="font-size: 9pt; font-weight: bold; color: #1a365d;">■ メネラウスの定理（直線が横切る）</span>
+                        <div style="font-size: 10pt; margin: 4px 0;">
+                            $$\frac{\text{BP}}{\text{PC}} \cdot \frac{\text{CQ}}{\text{QA}} \cdot \frac{\text{AR}}{\text{RB}} = 1$$
+                        </div>
+                        <svg width="220" height="110" viewBox="0 0 220 110" style="max-width: 100%; height: auto;">
+                            <!-- △ABC -->
+                            <polygon points="85,15 25,80 135,80" fill="none" stroke="#1a365d" stroke-width="1.8" />
+                            <!-- 辺BCの延長線 -->
+                            <line x1="135" y1="80" x2="195" y2="80" stroke="#cbd5e0" stroke-width="1.2" stroke-dasharray="2,2" />
+
+                            <!-- 交差する直線 (R-Q-P) -->
+                            <line x1="45" y1="50" x2="181" y2="80" stroke="#e53e3e" stroke-width="1.5" />
+
+                            <!-- 頂点・交点ラベル -->
+                            <text x="85" y="10" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">A</text>
+                            <text x="15" y="84" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">B</text>
+                            <text x="135" y="93" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">C</text>
+
+                            <text x="195" y="93" text-anchor="middle" fill="#e53e3e" font-size="8.5" font-weight="bold">P</text>
+                            <text x="122" y="56" text-anchor="start" fill="#e53e3e" font-size="8.5" font-weight="bold">Q</text>
+                            <text x="45" y="50" text-anchor="end" fill="#e53e3e" font-size="8.5" font-weight="bold">R</text>
+
+                            <!-- P, Q, R の交点マーク -->
+                            <circle cx="181" cy="80" r="2.5" fill="#e53e3e" />
+                            <circle cx="123" cy="68" r="2.5" fill="#e53e3e" />
+                            <circle cx="50" cy="52" r="2.5" fill="#e53e3e" />
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 8px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">一筆書きの移動ルール</div>
+                <div style="font-size: 9.5pt;">
+                    <b>「頂点 $\to$ 交点 $\to$ 頂点 $\to$ 交点 $\to$ 頂点 $\to$ 交点 $\to$ 頂点」</b>の順に、ぐるりと一周して元に戻る一筆書きのルートを意識すると、どんな複雑な図形でも公式の立式ミスを防げます。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド3 (4/10)：3. 円に内接する四角形と接弦定理（図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>3. 円に内接する四角形と接弦定理</h2>
+                <span class="badge">角度の性質</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;">円に関連する角度の移動ルール（円周角・対角の和・接弦定理）。</p>
+
+                <!-- 内容とSVG図解の2列カード配置 -->
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-bottom: 8px;">
+
+                    <!-- 左側：円に内接する四角形 -->
+                    <div style="flex: 1; min-width: 270px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px; text-align: center;">
+                        <span style="font-size: 9pt; font-weight: bold; color: #1a365d;">■ 円に内接する四角形の条件</span>
+                        <div style="font-size: 8.5pt; text-align: left; margin: 4px 0 6px 0; color: #2d3748; line-height: 1.5;">
+                            ・ 対角の和が $180^\circ$ （$\angle\text{A} + \angle\text{C} = 180^\circ$）<br>
+                            ・ 1つの内角が、その対角の外角に等しい
+                        </div>
+                        <svg width="220" height="110" viewBox="0 0 220 110" style="max-width: 100%; height: auto;">
+                            <!-- 円 -->
+                            <circle cx="100" cy="55" r="45" fill="none" stroke="#cbd5e0" stroke-width="1.2" />
+                            
+                            <!-- 四角形 ABCD -->
+                            <!-- A(70,20), B(62,80), C(142,70), D(132,24) -->
+                            <polygon points="70,20 62,80 142,70 132,24" fill="none" stroke="#1a365d" stroke-width="1.8" />
+                            
+                            <!-- 辺BCの延長線 (外角用) -->
+                            <line x1="58" y1="82" x2="180" y2="64.5" stroke="#a0aec0" stroke-width="1.2" stroke-dasharray="2,2" />
+
+                            <!-- 頂点ラベル -->
+                            <text x="68" y="10" text-anchor="middle" fill="#1a365d" font-size="8.5" font-weight="bold">A</text>
+                            <text x="56" y="84" text-anchor="end" fill="#1a365d" font-size="8.5" font-weight="bold">B</text>
+                            <text x="142" y="82" text-anchor="start" fill="#1a365d" font-size="8.5" font-weight="bold">C</text>
+                            <text x="138" y="20" text-anchor="start" fill="#1a365d" font-size="8.5" font-weight="bold">D</text>
+
+                            <!-- 角Aのマーク (青点) -->
+                            <circle cx="72" cy="20" r="3" fill="#2b6cb0" />
+                            
+                            <!-- Cの外角マーク (青点) -->
+                            <circle cx="142" cy="70" r="3" fill="#2b6cb0" />
+                        </svg>
+                    </div>
+
+                    <!-- 右側：接弦定理 -->
+                    <div style="flex: 1; min-width: 270px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px; text-align: center;">
+                        <span style="font-size: 9pt; font-weight: bold; color: #1a365d;">■ 接弦定理</span>
+                        <div style="font-size: 8.5pt; text-align: left; margin: 4px 0 6px 0; color: #2d3748; line-height: 1.5;">
+                            円の接線と弦が作る角は、その角の内部にある弧に対する<b>円周角に等しい</b>。
+                        </div>
+                        <svg width="220" height="110" viewBox="0 0 220 110" style="max-width: 100%; height: auto;">
+                            <!-- 円 -->
+                            <circle cx="110" cy="48" r="40" fill="none" stroke="#cbd5e0" stroke-width="1.2" />
+
+                            <!-- 接線 (y=88 付近で円の下端 (110,88) に接する) -->
+                            <line x1="20" y1="88" x2="200" y2="88" stroke="#e53e3e" stroke-width="1.5" />
+
+                            <!-- 内接三角形 A(83,18), B(145,28), P(110,88) -->
+                            <polygon points="83,18 145,28 110,88" fill="none" stroke="#1a365d" stroke-width="1.8" />
+
+                            <!-- 接点・頂点ラベル -->
+                            <text x="75" y="10" text-anchor="end" fill="#1a365d" font-size="8.5" font-weight="bold">A</text>
+                            <text x="152" y="26" text-anchor="start" fill="#1a365d" font-size="8.5" font-weight="bold">B</text>
+                            <text x="110" y="101" text-anchor="middle" fill="#e53e3e" font-size="8.5" font-weight="bold">P (接点)</text>
+
+                            <!-- 角A (円周角) マーク (赤点) -->
+                            <circle cx="83" cy="18" r="3" fill="#e53e3e" />
+
+                            <!-- 接線と弦PAが作る角 マーク (赤点) -->
+                            <circle cx="110" cy="88" r="3" fill="#e53e3e" />
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 8px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">4点が同一円上にある（共円）の証明テクニック</div>
+                <div style="font-size: 9.5pt;">
+                    問題文に「円」が直接描かれていなくても、<b>「円周角の定理の逆」</b>や<b>「対角の和が $180^\circ$」</b>を見つけることで、4点を通る隠れた円の存在を浮き彫りにするのが幾何証明の重要テクニックです。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド4 (5/10)：4. 方べきの定理（図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 方べきの定理</h2>
+                <span class="badge">交点と長さの積</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;">円と2直線の交点において成り立つ「交点からの長さの積」の一致法則。</p>
+
+                <!-- 3パターンのSVG図解エリア -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; margin-bottom: 8px;">
+
+                    <!-- パターン1：円の内部の交点 P -->
+                    <div style="flex: 1; min-width: 170px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 6px; padding: 6px; text-align: center;">
+                        <span style="font-size: 8.5pt; font-weight: bold; color: #1a365d;">① 円の内部の交点 P</span>
+                        <div style="font-size: 8.5pt; color: #2b6cb0; font-weight: bold; margin: 2px 0;">$\text{PA} \cdot \text{PB} = \text{PC} \cdot \text{PD}$</div>
+                        <svg width="150" height="95" viewBox="0 0 150 95" style="max-width: 100%; height: auto;">
+                            <!-- 円 -->
+                            <circle cx="75" cy="48" r="38" fill="none" stroke="#cbd5e0" stroke-width="1.2" />
+                            
+                            <!-- 弦 AB, CD -->
+                            <line x1="42" y1="28" x2="108" y2="68" stroke="#1a365d" stroke-width="1.5" />
+                            <line x1="45" y1="65" x2="105" y2="25" stroke="#1a365d" stroke-width="1.5" />
+
+                            <!-- 交点 P -->
+                            <circle cx="73" cy="48" r="2.5" fill="#e53e3e" />
+                            <text x="75" y="60" text-anchor="middle" fill="#e53e3e" font-size="8" font-weight="bold">P</text>
+
+                            <!-- 端点ラベル -->
+                            <text x="38" y="24" text-anchor="end" fill="#1a365d" font-size="8" font-weight="bold">A</text>
+                            <text x="112" y="72" text-anchor="start" fill="#1a365d" font-size="8" font-weight="bold">B</text>
+                            <text x="41" y="69" text-anchor="end" fill="#1a365d" font-size="8" font-weight="bold">C</text>
+                            <text x="109" y="22" text-anchor="start" fill="#1a365d" font-size="8" font-weight="bold">D</text>
+                        </svg>
+                    </div>
+
+                    <!-- パターン2：円の外部の交点 P （割線2本） -->
+                    <div style="flex: 1; min-width: 170px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 6px; padding: 6px; text-align: center;">
+                        <span style="font-size: 8.5pt; font-weight: bold; color: #1a365d;">② 円の外部の交点 P （割線）</span>
+                        <div style="font-size: 8.5pt; color: #2b6cb0; font-weight: bold; margin: 2px 0;">$\text{PA} \cdot \text{PB} = \text{PC} \cdot \text{PD}$</div>
+                        <svg width="150" height="95" viewBox="0 0 150 95" style="max-width: 100%; height: auto;">
+                            <!-- 円 -->
+                            <circle cx="102" cy="48" r="35" fill="none" stroke="#cbd5e0" stroke-width="1.2" />
+
+                            <!-- 2本の割線 -->
+                            <line x1="18" y1="48" x2="135" y2="35" stroke="#1a365d" stroke-width="1.5" />
+                            <line x1="18" y1="48" x2="132" y2="62" stroke="#1a365d" stroke-width="1.5" />
+
+                            <!-- 交点 P -->
+                            <circle cx="18" cy="48" r="2.5" fill="#e53e3e" />
+                            <text x="12" y="51" text-anchor="end" fill="#e53e3e" font-size="8" font-weight="bold">P</text>
+
+                            <!-- 交点 A, B, C, D -->
+                            <text x="66" y="38" text-anchor="middle" fill="#1a365d" font-size="8" font-weight="bold">A</text>
+                            <text x="138" y="32" text-anchor="start" fill="#1a365d" font-size="8" font-weight="bold">B</text>
+                            <text x="68" y="66" text-anchor="middle" fill="#1a365d" font-size="8" font-weight="bold">C</text>
+                            <text x="135" y="67" text-anchor="start" fill="#1a365d" font-size="8" font-weight="bold">D</text>
+                        </svg>
+                    </div>
+
+                    <!-- パターン3：接線が含まれる場合 -->
+                    <div style="flex: 1; min-width: 170px; background: #fafafa; border: 1px solid #edf2f7; border-radius: 6px; padding: 6px; text-align: center;">
+                        <span style="font-size: 8.5pt; font-weight: bold; color: #1a365d;">③ 接線が含まれる場合</span>
+                        <div style="font-size: 8.5pt; color: #e53e3e; font-weight: bold; margin: 2px 0;">$\text{PA} \cdot \text{PB} = \text{PT}^2$</div>
+                        <svg width="150" height="95" viewBox="0 0 150 95" style="max-width: 100%; height: auto;">
+                            <!-- 円 -->
+                            <circle cx="102" cy="48" r="35" fill="none" stroke="#cbd5e0" stroke-width="1.2" />
+
+                            <!-- 割線 (P - A - B) -->
+                            <line x1="18" y1="48" x2="135" y2="35" stroke="#1a365d" stroke-width="1.5" />
+
+                            <!-- 接線 (P - T) (102, 13) で接する -->
+                            <line x1="18" y1="48" x2="85" y2="15" stroke="#e53e3e" stroke-width="1.5" />
+
+                            <!-- 交点 P, T -->
+                            <circle cx="18" cy="48" r="2.5" fill="#e53e3e" />
+                            <text x="12" y="51" text-anchor="end" fill="#e53e3e" font-size="8" font-weight="bold">P</text>
+
+                            <circle cx="85" cy="15" r="2.5" fill="#e53e3e" />
+                            <text x="102" y="8" text-anchor="middle" fill="#e53e3e" font-size="8" font-weight="bold">T (接点)</text>
+
+                            <!-- 交点 A, B -->
+                            <text x="66" y="38" text-anchor="middle" fill="#1a365d" font-size="8" font-weight="bold">A</text>
+                            <text x="138" y="32" text-anchor="start" fill="#1a365d" font-size="8" font-weight="bold">B</text>
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 8px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">間違い防止のポイント</div>
+                <div style="font-size: 9.5pt;">
+                    必ず<b>「交点 P から円との各交点までの距離」</b>を掛け合わせます。<br>
+                    $\text{PA} \cdot \text{AB}$ のように「円の内部の長さ（弦の長さ）」を掛けてしまわないよう注意が必要です。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5 (6/10)：5. 空間図形と多面体 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>5. 空間図形とオイラーの多面体定理</h2>
+                <span class="badge">空間とオイラー</span>
+            </div>
+            <div class="content-box">
+                <p>直線と平面の位置関係、および凸多面体における頂点・辺・面の数の関係。</p>
+
+                <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">■ オイラーの多面体定理</p>
+                    穴の開いていない任意の凸多面体において、<b>頂点の数 $v$、辺の数 $e$、面の数 $f$</b> の間には常に次の関係が成立する：
+                    $$\mathbf{v - e + f = 2} \quad \text{（「頂点」$-$「辺」$+$「面」$= 2$）}$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">💡 覚え方の語呂合わせ</div>
+                <div>
+                    <b>「頂（$v$）え（$e$）顔（$f$）で ニッ（$2$）こり」</b><br>
+                    （$v - e + f = 2$。立方体なら 頂点 $8$ $-$ 辺 $12$ $+$ 面 $6 = 2$ で確かに成り立ちます）
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6 (7/10)：演習問題［1］角の二等分線と重心 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［1］：角の二等分線と比</h2>
+                <span class="badge">基本レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $\triangle\text{ABC}$ において、$\text{AB} = 6, \ \text{AC} = 4, \ \text{BC} = 5$ である。$\angle\text{A}$ の二等分線と辺 $\text{BC}$ の交点を $\text{D}$ とするとき、線分 $\text{BD}$ の長さを求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    角の二等分線定理より：<br>
+                    $$\text{BD} : \text{DC} = \text{AB} : \text{AC} = 6 : 4 = 3 : 2$$
+                    したがって、$\text{BD}$ は辺 $\text{BC}$ の長さを $3 : 2$ に内分した長さとなるため：<br>
+                    $$\text{BD} = \text{BC} \times \frac{3}{3 + 2} = 5 \times \frac{3}{5} = \mathbf{3}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド7 (8/10)：演習問題［2］メネラウスの定理 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［2］：メネラウスの定理の適用</h2>
+                <span class="badge">標準レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $\triangle\text{ABC}$ の辺 $\text{AB}$ を $2:1$ に内分する点を $\text{R}$、辺 $\text{AC}$ を $1:2$ に内分する点を $\text{Q}$ とする。線分 $\text{BQ}$ と $\text{CR}$ の交点を $\text{P}$ とするとき、$\text{BP} : \text{PQ}$ を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    $\triangle\text{ABQ}$ と直線 $\text{CR}$ に対して<b>メネラウスの定理</b>を適用する：<br>
+                    $$\frac{\text{BC}}{\text{CQ}} \cdot \frac{\text{QP}}{\text{PB}} \cdot \frac{\text{RA}}{\text{AB}} = 1$$
+                    ここで、$\text{AQ} : \text{QC} = 1 : 2 \implies \text{BC} : \text{CQ} = 3 : 2$<br>
+                    また、$\text{AR} : \text{RB} = 2 : 1 \implies \text{RA} : \text{AB} = 2 : 3$<br>
+                    数値を代入すると：<br>
+                    $$\frac{3}{2} \cdot \frac{\text{QP}}{\text{PB}} \cdot \frac{2}{3} = 1 \implies \frac{\text{QP}}{\text{PB}} = 1 \implies \text{BP} : \text{PQ} = \mathbf{1 : 1}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8 (9/10)：演習問題［3］方べきの定理 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［3］：方べきの定理と円</h2>
+                <span class="badge">標準・頻出</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    円の外部の点 $\text{P}$ から円に接線 $\text{PT}$ を引いたところ $\text{PT} = 6$ であった。また点 $\text{P}$ を通る割線が円と交わる2点を $\text{A}, \text{B}$ とし、$\text{PA} = 4$ のとき、線分 $\text{AB}$ の長さを求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    接線と割線に関する<b>方べきの定理</b>を適用する：<br>
+                    $$\text{PA} \cdot \text{PB} = \text{PT}^2$$
+                    $\text{PB} = \text{PA} + \text{AB} = 4 + \text{AB}$ より：<br>
+                    $$4 \times (4 + \text{AB}) = 6^2 = 36$$
+                    $$16 + 4\text{AB} = 36 \implies 4\text{AB} = 20 \implies \mathbf{\text{AB} = 5}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9 (10/10)：まとめ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>図形の性質のまとめ</h2>
+                <span class="badge">総括</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-weight: normal; font-size: 11pt;">
+                    <ol style="margin-left: 20px; line-height: 2;">
+                        <li><b>五心と角の二等分線：</b> 重心 $2:1$ や $\text{BD}:\text{DC}=\text{AB}:\text{AC}$ の辺の比の関係を定着させる。</li>
+                        <li><b>チェバ・メネラウス：</b> 頂点 $\to$ 交点 $\to$ 頂点 の一筆書きルートで立式ミスを防ぐ。</li>
+                        <li><b>円の性質・接弦定理：</b> 対角の和 $180^\circ$ や接線・弦のなす角から隠れた角度の一致を発見する。</li>
+                        <li><b>方べき・オイラー：</b> $\text{PA}\cdot\text{PB} = \text{PC}\cdot\text{PD}$ や $v - e + f = 2$ の構造を正確に使いこなす。</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">学習のアドバイス</div>
+                <div>図形問題攻略の極意は<b>「問題文の条件を図の上にすべて描き込むこと」</b>です。与えられた長さや等しい角をマーカーなどで可視化することで、チェバ・メネラウスや方べきの定理などの発動条件がパッと見えてきます。</div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 10</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 三角形の五心</button>
+            <button onclick="goToSlide(2)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. チェバ・メネラウスの定理</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. 円に内接する四角形</button>
+            <button onclick="goToSlide(4)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 方べきの定理</button>
+            <button onclick="goToSlide(5)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 空間図形と多面体</button>
+            <button onclick="goToSlide(6)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">7. 演習［1］角の二等分線</button>
+            <button onclick="goToSlide(7)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">8. 演習［2］メネラウスの定理</button>
+            <button onclick="goToSlide(8)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">9. 演習［3］方べきの定理</button>
+            <button onclick="goToSlide(9)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">10. まとめ</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

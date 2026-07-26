@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学A 整数の性質</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド0 (1/10)：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 34pt; color: #1a365d; margin-bottom: 20px;">数学A_整数の性質</h1>
+                <p style="font-size: 18pt; color: #4a5568;">倍数・約数・素因数分解・ユークリッドの互除法・不定方程式・n進法</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド1 (2/10)：1. 約数・倍数と素因数分解 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. 約数の個数と総和（素因数分解）</h2>
+                <span class="badge">数論の基本</span>
+            </div>
+            <div class="content-box">
+                <p>自然数 $N$ が $N = p^a q^b r^c$ （$p, q, r$ は互いに異なる素数）と素因数分解できるときの公式。</p>
+
+                <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 正の約数の個数</p>
+                    $$\text{個数} = \mathbf{(a + 1)(b + 1)(c + 1)}$$
+
+                    <p style="font-weight: bold; color: #1a365d; margin-top: 12px; margin-bottom: 5px;">■ 正の約数の総和</p>
+                    $$\text{総和} = \mathbf{(1 + p + p^2 + \cdots + p^a)(1 + q + q^2 + \cdots + q^b)(1 + r + \cdots + r^c)}$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">💡 具体例： $N = 360 = 2^3 \times 3^2 \times 5^1$ の場合</div>
+                <div style="font-size: 10pt;">
+                    ・ 約数の個数： $(3+1)(2+1)(1+1) = 4 \times 3 \times 2 = \mathbf{24 \text{ 個}}$<br>
+                    ・ 約数の総和： $(1+2+4+8)(1+3+9)(1+5) = 15 \times 13 \times 6 = \mathbf{1170}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2 (3/10)：2. 最大公約数と最小公倍数の性質 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 最大公約数(GCD)と最小公倍数(LCM)</h2>
+                <span class="badge">互いに素</span>
+            </div>
+            <div class="content-box">
+                <p>2つの自然数 $a, b$ の最大公約数を $g$、最小公倍数を $l$ としたときの構造的公式。</p>
+
+                <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                    $a = g a', \ b = g b'$ （$a', b'$ は<b>互いに素な自然数</b>、即ち $\gcd(a', b') = 1$）とおける。<br><br>
+                    $$\text{① } \mathbf{l = g a' b'} \qquad \text{（最小公倍数の表し方）}$$
+                    $$\text{② } \mathbf{ab = g \cdot l} \qquad \text{（「2数の積」$=$「最大公約数 $\times$ 最小公倍数」）}$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">「互いに素」の重要性</div>
+                <div>
+                    最大公約数 $g$ を括り出した残りの $a', b'$ に<b>共通の素因数が残っていないこと（$\gcd(a', b')=1$）</b>が、整数問題の立式における必要不可欠な前提条件となる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド3 (4/10)：3. ユークリッドの互除法 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>3. ユークリッドの互除法</h2>
+                <span class="badge">巨大な数のGCD</span>
+            </div>
+            <div class="content-box">
+                <p>大きい数同士の最大公約数を「割り算のあまり」を繰り返すことで効率的に導出する。</p>
+
+                <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 互除法の原理</p>
+                    $a$ を $b$ で割った商を $q$、余りを $r$ とすると （$a = bq + r$）<br>
+                    $$\mathbf{\gcd(a, b) = \gcd(b, r)} \quad \text{（「a と b の最大公約数」$=$「b と 余り r の最大公約数」）}$$
+                    余りが $0$ になったときの<b>最後の割り手（除数）</b>が最大公約数となる。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">💡 具体例： $\gcd(221, 153)$ を求める</div>
+                <div style="font-size: 10pt;">
+                    ・ $221 = 153 \times 1 + 68 \implies \gcd(221, 153) = \gcd(153, 68)$<br>
+                    ・ $153 = 68 \times 2 + 17 \implies \gcd(153, 68) = \gcd(68, 17)$<br>
+                    ・ $68 = 17 \times 4 + 0 \implies$ 余りが $0$ になったので最大公約数は <b>$\mathbf{17}$</b>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド4 (5/10)：4. 1次不定方程式 ax + by = c -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 1次不定方程式 $ax + by = c$ の解法</h2>
+                <span class="badge">最重要パターン</span>
+            </div>
+            <div class="content-box">
+                <p>整数解をもつ条件と、一般解を求めるための 3ステップ解法。</p>
+
+                <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 解が存在する条件と解法手順</p>
+                    $a, b$ が互いに素なとき、$ax + by = 1$ には必ず整数解が存在する。
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li><b>特殊解を1組見つける：</b> $(x, y) = (x_0, y_0)$ （互除法を逆算して探索）</li>
+                        <li><b>元の式との引き算：</b> $a(x - x_0) + b(y - y_0) = 0 \implies a(x - x_0) = -b(y - y_0)$</li>
+                        <li><b>「互いに素」を利用：</b> $x - x_0 = bk \implies \mathbf{x = bk + x_0, \ y = -ak + y_0 \quad (k \in \mathbb{Z})}$</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">互除法の逆算（特殊解の発見）</div>
+                <div>
+                    係数が大きく目視で特殊解が見つからない場合は、<b>ユークリッドの互除法の計算過程を「余り $=$ 」の形に変形して代入代入で遡る</b>ことで確実に1組の解が得られる。
+                </div>
+            </div>
+        </div>
+        <!-- スライド：合同式（mod）の基本と活用 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>余り計算の強力な武器：合同式（mod）</h2>
+                <span class="badge">余りの世界</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;">割り算の<b>「余り」だけに注目</b>して、複雑な巨大数の計算を簡略化する表記法。</p>
+
+                <!-- 定義の解説ボックス -->
+                <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 12px 15px; margin-bottom: 10px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">■ 合同式の定義</p>
+                    $a$ と $b$ を $m$ で割った余りが等しいとき、<b>「$a$ と $b$ は $m$ を模として合同」</b>といい、次のように書く。
+                    $$\mathbf{a \equiv b \pmod{m}} \iff \mathbf{a - b \text{ は } m \text{ の倍数}}$$
+                    <span style="font-size: 9pt; color: #718096;">（例： $17 \equiv 3 \pmod{7}$ は、17 も 3 も 7 で割った余りが 3 であることを意味する）</span>
+                </div>
+
+                <!-- 性質の解説ボックス -->
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #cbd5e0; padding: 12px 15px; font-size: 10pt; font-weight: normal; margin-bottom: 0;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">■ 合同式の 4大性質（$a \equiv b, \ c \equiv d \pmod{m}$ のとき）</p>
+                    <div style="line-height: 1.8;">
+                        ・ <b>足し算・引き算：</b> $a \pm c \equiv b \pm d \pmod{m}$<br>
+                        ・ <b>掛け算：</b> $a \cdot c \equiv b \cdot d \pmod{m}$<br>
+                        ・ <b>累乗（最重要）：</b> $\mathbf{a^k \equiv b^k \pmod{m}}$ （何乗しても余りの関係は保たれる！）
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">💡 具体例： $3^{100}$ を 7 で割った余りを求める</div>
+                <div style="font-size: 9.5pt; line-height: 1.6;">
+                    $3^1 \equiv 3$, $\ 3^2 \equiv 2$, $\ \mathbf{3^3 = 27 \equiv -1 \pmod{7}}$ に着目する。<br>
+                    両辺を 33 乗すると： $(3^3)^{33} \equiv (-1)^{33} \implies 3^{99} \equiv -1 \pmod{7}$<br>
+                    両辺に 3 を掛けると： $3^{100} \equiv -1 \times 3 = -3 \equiv \mathbf{4 \pmod{7}}$ $\to$ <b>余りは 4</b>
+                </div>
+            </div>
+        </div>
+        <!-- スライド：n進法の仕組みと相互変換 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>n進法の仕組みと相互変換</h2>
+                <span class="badge">記数法</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;"><b>「$n$ 個集まると上の位へ繰り上がる」</b>考え方。日常の10進数を基軸に構造を理解する。</p>
+
+                <!-- 定義・位取りの解説ボックス -->
+                <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 12px 15px; margin-bottom: 10px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">■ n進数の位取り（重み付け）</p>
+                    $n$ 進数 $a_3 a_2 a_1 a_0 \ _{(n)}$ は、各桁に <b>$n^0, n^1, n^2, n^3 \dots$ の重み</b>がついている。
+                    $$a_3 a_2 a_1 a_0 \ _{(n)} = a_3 \times n^3 + a_2 \times n^2 + a_1 \times n^1 + a_0 \times n^0$$
+                    <span style="font-size: 9pt; color: #718096;">（例： 2進数は $0, 1$ の2つの数字のみ、5進数は $0, 1, 2, 3, 4$ の5つの数字のみで表現する）</span>
+                </div>
+
+                <!-- 相互変換アルゴリズムの解説ボックス -->
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #cbd5e0; padding: 12px 15px; font-size: 10pt; font-weight: normal; margin-bottom: 0;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">■ 10進数 と n進数 の相互変換アルゴリズム</p>
+                    <div style="line-height: 1.8;">
+                        ・ <b>n進数 $\to$ 10進数：</b> 各桁に $n^k$ を掛けて<b>展開して足し合わせる</b>。<br>
+                        ・ <b>10進数 $\to$ n進数：</b> もとの数を $n$ で割り続け、<b>商が $0$ になるまでの「あまり」を逆順に並べる</b>。
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">💡 少数への拡張（n進小数の重み）</div>
+                <div style="font-size: 9.5pt; line-height: 1.6;">
+                    小数点の右側は <b>$\frac{1}{n}, \frac{1}{n^2}, \frac{1}{n^3} \dots$ の重み</b>がつく。<br>
+                    例： $0.11_{(2)} = 1 \times \frac{1}{2^1} + 1 \times \frac{1}{2^2} = \frac{1}{2} + \frac{1}{4} = \mathbf{0.75}$
+                </div>
+            </div>
+        </div>
+        <!-- スライド：整数問題を解くための3原則 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>整数問題を解くための3原則（解法のTips）</h2>
+                <span class="badge">アプローチの鉄則</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;">未知の整数問題を前にしたとき、まずは以下の<b>3原則のどれに当てはめるか</b>を検討する。</p>
+
+                <div class="problem-text" style="font-size: 10pt; font-weight: normal; padding: 12px 15px; margin-bottom: 8px; background-color: #f4f7f9; border: 1px solid #cbd5e0;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 3px;">① 足し算は掛け算になるべく直す（積の形を作る）</p>
+                    <div style="line-height: 1.6;">
+                        ・ <b>狙い：</b> 「整数 $\times$ 整数 $=$ 整数（定数）」の形を作ることで、<b>約数の候補に絞り込む</b>。<br>
+                        ・ <b>例：</b> $xy - 2x - 3y = 0 \implies (x - 3)(y - 2) = 6$ （6の約数ペアに限定できる）
+                    </div>
+                </div>
+
+                <div class="problem-text" style="font-size: 10pt; font-weight: normal; padding: 12px 15px; margin-bottom: 8px; background-color: #fffaf0; border: 1px solid #fbd38d;">
+                    <p style="font-weight: bold; color: #dd6b20; margin-bottom: 3px;">② 倍数・あまりに着目する（周期性・合同式）</p>
+                    <div style="line-height: 1.6;">
+                        ・ <b>狙い：</b> 余りで分類して<b>不可能なケースを排除する</b>（奇数・偶数、3で割った余りなど）。<br>
+                        ・ <b>例：</b> $n^2$ を 3 で割った余りは $0$ か $1$ にしかならない（$2$ には絶対にならない）ことを利用する。
+                    </div>
+                </div>
+
+                <div class="problem-text" style="font-size: 10pt; font-weight: normal; padding: 12px 15px; margin-bottom: 0; background-color: #f7fafc; border: 1px solid #e2e8f0;">
+                    <p style="font-weight: bold; color: #2b6cb0; margin-bottom: 3px;">③ 範囲・条件で絞る（不等式の活用）</p>
+                    <div style="line-height: 1.6;">
+                        ・ <b>狙い：</b> 解の候補が無限に広がらないよう、<b>不等式を作って有限個に追い詰める</b>。<br>
+                        ・ <b>例：</b> $a \leqq b \leqq c$ のとき $\frac{1}{a} + \frac{1}{b} + \frac{1}{c} = 1 \implies 1 \leqq \frac{3}{a} \implies a \leqq 3$
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 8px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">思考のフロー</div>
+                <div style="font-size: 9.5pt;">
+                    問題文に「整数解を求めよ」「自然数 $n$」とあったら、まずは <b>「積の形（①）」$\to$ 「あまりの分類（②）」$\to$ 「範囲の絞り込み（③）」</b> の順で突破口を探すのが定石です。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5 (6/10)：演習問題［1］約数の個数と総和 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［1］：約数の個数と総和</h2>
+                <span class="badge">基本レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $200$ の正の約数の個数、およびそれらの総和を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    まず $200$ を素因数分解する：<br>
+                    $$200 = 2^3 \times 5^2$$
+                    ・ <b>正の約数の個数：</b><br>
+                    $\quad (3 + 1)(2 + 1) = 4 \times 3 = \mathbf{12 \text{ 個}}$<br><br>
+                    ・ <b>正の約数の総和：</b><br>
+                    $\quad (1 + 2 + 2^2 + 2^3)(1 + 5 + 5^2) = (1 + 2 + 4 + 8)(1 + 5 + 25) = 15 \times 31 = \mathbf{465}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6 (7/10)：演習問題［2］最大公約数・最小公倍数 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［2］：2整数の決定</h2>
+                <span class="badge">標準レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    最大公約数が $12$、最小公倍数が $180$ である 2つの自然数 $a, b$ ($a < b$) の組をすべて求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    $a = 12a', \ b = 12b'$ （$a', b'$ は<b>互いに素な自然数で $a' < b'$</b>）とおける。<br>
+                    最小公倍数の条件より： $12 a' b' = 180 \implies a' b' = 15$<br>
+                    積が $15$ であり、互いに素かつ $a' < b'$ を満たす自然数 $(a', b')$ の組は：<br>
+                    $\quad (a', b') = (1, 15), \ (3, 5)$<br>
+                    それぞれ $12$ 倍して求める自然数 $(a, b)$ の組は：<br>
+                    $\quad \mathbf{(a, b) = (12, 180), \ (36, 60)}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド7 (8/10)：演習問題［3］1次不定方程式の一般解 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［3］：1次不定方程式 ax+by=1</h2>
+                <span class="badge">標準・頻出</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    方程式 $7x - 3y = 1$ のすべての整数解（一般解）を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    ・ <b>特殊解の発見：</b> $x = 1, y = 2$ は $7(1) - 3(2) = 1$ を満たす。<br>
+                    ・ <b>引き算：</b><br>
+                    $$\begin{aligned} 7x - 3y &= 1 \\ -) \ 7(1) - 3(2) &= 1 \\ \hline 7(x - 1) - 3(y - 2) &= 0 \implies 7(x - 1) = 3(y - 2) \end{aligned}$$
+                    $7$ と $3$ は互いに素であるため、$x - 1$ は $3$ の倍数である。即ち $x - 1 = 3k \ (k \in \mathbb{Z})$ とおける。<br>
+                    代入すると $7(3k) = 3(y - 2) \implies y - 2 = 7k$<br>
+                    したがって一般解は： $\mathbf{x = 3k + 1, \ y = 7k + 2 \quad (k \text{ は整数})}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8 (9/10)：演習問題［4］n進法の変換 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［4］：n進法の変換</h2>
+                <span class="badge">記数法</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    (1) 10進数の $43$ を 2進法で表せ。<br>
+                    (2) 5進法で表された数 $234_{(5)}$ を 10進法で表せ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>(1) 10進数 $\to$ 2進数（2で割った余りを下から並べる）：</b><br>
+                    $43 \div 2 = 21 \cdots 1$<br>
+                    $21 \div 2 = 10 \cdots 1$<br>
+                    $10 \div 2 = 5 \cdots 0$<br>
+                    $5 \div 2 = 2 \cdots 1$<br>
+                    $2 \div 2 = 1 \cdots 0 \implies 1 \div 2 = 0 \cdots 1$<br>
+                    余りを逆から並べて： $\mathbf{101011_{(2)}}$<br><br>
+                    <b>(2) 5進数 $\to$ 10進数（重み付けを展開）：</b><br>
+                    $234_{(5)} = 2 \times 5^2 + 3 \times 5^1 + 4 \times 5^0 = 2 \times 25 + 3 \times 5 + 4 \times 1 = 50 + 15 + 4 = \mathbf{69}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9 (10/10)：まとめ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>整数の性質のまとめ</h2>
+                <span class="badge">総括</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-weight: normal; font-size: 11pt;">
+                    <ol style="margin-left: 20px; line-height: 2;">
+                        <li><b>素因数分解：</b> 全ての自然数の素構造を可視化する基本ツール（約数の個数・総和の土台）。</li>
+                        <li><b>互いに素：</b> $a = ga', b = gb'$ （$\gcd(a',b')=1$）や $ab = gl$ などの公約数・公倍数立式の核心。</li>
+                        <li><b>ユークリッドの互除法：</b> 割り算の余りを追跡して大きな数のGCD導出や不定方程式の特殊解探索に活用。</li>
+                        <li><b>1次不定方程式：</b> 特殊解を1組見つけ、差をとって「互いに素」の条件から一般解 $k$ を導出する。</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">学習のアドバイス</div>
+                <div>整数の問題は「あまりに注目する（余りの分類）」「因数分解の形 $A \times B = C$（整数）を作る」「不等式で範囲を絞り込む」の3大解法アプローチが非常に有効です。パターンを押さえて解き筋を見極めましょう。</div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 10</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 約数の個数と総和</button>
+            <button onclick="goToSlide(2)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. 最大公約数と最小公倍数</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. ユークリッドの互除法</button>
+            <button onclick="goToSlide(4)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 1次不定方程式 ax+by=c</button>
+            <button onclick="goToSlide(8)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 演習［1］約数の個数・総和</button>
+            <button onclick="goToSlide(9)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">7. 演習［2］2整数の決定</button>
+            <button onclick="goToSlide(10)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">8. 演習［3］1次不定方程式</button>
+            <button onclick="goToSlide(11)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">9. 演習［4］n進法の変換</button>
+            <button onclick="goToSlide(12)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">10. まとめ</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

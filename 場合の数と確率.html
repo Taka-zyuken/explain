@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学A 場合の数と確率</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド0 (1/10)：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 34pt; color: #1a365d; margin-bottom: 20px;">数学A_場合の数と確率</h1>
+                <p style="font-size: 18pt; color: #4a5568;">和の法則・積の法則・順列 P・組合せ C・反復試行・条件付き確率</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド1 (2/10)：1. 順列 P と特異な順列 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. 順列（並べ方）と様々な特殊順列</h2>
+                <span class="badge">順番を考慮</span>
+            </div>
+            <div class="content-box">
+                <p>異なる $n$ 個から $r$ 個を選んで<b>順番に並べる</b>方法の総数。</p>
+
+                <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">■ 順列公式： $\mathbf{{}_n\mathrm{P}_r = \frac{n!}{(n-r)!} = n(n-1)\cdots(n-r+1)}$</p>
+                    <ul style="margin-top: 6px;">
+                        <li><b>円順列（首飾りで裏返せない場合）：</b> $n$ 個の円形並べ方 $\implies \mathbf{(n - 1)!}$ （1箇所を固定）</li>
+                        <li><b>じゅず順列（ひっくり返せる場合）：</b> $\mathbf{\frac{(n - 1)!}{2}}$</li>
+                        <li><b>重複順列：</b> 繰り返し選んで並べる $\implies \mathbf{n^r}$</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">💡 隣り合う・隣り合わないの解法鉄則</div>
+                <div style="font-size: 10pt;">
+                    ・ <b>「隣り合う」：</b> 隣り合うものを<b>1つの固まり（束）</b>とみなして全体を並べ、最後に束の中の並べ方を掛ける。<br>
+                    ・ <b>「隣り合わない」：</b> 条件のない方を先に並べ、その<b>「隙間」に挟み込む</b>。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2 (3/10)：2. 組合せ C と重複組合せ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 組合せ（選び方）と重複組合せ</h2>
+                <span class="badge">順番を問わない</span>
+            </div>
+            <div class="content-box">
+                <p>異なる $n$ 個から順序を区別せず $r$ 個を<b>選ぶだけ</b>の総数。</p>
+
+                <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">■ 組合せ公式： $\mathbf{{}_n\mathrm{C}_r = \frac{{}_n\mathrm{P}_r}{r!} = \frac{n!}{r!(n-r)!}}$  （性質: ${}_n\mathrm{C}_r = {}_n\mathrm{C}_{n-r}$）</p>
+                    
+                    <p style="font-weight: bold; color: #1a365d; margin-top: 10px; margin-bottom: 4px;">■ 重複組合せ（仕切り棒の考え方）： $\mathbf{{}_n\mathrm{H}_r = {}_{n+r-1}\mathrm{C}_r}$</p>
+                    $n$ 種類のものから重複を許して $r$ 個選ぶ手法（$\mathbf{r}$ 個の「〇」と $\mathbf{n-1}$ 本の「仕切り $|$」の並べ替え）。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">「同じものを含む順列」と C の関係</div>
+                <div>
+                    $a, a, a, b, b$ の 5文字の並べ替えは $\frac{5!}{3!2!} = {}_5\mathrm{C}_3 = 10$ 通り。<br>
+                    「同じものを含む順列」は「組合せ ${}_n\mathrm{C}_r$」の考え方と完全に一致する。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド2 (3/10)：2. 組合せ C と重複組合せ（被りあり） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 組合せ C と重複組合せ（被りあり）</h2>
+                <span class="badge">選び方の徹底比較</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;">被りなし（区別して選ぶ）の <b>${}_n\mathrm{C}_r$</b> と、被りあり（同じものを何度選んでもよい）の <b>${}_n\mathrm{H}_r$</b>。</p>
+
+                <!-- 上部：普通の組合せ C -->
+                <div class="problem-text" style="font-size: 10pt; font-weight: normal; padding: 10px 15px; margin-bottom: 10px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 3px;">■ 被りなしの組合せ： $\mathbf{{}_n\mathrm{C}_r = \frac{n!}{r!(n-r)!}}$</p>
+                    異なる $n$ 個から重複を許さずに $r$ 個を選ぶ方法（例: 5人から委員2人を選ぶ $\implies {}_5\mathrm{C}_2$）。
+                </div>
+
+                <!-- 被りありの組合せ（重複組合せ）の導出・考え方 -->
+                <div class="problem-text" style="background-color: #fffaf0; border: 1px solid #fbd38d; padding: 12px 15px; font-size: 9.5pt; font-weight: normal; margin-bottom: 0;">
+                    <p style="font-weight: bold; color: #dd6b20; margin-bottom: 4px;">💡 被りあり（重複組合せ）の求め方： 「〇（選びたい個数）」と「$|$（仕切り）」の並べ替え</p>
+                    <div style="line-height: 1.7;">
+                        $n$ 種類のものから重複を許して $r$ 個選ぶとき、アイテム自体ではなく<b>「枠組み（グループ）を区切る $(n-1)$ 本の仕切り $|$」</b>と<b>「選ぶ総数 $r$ 個の 〇」</b>の並べ替えに置き換える！<br>
+                        $$\mathbf{{}_n\mathrm{H}_r = {}_{n+r-1}\mathrm{C}_r} \quad \left(\text{「合計位置 } n+r-1 \text{ 箇所」から「〇を置く } r \text{ 箇所」を選ぶ}\right)$$
+                        
+                        <!-- 具体例ビジュアル表示 -->
+                        <div style="background-color: #ffffff; border: 1px dashed #dd6b20; padding: 8px 12px; border-radius: 6px; margin-top: 6px;">
+                            <b>【例】 A, B, C の3種類（$n=3$）から重複を許して 4個（$r=4$）選ぶ場合：</b><br>
+                            ・ 仕切り： $3 - 1 = 2$ 本 （$|$ $|$）<br>
+                            ・ 〇： $4$ 個 （〇 〇 〇 〇）<br>
+                            ・ <b>パターン例：</b> 〇 〇 $|$ 〇 $|$ 〇 $\implies$ <b>Aが2個、Bが1個、Cが1個</b> を選んだことを意味する！<br>
+                            ・ <b>計算式：</b> ${}_3\mathrm{H}_4 = {}_{3+4-1}\mathrm{C}_4 = {}_6\mathrm{C}_4 = {}_6\mathrm{C}_2 = \mathbf{15 \text{ 通り}}$
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">判別（立式）のコツ</div>
+                <div style="font-size: 9.5pt;">
+                    問題文に<b>「同じものを何度選んでもよい」「空の箱があってもよい分配」</b>といったキーワードが出たら重複組合せ（被りあり）です。<b>「個数 $r$」</b>と<b>「種類の区切り $(n-1)$」</b>の和から ${}_{n+r-1}\mathrm{C}_r$ を立式しましょう。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド4 (5/10)：4. 条件付き確率 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 条件付き確率 $P_A(B)$</h2>
+                <span class="badge">頻出・差がつく</span>
+            </div>
+            <div class="content-box">
+                <p>事象 $A$ が起こったという<b>「情報が判明した（全事象が A に縮小した）」</b>下で事象 $B$ が起こる確率。</p>
+
+                <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 15px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">■ 条件付き確率の公式</p>
+                    $$\mathbf{P_A(B) = \frac{P(A \cap B)}{P(A)} = \frac{n(A \cap B)}{n(A)}}$$
+                    全事象 $U$ ではなく、<b>$A$ の世界（または $n(A)$ の要素数）を分母の基準</b>として割合を再計算する。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">確率の乗法定理</div>
+                <div>
+                    $P(A \cap B) = P(A) \cdot P_A(B)$<br>
+                    「くじ引きで1人目が当たり、かつ2人目も当たる確率」のように、順を追って連続して事象が発生する計算の土台となる。
+                </div>
+            </div>
+            <br>
+            <div class="content-box">
+                <p style="margin-bottom: 8px;">条件付き確率の本質は<b>「判定や情報によって、全体の分母が狭まる（縮小する）」</b>ことにある。</p>
+
+                <!-- 具体的な状況設定 -->
+                <div class="problem-text" style="font-size: 10pt; font-weight: normal; padding: 10px 15px; margin-bottom: 10px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 3px;">💡 状況設定： 10,000 人の集団と検査薬（精度 95%）</p>
+
+                    <!-- 表による全体像の可視化 -->
+                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 9.5pt; margin-top: 6px; background-color: #ffffff;">
+                        <thead>
+                            <tr style="background-color: #edf2f7; color: #1a365d;">
+                                <th style="padding: 6px; border: 1px solid #cbd5e0;"></th>
+                                <th style="padding: 6px; border: 1px solid #cbd5e0;">実際に病気 (100人)</th>
+                                <th style="padding: 6px; border: 1px solid #cbd5e0;">健康な人 (9,900人)</th>
+                                <th style="padding: 6px; border: 1px solid #cbd5e0;">合計</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #cbd5e0; font-weight: bold; background-color: #fffaf0; color: #e53e3e;">陽性反応</td>
+                                <td style="padding: 6px; border: 1px solid #cbd5e0; font-weight: bold; color: #2b6cb0;">95人</td>
+                                <td style="padding: 6px; border: 1px solid #cbd5e0;">495人</td>
+                                <td style="padding: 6px; border: 1px solid #cbd5e0; font-weight: bold; background-color: #fffaf0;">590人</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #cbd5e0; font-weight: bold;">陰性反応</td>
+                                <td style="padding: 6px; border: 1px solid #cbd5e0;">5人</td>
+                                <td style="padding: 6px; border: 1px solid #cbd5e0;">9,405人</td>
+                                <td style="padding: 6px; border: 1px solid #cbd5e0;">9,410人</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 計算の思考プロセス -->
+                <div class="problem-text" style="background-color: #fffaf0; border: 1px solid #fbd38d; padding: 12px 15px; font-size: 9.5pt; font-weight: normal; margin-bottom: 0;">
+                    <p style="font-weight: bold; color: #dd6b20; margin-bottom: 3px;">🔍 「検査結果が陽性だったとき、本当に病気である確率」 $P_{\text{陽性}}(\text{病気})$</p>
+                    <div style="line-height: 1.7;">
+                        1. 全事象 10,000 人のうち、<b>「陽性」と判定されたのは 590 人</b>（分母が 590 に縮小）。<br>
+                        2. その 590 人の中で、<b>本当に病気なのは 95 人</b>（分子）。<br>
+                        3. 求める条件付き確率： $\mathbf{P_{\text{陽性}}(\text{病気}) = \frac{95}{590} \approx 0.161 \quad (\text{約 } 16.1\%)}$
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">なぜ約 16% になってしまうのか？</div>
+                <div style="font-size: 9.5pt;">
+                    精度 95% の検査でも、もともと病気にかかっている人が少ない場合、<b>「健康な人が誤って陽性になる人数（495人）」が「本当に病気で陽性になる人数（95人）」を上回ってしまう</b>ためです。「陽性という条件がついたことで、世界（分母）が 590人に絞られた」と捉えるのが条件付き確率の本質です。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5 (6/10)：演習問題［1］条件付き順列 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［1］：隣り合う順列と円順列</h2>
+                <span class="badge">基本レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    男子 4人、女子 2人の合計 6人が1列に並ぶとき、女子 2人が隣り合う並び方は何通りあるか。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    ・ <b>女子2人を「1つの固まり（束）」とみなす：</b><br>
+                    $\quad$ 男子4人 $+$ 女子グループ1束 $=$ 5つのものを1列に並べる $\implies 5! = 120$ 通り<br><br>
+                    ・ <b>女子グループ内の並び替え：</b><br>
+                    $\quad$ 女子2人の左右の入れ替え $\implies 2! = 2$ 通り<br><br>
+                    積の法則より： $\mathbf{120 \times 2 = 240 \text{ 通り}}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6 (7/10)：演習問題［2］重複組合せ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［2］：重複組合せ（リンゴと仕切り）</h2>
+                <span class="badge">標準レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    3種類のお菓子 A, B, C から、重複を許して合計 6個 を選ぶ方法は何通りあるか。ただし、選ばないお菓子があってもよいものとする。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    3種類に分配するための<b>「仕切り 2本（$3-1$）」</b>と<b>「〇 6個」</b>の並べ替えとして捉える。<br><br>
+                    公式 ${}_n\mathrm{H}_r = {}_{n+r-1}\mathrm{C}_r$ より（$n=3, \ r=6$）：<br>
+                    $${}_3\mathrm{H}_6 = {}_{3+6-1}\mathrm{C}_6 = {}_8\mathrm{C}_6 = {}_8\mathrm{C}_2$$
+                    $${}_8\mathrm{C}_2 = \frac{8 \times 7}{2 \times 1} = \mathbf{28 \text{ 通り}}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド7 (8/10)：演習問題［3］反復試行の確率 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［3］：反復試行と動点問題</h2>
+                <span class="badge">標準・頻出</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    1個のサイコロを 5回 投げるとき、1の目がちょうど 3回 出る確率を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    1回の投擲で「1の目が出る確率」は $p = \frac{1}{6}$、「1以外の目が出る確率」は $1-p = \frac{5}{6}$ である。<br><br>
+                    5回中 ちょうど3回「1の目」が出る反復試行の公式より：<br>
+                    $$P = {}_5\mathrm{C}_3 \left(\frac{1}{6}\right)^3 \left(\frac{5}{6}\right)^{5-3} = 10 \times \frac{1}{216} \times \frac{25}{36} = \frac{250}{7776} = \mathbf{\frac{125}{3888}}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8 (9/10)：演習問題［4］条件付き確率 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［4］：条件付き確率（原因の確率）</h2>
+                <span class="badge">応用・最重要</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    箱 A には赤玉 3個・白玉 2個、箱 B には赤玉 1個・白玉 4個 が入っている。コインを投げて表なら A、裏なら B を選んで玉を 1個 取り出したところ、赤玉であった。このとき、取り出した赤玉が箱 A から選ばれた確率を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    事象 $R$: 「赤玉が出る」、事象 $A$: 「箱 A を選ぶ」 とする。<br>
+                    ・ <b>箱 A を選んで赤玉が出る確率：</b> $P(A \cap R) = \frac{1}{2} \times \frac{3}{5} = \frac{3}{10}$<br>
+                    ・ <b>箱 B を選んで赤玉が出る確率：</b> $P(B \cap R) = \frac{1}{2} \times \frac{1}{5} = \frac{1}{10}$<br>
+                    ・ <b>赤玉が出る全体確率：</b> $P(R) = \frac{3}{10} + \frac{1}{10} = \frac{4}{10}$<br><br>
+                    求める条件付き確率 $P_R(A)$ は：<br>
+                    $$P_R(A) = \frac{P(A \cap R)}{P(R)} = \frac{3/10}{4/10} = \mathbf{\frac{3}{4}}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9 (10/10)：まとめ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>場合の数と確率のまとめ</h2>
+                <span class="badge">総括</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-weight: normal; font-size: 11pt;">
+                    <ol style="margin-left: 20px; line-height: 2;">
+                        <li><b>区別の意識：</b> 「順序を区別するか（$P$）」それとも「選ぶだけか（$C$）」を問題文から見極める。</li>
+                        <li><b>重複組合せ：</b> 「異なる枠組みに同じものを分ける」構造は仕切り棒（${}_n\mathrm{H}_r$）に変換。</li>
+                        <li><b>反復試行：</b> 独立な試行の繰り返しは ${}_n\mathrm{C}_r p^r (1-p)^{n-r}$。余事象（少なくとも1回）も活用。</li>
+                        <li><b>条件付き確率：</b> 「〜であったとき」は分母を全体の $U$ から「条件の起こる集合」に縮小して計算する。</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">学習のアドバイス</div>
+                <div>場合の数・確率は<b>「同様に確からしい」根本概念の理解</b>と<b>問題文の正確な読解</b>が命です。公式を闇雲に当てはめるのではなく「全体で何通りあり、該当するのは何通りか」を樹形図やベン図でイメージしながら解きましょう。</div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 10</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 順列 P と特殊順列</button>
+            <button onclick="goToSlide(2)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. 組合せ C と重複組合せ</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. 確率の基本と反復試行</button>
+            <button onclick="goToSlide(4)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 条件付き確率</button>
+            <button onclick="goToSlide(5)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 演習［1］条件付き順列</button>
+            <button onclick="goToSlide(6)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">7. 演習［2］重複組合せ</button>
+            <button onclick="goToSlide(7)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">8. 演習［3］反復試行</button>
+            <button onclick="goToSlide(8)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">9. 演習［4］条件付き確率</button>
+            <button onclick="goToSlide(9)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">10. まとめ</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
