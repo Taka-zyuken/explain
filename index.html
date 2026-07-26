@@ -3,104 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数学の解説トップページ</title>
+    <title>高校数学 解説スライドポータル</title>
     <style>
-        /* 全体の基本設定 */
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --sub-text: #718096;
+            --primary-color: #2b6cb0;
+            --border-color: #e2e8f0;
+            --hover-bg: #ebf8ff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a202c;
+            --card-bg: #2d3748;
+            --text-color: #f7fafc;
+            --sub-text: #a0aec0;
+            --primary-color: #63b3ed;
+            --border-color: #4a5568;
+            --hover-bg: #2c5282;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            margin: 0;
-            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 40px 20px;
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            position: relative;
         }
 
-        h1 {
+        .top-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .theme-btn {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .header {
             text-align: center;
-            color: #2c3e50;
             margin-bottom: 30px;
-            font-size: 24px;
-            border-bottom: 2px solid #eef2f5;
-            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
         }
 
-        /* カテゴリーの見出し */
+        .header h1 {
+            color: var(--text-color);
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--sub-text);
+            font-size: 14px;
+        }
+
+        /* 検索バー */
+        .search-box {
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .category-group {
+            margin-bottom: 35px;
+        }
+
         .category-title {
-            font-size: 18px;
-            color: #2c3e50;
-            margin-top: 25px;
-            margin-bottom: 12px;
-            padding-left: 10px;
-            border-left: 4px solid #3498db;
+            font-size: 20px;
+            color: var(--text-color);
+            margin-bottom: 16px;
+            padding-left: 12px;
+            border-left: 5px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* リンク一覧のグリッドレイアウト */
+        .category-badge {
+            font-size: 11px;
+            background: var(--bg-color);
+            color: var(--sub-text);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
         .grid-list {
             list-style: none;
-            padding: 0;
-            margin: 0 0 20px 0;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 15px;
         }
 
-        /* カード風ボタンのデザイン */
-        .grid-list a {
-            display: block;
-            padding: 18px 20px;
-            background-color: #ffffff;
-            color: #34495e;
-            text-decoration: none;
-            border: 2px solid #e0e6ed;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-            transition: all 0.2s ease;
+        .grid-list li.hidden {
+            display: none;
         }
 
-        /* ホバー（マウスを乗せた時）の動き */
+        .grid-list a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 20px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            text-decoration: none;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            text-align: center;
+        }
+
         .grid-list a:hover {
-            border-color: #3498db;
-            background-color: #f0f8ff;
-            color: #2980b9;
+            border-color: var(--primary-color);
+            background-color: var(--hover-bg);
+            color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.15);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 25px 18px; }
+            .grid-list { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+            .grid-list a { padding: 12px 14px; font-size: 13.5px; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>数学の解説ページ一覧</h1>
-        <h2 class="category-title">数Ⅰ・A</h2>
-        <ul class="grid-list">
-            <!--<li><a href="数列.html">数列</a></li>-->
-        </ul>
+        <div class="top-controls">
+            <button class="theme-btn" onclick="toggleTheme()">🌙 ダークモード</button>
+        </div>
+
+        <div class="header">
+            <h1>高校数学 解説スライド ポータル</h1>
+            <p>単元を選択するとインタラクティブな解説スライドへ移動します</p>
+        </div>
+
+        <!-- リアルタイム検索バー -->
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="単元名やキーワードで検索（例: チェバ、2次関数、ベクトル）" oninput="filterCards()">
+        </div>
+
+        <!-- 数Ⅰ・A グループ -->
+        <div class="category-group">
+            <h2 class="category-title">数学Ⅰ・A <span class="category-badge">7単元</span></h2>
+            <ul class="grid-list">
+                <li><a href="数と式・集合と条件.html" data-keywords="展開 因数分解 集合 必要条件 十分条件">数と式・集合と条件</a></li>
+                <li><a href="2次関数.html" data-keywords="頂点 軸 平方完成 判別式 最大最小">2次関数</a></li>
+                <li><a href="三角比.html" data-keywords="サイン コサイン タンジェント 正弦定理 余弦定理 面積">三角比</a></li>
+                <li><a href="データの分析.html" data-keywords="平均値 分散 標準偏差 箱ひげ図 相関係数">データの分析</a></li>
+                <li><a href="整数.html" data-keywords="素因数分解 ユークリッドの互除法 不定方程式 合同式 n進法 3原則">整数の性質</a></li>
+                <li><a href="場合の数と確率.html" data-keywords="順列 P 組合せ C 重複組合せ 反復試行 条件付き確率">場合の数と確率</a></li>
+                <li><a href="図形.html" data-keywords="五心 重心 内心 外心 チェバ メネラウス 円に内接 方べき">図形の性質</a></li>
+            </ul>
+        </div>
 
         <!-- 数Ⅱ・B グループ -->
-        <h2 class="category-title">数Ⅱ・B</h2>
-        <ul class="grid-list">
-            <li><a href="数列.html">数列</a></li>
-        </ul>
+        <div class="category-group">
+            <h2 class="category-title">数学Ⅱ・B <span class="category-badge">7単元</span></h2>
+            <ul class="grid-list">
+                <li><a href="図形と方程式.html" data-keywords="軌跡 領域 点と直線の距離 円の方程式">図形と方程式</a></li>
+                <li><a href="指数・対数.html" data-keywords="対数 log 底の変換 常用対数">指数・対数関数</a></li>
+                <li><a href="三角関数.html" data-keywords="孤度法 加法定理 2倍角 合成">三角関数</a></li>
+                <li><a href="微積(数Ⅱ).html" data-keywords="導関数 接線 定積分 面積公式 1/6公式">微分・積分 (数Ⅱ)</a></li>
+                <li><a href="複素数(数2).html" data-keywords="虚数 剰余の定理 解と係数の関係">複素数と方程式</a></li>
+                <li><a href="数列.html" data-keywords="等差 等比 漸化式 数学的帰納法 シグマ Σ">数列</a></li>
+                <li><a href="ベクトル.html" data-keywords="内積 位置ベクトル 成分 空間ベクトル">ベクトル</a></li>
+            </ul>
+        </div>
 
         <!-- 数Ⅲ・C グループ -->
-        <h2 class="category-title">数Ⅲ・C</h2>
-        <ul class="grid-list">
-            <li><a href="放物線.html">放物線</a></li>
-            <li><a href="極限.html">極限</a></li>
-            <li><a href="微分.html">微分</a></li>
-            <li><a href="積分.html">積分</a></li>
-            <li><a href="複素数.html">複素数</a></li>
-        </ul>
+        <div class="category-group">
+            <h2 class="category-title">数学Ⅲ・C <span class="category-badge">6単元</span></h2>
+            <ul class="grid-list">
+                <li><a href="放物線.html" data-keywords="二次曲線 楕円 双曲線 媒介変数">平面上の曲線 (放物線)</a></li>
+                <li><a href="極限.html" data-keywords="無限 ハサミウチ 連続性">極限</a></li>
+                <li><a href="微分.html" data-keywords="商の微分 合成関数 逆関数 凹凸">微分法 (数Ⅲ)</a></li>
+                <li><a href="積分.html" data-keywords="置換積分 部分積分 区分所有法 体積">積分法 (数Ⅲ)</a></li>
+                <li><a href="複素数.html" data-keywords="極形式 ド・モアブル 複素数平面">複素数平面</a></li>
+                <li><a href="確率分布.html" data-keywords="正規分布 期待値 二項分布 推測">確率分布と統計的な推測</a></li>
+            </ul>
+        </div>
     </div>
 
+    <script>
+        // 検索絞り込み処理
+        function filterCards() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const items = document.querySelectorAll('.grid-list li');
+
+            items.forEach(item => {
+                const a = item.querySelector('a');
+                const text = a.textContent.toLowerCase();
+                const keywords = (a.getAttribute('data-keywords') || '').toLowerCase();
+
+                if (text.includes(query) || keywords.includes(query)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        // テーマ切替（ライト/ダーク）
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            const btn = document.querySelector('.theme-btn');
+            btn.innerText = newTheme === 'dark' ? '☀️ ライトモード' : '🌙 ダークモード';
+        }
+
+        // 保存されたテーマの読み込み
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                document.querySelector('.theme-btn').innerText = '☀️ ライトモード';
+            }
+        });
+    </script>
 </body>
 </html>
