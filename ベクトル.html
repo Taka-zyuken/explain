@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学B/C ベクトル（詳細版）</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド0 (1/21)：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 34pt; color: #1a365d; margin-bottom: 20px;">数学B/C_ベクトル（体系的解説）</h1>
+                <p style="font-size: 18pt; color: #4a5568;">平面のベクトル状態・位置ベクトル・空間ベクトル</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド1 (2/21)：1. ベクトルの定義・分解原理 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. ベクトルの定義と分解の原理</h2>
+                <span class="badge">ベクトルの基本</span>
+            </div>
+            <div class="content-box">
+                <p>ベクトルは「向き」と「大きさ」をもつ量であり、始点と終点の差として表される。</p>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <ul>
+                                <li><b>合成・差：</b> $\overrightarrow{\text{AB}} = \overrightarrow{\text{OB}} - \overrightarrow{\text{OA}}$ （後ろ $-$ 前）</li>
+                                <li><b>一次独立（基底）：</b> $\vec{a} \neq \vec{0}, \vec{b} \neq \vec{0}, \vec{a} \nparallel \vec{b}$ のとき、平面上の任意のベクトル $\vec{p}$ は $\vec{p} = s\vec{a} + t\vec{b}$ と<b>ただ1通り</b>に表せる。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（ベクトルの分解） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="140" viewBox="0 0 220 140" style="max-width: 100%; height: auto;">
+                            <defs>
+                                <marker id="arr-b" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#2b6cb0" />
+                                </marker>
+                                <marker id="arr-r" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#e53e3e" />
+                                </marker>
+                            </defs>
+                            <line x1="30" y1="110" x2="110" y2="110" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="3" />
+                            <line x1="110" y1="110" x2="180" y2="30" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="3" />
+                            <line x1="30" y1="110" x2="180" y2="30" stroke="#e53e3e" stroke-width="2.5" marker-end="url(#arr-r)" />
+                            <circle cx="30" cy="110" r="3.5" fill="#1a365d" />
+                            <text x="20" y="125" fill="#1a365d" font-size="10" font-weight="bold">O</text>
+                            <text x="185" y="25" fill="#e53e3e" font-size="10" font-weight="bold">P(p)</text>
+                            <text x="65" y="125" fill="#2b6cb0" font-size="10" font-weight="bold">s a</text>
+                            <text x="155" y="75" fill="#2b6cb0" font-size="10" font-weight="bold">t b</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">一次独立の重要性</div>
+                <div>$s_1\vec{a} + t_1\vec{b} = s_2\vec{a} + t_2\vec{b} \iff s_1 = s_2 \ \text{かつ} \ t_1 = t_2$。係数を比較する思考の根幹となる。</div>
+            </div>
+        </div>
+
+        <!-- スライド2 (3/21)：2. 内積と成分・平行垂直条件 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 内積・成分表示と条件式</h2>
+                <span class="badge">計算の根幹</span>
+            </div>
+            <div class="content-box">
+                <p>内積は「影の長さとの積」を意味するスカラー量である。</p>
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 内積の定義と成分表示（$\vec{a}=(a_1, a_2), \vec{b}=(b_1, b_2)$）</b></p>
+                    $$\vec{a} \cdot \vec{b} = |\vec{a}||\vec{b}|\cos\theta = a_1 b_1 + a_2 b_2$$
+                    <p style="margin-top: 12px; margin-bottom: 8px;"><b>■ ベクトルの平行・垂直条件（成分表示）</b></p>
+                    $$\text{平行 } (\vec{a} /\!/ \vec{b}) \ \iff \ a_1 b_2 - a_2 b_1 = 0 \quad (\vec{b} = k\vec{a})$$
+                    $$\text{垂直 } (\vec{a} \perp \vec{b}) \ \iff \ a_1 b_1 + a_2 b_2 = 0 \quad (\vec{a} \cdot \vec{b} = 0)$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">絶対値の自乗展開</div>
+                <div>$|\vec{a} + t\vec{b}|^2 = |\vec{a}|^2 + 2t(\vec{a} \cdot \vec{b}) + t^2|\vec{b}|^2$ のように、<b>大きさを2乗して内積の形を作る処理</b>は超頻出。</div>
+            </div>
+        </div>
+
+        <!-- スライド3 (4/21)：3. 位置ベクトルと分点・三角形の重心 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>3. 位置ベクトルと分点・重心</h2>
+                <span class="badge">図形の性質</span>
+            </div>
+            <div class="content-box">
+                <p>基準点 $\text{O}$ から見た各点の位置ベクトル $\vec{a}, \vec{b}, \vec{c}$ による表現。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <ul>
+                                <li><b>内分点 $\text{P}$：</b> $\vec{p} = \frac{n\vec{a} + m\vec{b}}{m+n}$</li>
+                                <li><b>外分点 $\text{Q}$：</b> $\vec{q} = \frac{-n\vec{a} + m\vec{b}}{m-n}$</li>
+                                <li><b>$\triangle\text{ABC}$ の重心 $\text{G}$：</b> $\vec{g} = \frac{\vec{a} + \vec{b} + \vec{c}}{3}$</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（重心Gの導出） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="150" viewBox="0 0 220 150" style="max-width: 100%; height: auto;">
+                            <polygon points="110,20 30,130 190,130" fill="none" stroke="#1a365d" stroke-width="2" />
+                            <line x1="110" y1="20" x2="110" y2="130" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="3" />
+                            <circle cx="110" cy="93" r="4" fill="#e53e3e" />
+                            <text x="110" y="12" text-anchor="middle" fill="#1a365d" font-size="10" font-weight="bold">A(a)</text>
+                            <text x="20" y="140" fill="#1a365d" font-size="10" font-weight="bold">B(b)</text>
+                            <text x="195" y="140" fill="#1a365d" font-size="10" font-weight="bold">C(c)</text>
+                            <text x="120" y="95" fill="#e53e3e" font-size="10" font-weight="bold">G(重心)</text>
+                            <text x="115" y="55" fill="#2b6cb0" font-size="9">2</text>
+                            <text x="115" y="115" fill="#2b6cb0" font-size="9">1</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">重心の性質</div>
+                <div>重心 $\text{G}$ は中線 $\text{AM}$ を $2:1$ に内分する点であるため、 $\vec{g} = \frac{\vec{a} + 2\left(\frac{\vec{b}+\vec{c}}{2}\right)}{1+2} = \frac{\vec{a}+\vec{b}+\vec{c}}{3}$ と導出される。</div>
+            </div>
+        </div>
+
+        <!-- スライド4 (5/21)：4. 三角形の五心と位置ベクトル -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 三角形の五心と位置ベクトル</h2>
+                <span class="badge">発展・応用</span>
+            </div>
+            <div class="content-box">
+                <p>重心以外の「心」の位置ベクトル条件（$\triangle\text{ABC}$ の頂点位置ベクトルを $\vec{a}, \vec{b}, \vec{c}$ とする）。</p>
+                <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                    <ul>
+                        <li><b>推進（垂心 $\text{H}$）：</b> $\overrightarrow{\text{AH}} \cdot \overrightarrow{\text{BC}} = 0 \ \text{かつ} \ \overrightarrow{\text{BH}} \cdot \overrightarrow{\text{CA}} = 0$ （各頂点からの垂線の交点）</li>
+                        <li><b>外心 $\text{O}$：</b> $|\overrightarrow{\text{OA}}| = |\overrightarrow{\text{OB}}| = |\overrightarrow{\text{OC}}| = R$ （外接円の半径）</li>
+                        <li><b>内心 $\text{I}$：</b> 各辺の長さを $a, b, c$ としたとき $\quad \vec{i} = \frac{a\vec{a} + b\vec{b} + c\vec{c}}{a + b + c}$</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">オイラー線の関係</div>
+                <div>外心 $\text{O}$、重心 $\text{G}$、垂心 $\text{H}$ は一直線上に並び（オイラー線）、<b>$\overrightarrow{\text{OH}} = 3\overrightarrow{\text{OG}}$ （$\vec{h} = \vec{a} + \vec{b} + \vec{c}$）</b> が成立する。</div>
+            </div>
+        </div>
+
+        <!-- スライド5 (6/21)：直線のベクトル方程式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>直線のベクトル方程式</h2>
+                <span class="badge">図形と方程式</span>
+            </div>
+            <div class="content-box">
+                <!-- 一次独立と平面表現の前提 -->
+                <div style="background-color: #f0f4f8; border-left: 4px solid #2b6cb0; padding: 10px 15px; margin-bottom: 12px; font-size: 10.5pt;">
+                    <b>💡 導入の理論：</b> 一次独立な2つのベクトル $\vec{a}, \vec{b}$（平行でなく $\vec{0}$ でない）があれば、<b>2次元平面上のすべてのベクトルは $\vec{p} = s\vec{a} + t\vec{b}$ と表せる。</b><br>
+                    $\to$ この係数 $s, t$ に<b>「特定の制限」</b>を与えることで、平面全体の点の中から<b>「直線上の点」</b>だけを絞り出すことができる。
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <!-- 左側：公式解説 -->
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="padding: 12px 15px; font-weight: normal; font-size: 10pt; margin-bottom: 0;">
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 3px;">① 異なる2点 $\text{A}(\vec{a}), \text{B}(\vec{b})$ を通る直線（係数和 $= 1$）</p>
+                            <div style="margin-bottom: 10px; font-size: 10.5pt;">
+                                平面上の任意の点表現 $\vec{p} = s\vec{a} + t\vec{b}$ に対し、<b>係数の和を $s + t = 1$ に制限</b>すると、点 $\text{P}$ は直線 $\text{AB}$ 上のみを動く。
+                                $$\vec{p} = (1 - t)\vec{a} + t\vec{b} \quad (t \text{ は実数})$$
+                            </div>
+
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 3px;">② 1点 $\text{A}(\vec{a})$ を通り 方向 $\vec{d}$ に平行な直線</p>
+                            <div style="font-size: 10.5pt;">
+                                点 $\text{A}$ から方向ベクトル $\vec{d}$ に沿って伸縮（$t$ 倍）させる。
+                                $$\vec{p} = \vec{a} + t\vec{d} \quad (t \text{ は実数})$$
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：SVG図解 -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="160" viewBox="0 0 220 160" style="max-width: 100%; height: auto;">
+                            <!-- 背景：平面全体のイメージ（薄いグリッド風） -->
+                            <path d="M 10 140 L 110 20 M 60 140 L 160 20 M 110 140 L 210 20" stroke="#edf2f7" stroke-width="1" />
+                            <path d="M 20 120 L 200 120 M 40 80 L 200 80 M 60 40 L 200 40" stroke="#edf2f7" stroke-width="1" />
+
+                            <!-- 基準点 O -->
+                            <circle cx="30" cy="130" r="3.5" fill="#1a365d" />
+                            <text x="18" y="142" fill="#1a365d" font-size="10" font-weight="bold">O</text>
+
+                            <!-- 直線 AB (絞り込まれた1次元) -->
+                            <line x1="20" y1="90" x2="200" y2="30" stroke="#1a365d" stroke-width="2.5" />
+
+                            <!-- ベクトル a, b, p -->
+                            <line x1="30" y1="130" x2="80" y2="70" stroke="#a0aec0" stroke-width="1.5" />
+                            <line x1="30" y1="130" x2="170" y2="40" stroke="#a0aec0" stroke-width="1.5" />
+                            <line x1="30" y1="130" x2="125" y2="55" stroke="#e53e3e" stroke-width="2" />
+
+                            <!-- 点 A, B, P -->
+                            <circle cx="80" cy="70" r="3.5" fill="#1a365d" />
+                            <text x="75" y="85" fill="#1a365d" font-size="9.5" font-weight="bold">A(a)</text>
+
+                            <circle cx="170" cy="40" r="3.5" fill="#1a365d" />
+                            <text x="175" y="50" fill="#1a365d" font-size="9.5" font-weight="bold">B(b)</text>
+
+                            <circle cx="125" cy="55" r="3.5" fill="#e53e3e" />
+                            <text x="120" y="45" fill="#e53e3e" font-size="9.5" font-weight="bold">P(p)</text>
+
+                            <!-- s+t=1 のラベル注釈 -->
+                            <rect x="75" y="10" width="110" height="18" rx="4" fill="#feefed" stroke="#e53e3e" stroke-width="1" />
+                            <text x="130" y="22" text-anchor="middle" fill="#e53e3e" font-size="8.5" font-weight="bold">s + t = 1 で直線に限定！</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">思考のステップまとめ</div>
+                <div style="font-size: 10pt;">
+                    <b>① 平面全域を表す（自由度2）</b>： $\vec{p} = s\vec{a} + t\vec{b}$ （$s, t$ は自由な実数）<br>
+                    <b>② 直線に絞る（自由度1）</b>： $s + t = 1$ という<b>制約（等式1つ）</b>を加えることで、2次元平面から1次元の「直線」を取り出すことができる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6 (7/21)：点の存在範囲［1］：基礎パターン -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>点の存在範囲［1］：基礎パターン</h2>
+                <span class="badge">ベクトルの領域</span>
+            </div>
+            <div class="content-box">
+                <p>$\overrightarrow{\text{OP}} = s\overrightarrow{\text{OA}} + t\overrightarrow{\text{OB}}$ における係数 $s, t$ の条件と点 $\text{P}$ の動く範囲。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px;">
+                    <!-- 左側：解説テキスト -->
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <ul>
+                                <li><b style="color: #2b6cb0;">$s + t = 1$ ：</b> 直線 $\text{AB}$<br><span style="font-size: 9.5pt; color: #718096;">（※ $s \geqq 0, t \geqq 0$ が付けば<b>線分 $\text{AB}$</b>）</span></li>
+                                <li><b style="color: #e53e3e;">$s + t \leqq 1 \ (s \geqq 0, t \geqq 0)$ ：</b> $\triangle\text{OAB}$ の周および内部</li>
+                                <li><b style="color: #dd6b20;">$0 \leqq s \leqq 1, \ 0 \leqq t \leqq 1$ ：</b> 平行四辺形 $\text{OACB}$ の周および内部</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 右側：SVG図解（基本3パターン） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="150" viewBox="0 0 220 150" style="max-width: 100%; height: auto;">
+                            <!-- 平行四辺形領域 (0<=s<=1, 0<=t<=1) -->
+                            <polygon points="30,120 110,120 170,40 90,40" fill="#fefcbf" opacity="0.6" stroke="#dd6b20" stroke-width="1.5" stroke-dasharray="3,3" />
+                            
+                            <!-- 三角形領域 (s+t <= 1) -->
+                            <polygon points="30,120 110,120 90,40" fill="#ebf8ff" stroke="#2b6cb0" stroke-width="1.5" />
+                            
+                            <!-- 線分 AB (s+t = 1) -->
+                            <line x1="110" y1="120" x2="90" y2="40" stroke="#e53e3e" stroke-width="3" />
+
+                            <!-- 点 O, A, B, C -->
+                            <circle cx="30" cy="120" r="3.5" fill="#1a365d" />
+                            <text x="18" y="130" fill="#1a365d" font-size="10" font-weight="bold">O</text>
+
+                            <circle cx="110" cy="120" r="3.5" fill="#1a365d" />
+                            <text x="115" y="130" fill="#1a365d" font-size="10" font-weight="bold">A</text>
+
+                            <circle cx="90" cy="40" r="3.5" fill="#1a365d" />
+                            <text x="80" y="30" fill="#1a365d" font-size="10" font-weight="bold">B</text>
+
+                            <circle cx="170" cy="40" r="3.5" fill="#dd6b20" />
+                            <text x="175" y="45" fill="#dd6b20" font-size="10" font-weight="bold">C</text>
+
+                            <!-- ラベル -->
+                            <text x="105" y="80" fill="#e53e3e" font-size="9" font-weight="bold">s+t=1</text>
+                            <text x="65" y="95" fill="#2b6cb0" font-size="9" font-weight="bold">s+t≦1</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">思考のポイント：斜交座標</div>
+                <div>$\overrightarrow{\text{OA}}$ と $\overrightarrow{\text{OB}}$ をそれぞれ $x$ 軸・$y$ 軸のように見立てる「<b>斜交座標</b>」として捉えると、通常の直交座標平面上の領域問題（$x+y=1$ や $x+y \leqq 1$ など）とまったく同じ構造であることが理解しやすい。</div>
+            </div>
+        </div>
+
+        <!-- スライド7 (8/21)：点の存在範囲［2］：定数k倍の変形パターン -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>点の存在範囲［2］：変形・応用パターン</h2>
+                <span class="badge">係数処理</span>
+            </div>
+            <div class="content-box">
+                <p>係数の和が $1$ 以外（$s + t = k$ や $a s + b t \leqq k$）の場合の変形手順。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <!-- 左側：解説テキスト -->
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-weight: normal; padding: 15px; font-size: 11pt;">
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">■ 変形ステップ（例: $2s + 3t \leqq 6, \ s \geqq 0, \ t \geqq 0$）</p>
+                            <ol style="margin-left: 15px; line-height: 1.8;">
+                                <li><b>Step 1：</b> 右辺を $1$ にするために全体を $6$ で割る。<br>
+                                    $$\frac{s}{3} + \frac{t}{2} \leqq 1$$
+                                </li>
+                                <li><b>Step 2：</b> $s' = \frac{s}{3}, \ t' = \frac{t}{2}$ と置き換えて $s' + t' \leqq 1$ の形を作る。</li>
+                                <li><b>Step 3：</b> 式を新基底で書き直す。<br>
+                                    $$\overrightarrow{\text{OP}} = s'\underbrace{(3\overrightarrow{\text{OA}})}_{\overrightarrow{\text{OA'}}} + t'\underbrace{(2\overrightarrow{\text{OB}})}_{\overrightarrow{\text{OB'}}}$$
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- 右側：SVG図解（新基底 A', B' による拡大） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="160" viewBox="0 0 220 160" style="max-width: 100%; height: auto;">
+                            <!-- 元の三角形 OAB -->
+                            <polygon points="20,140 60,140 50,100" fill="none" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="2,2" />
+                            
+                            <!-- 拡大された三角形 OA'B' -->
+                            <polygon points="20,140 180,140 140,20" fill="#ebf8ff" stroke="#2b6cb0" stroke-width="2" />
+                            <line x1="180" y1="140" x2="140" y2="20" stroke="#e53e3e" stroke-width="2.5" />
+
+                            <!-- 点 O, A, A', B, B' -->
+                            <circle cx="20" cy="140" r="3.5" fill="#1a365d" />
+                            <text x="10" y="150" fill="#1a365d" font-size="10" font-weight="bold">O</text>
+
+                            <circle cx="60" cy="140" r="2.5" fill="#718096" />
+                            <text x="58" y="153" fill="#718096" font-size="9">A</text>
+
+                            <circle cx="180" cy="140" r="3.5" fill="#2b6cb0" />
+                            <text x="185" y="150" fill="#2b6cb0" font-size="10" font-weight="bold">A'(3A)</text>
+
+                            <circle cx="50" cy="100" r="2.5" fill="#718096" />
+                            <text x="32" y="102" fill="#718096" font-size="9">B</text>
+
+                            <circle cx="140" cy="20" r="3.5" fill="#2b6cb0" />
+                            <text x="145" y="25" fill="#2b6cb0" font-size="10" font-weight="bold">B'(2B)</text>
+
+                            <!-- ラベル -->
+                            <text x="90" y="100" fill="#2b6cb0" font-size="10" font-weight="bold">△OA'B' の内部</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">結論のまとめ</div>
+                <div>点 $\text{P}$ は <b>$\text{A'}(3\text{A})$ と $\text{B'}(2\text{B})$ を頂点とする $\triangle\text{OA'B'}$ の周および内部</b>を動く。面積は元の $\triangle\text{OAB}$ の $3 \times 2 = 6$ 倍となる。</div>
+            </div>
+        </div>
+
+        <!-- スライド8 (9/21)：点の存在範囲［3］：台形・帯状領域パターン -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>点の存在範囲［3］：台形・帯状領域</h2>
+                <span class="badge">不等式挟み</span>
+            </div>
+            <div class="content-box">
+                <p>条件が範囲（$1 \leqq s + t \leqq 2$ など）で与えられるパターンの図形。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <!-- 左側：解説テキスト -->
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-weight: normal; padding: 15px; font-size: 11pt;">
+                            <ul>
+                                <li><b>$1 \leqq s + t \leqq 2 \ (s \geqq 0, t \geqq 0)$ ：</b><br>
+                                    $s + t = 1$（線分 $\text{AB}$）と $s + t = 2$（線分 $\text{A'B'}$）に挟まれた<b>台形領域</b>。
+                                </li>
+                                <li style="margin-top: 10px;"><b>$1 \leqq s \leqq 2, \ 0 \leqq t \leqq 1$ ：</b><br>
+                                    $s$ の範囲が引き延ばされた<b>平行四辺形（または帯状）領域</b>。
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 右側：SVG図解（台形領域） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="160" viewBox="0 0 220 160" style="max-width: 100%; height: auto;">
+                            <!-- 台形領域 (1 <= s+t <= 2) -->
+                            <polygon points="70,110 120,110 170,30 70,30" fill="#feefed" stroke="#e53e3e" stroke-width="1.5" />
+                            
+                            <!-- 内側の境界線 (s+t = 1) -->
+                            <line x1="70" y1="110" x2="120" y2="110" stroke="#a0aec0" stroke-dasharray="2,2" />
+                            <line x1="70" y1="110" x2="70" y2="30" fill="none" stroke="#2b6cb0" stroke-width="2" />
+                            <line x1="120" y1="110" x2="170" y2="30" stroke="#e53e3e" stroke-width="2" />
+
+                            <!-- 基準点 O, A, A', B, B' -->
+                            <circle cx="20" cy="110" r="3.5" fill="#1a365d" />
+                            <text x="10" y="120" fill="#1a365d" font-size="10" font-weight="bold">O</text>
+
+                            <circle cx="70" cy="110" r="3" fill="#1a365d" />
+                            <text x="65" y="125" fill="#1a365d" font-size="9" font-weight="bold">A</text>
+
+                            <circle cx="120" cy="110" r="3" fill="#e53e3e" />
+                            <text x="120" y="125" fill="#e53e3e" font-size="9" font-weight="bold">A'(2A)</text>
+
+                            <circle cx="70" cy="30" r="3" fill="#1a365d" />
+                            <text x="55" y="25" fill="#1a365d" font-size="9" font-weight="bold">B</text>
+
+                            <circle cx="170" cy="30" r="3" fill="#e53e3e" />
+                            <text x="175" y="25" fill="#e53e3e" font-size="9" font-weight="bold">B'(2B)</text>
+
+                            <!-- ラベル -->
+                            <text x="100" y="70" fill="#e53e3e" font-size="10" font-weight="bold">台形領域</text>
+                            <text x="100" y="85" fill="#718096" font-size="8.5">1 ≦ s+t ≦ 2</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">領域判定のコツ</div>
+                <div>等式（$=$）は「<b>線</b>」を表し、不等式（$\leqq, \geqq$）は「<b>面（領域）</b>」を表す。限界となる境界線（$s+t=1$ と $s+t=2$）をまず描き、その間を塗りつぶすと間違いがない。</div>
+            </div>
+        </div>
+
+        <!-- スライド9 (10/21)：点の存在範囲：図示の思考ステップ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>点の存在範囲：図示の思考ステップ</h2>
+                <span class="badge">解き方フロー</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 10px;">どんな複雑な条件でも、次の<b>3ステップ</b>で確実に図示・イメージ化できる。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <!-- 左側：手順解説テキスト -->
+                    <div style="flex: 1.1; min-width: 280px;">
+                        <div class="problem-text" style="padding: 12px 15px; font-weight: normal; font-size: 10.5pt; margin-bottom: 0;">
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 6px;">【例】 $s + 2t \leqq 2, \ s \geqq 0, \ t \geqq 0$ の場合</p>
+                            
+                            <div style="margin-bottom: 8px;">
+                                <b style="color: #2b6cb0;">Step 1：最大値までベクトルを伸ばす</b><br>
+                                $s, t$ の単独での最大値を求める。<br>
+                                ・ $t=0 \implies s$ の最大値は $2 \ \implies \mathbf{\overrightarrow{\text{OA'}} = 2\overrightarrow{\text{OA}}}$<br>
+                                ・ $s=0 \implies t$ の最大値は $1 \ \implies \mathbf{\overrightarrow{\text{OB'}} = 1\overrightarrow{\text{OB}}}$
+                            </div>
+
+                            <div style="margin-bottom: 8px;">
+                                <b style="color: #dd6b20;">Step 2：角点（端点）同士を結ぶ</b><br>
+                                等号成立（$s + 2t = 2$）の境界線を作るため、伸ばした端点 $\text{A'}, \text{B'}$ 同士を直線・線分で結ぶ。
+                            </div>
+
+                            <div>
+                                <b style="color: #e53e3e;">Step 3：条件範囲を塗る（斜線イメージ）</b><br>
+                                不等号（$\leqq$ や $\geqq$）に合わせて、境界線の内側（原点側）や挟まれた領域を斜線で囲む。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：3ステップを視覚化するSVG図解 -->
+                    <div style="flex: 1; min-width: 240px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="240" height="180" viewBox="0 0 240 180" style="max-width: 100%; height: auto;">
+                            <defs>
+                                <!-- 斜線パターン定義 -->
+                                <pattern id="hatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                                    <line x1="0" y1="0" x2="0" y2="8" stroke="#e53e3e" stroke-width="1.2" opacity="0.7" />
+                                </pattern>
+                                <marker id="arr-step" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#2b6cb0" />
+                                </marker>
+                            </defs>
+
+                            <!-- Step 3: 斜線領域 (s + 2t <= 2) -->
+                            <polygon points="30,150 190,150 110,50" fill="url(#hatch)" opacity="0.8" />
+                            <polygon points="30,150 190,150 110,50" fill="#feefed" opacity="0.5" />
+
+                            <!-- Step 1: 元のベクトル (OA, OB) -->
+                            <line x1="30" y1="150" x2="110" y2="150" stroke="#a0aec0" stroke-width="2" />
+                            <line x1="30" y1="150" x2="110" y2="50" stroke="#a0aec0" stroke-width="2" />
+
+                            <!-- Step 1: 最大値まで伸ばす矢印 (OA', OB') -->
+                            <line x1="110" y1="150" x2="190" y2="150" stroke="#2b6cb0" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arr-step)" />
+                            
+                            <!-- Step 2: 角点を結ぶ境界線 (A'B') -->
+                            <line x1="190" y1="150" x2="110" y2="50" stroke="#dd6b20" stroke-width="2.5" />
+
+                            <!-- 各点のプロットとラベル -->
+                            <!-- 原点 O -->
+                            <circle cx="30" cy="150" r="3.5" fill="#1a365d" />
+                            <text x="18" y="162" fill="#1a365d" font-size="10" font-weight="bold">O</text>
+
+                            <!-- 点 A と A'(2A) -->
+                            <circle cx="110" cy="150" r="2.5" fill="#718096" />
+                            <text x="105" y="165" fill="#718096" font-size="9">A</text>
+                            <circle cx="190" cy="150" r="3.5" fill="#2b6cb0" />
+                            <text x="185" y="165" fill="#2b6cb0" font-size="10" font-weight="bold">A'(s=2)</text>
+
+                            <!-- 点 B (= B') -->
+                            <circle cx="110" cy="50" r="3.5" fill="#2b6cb0" />
+                            <text x="115" y="45" fill="#2b6cb0" font-size="10" font-weight="bold">B'(t=1)</text>
+
+                            <!-- ステップ補足ラベル -->
+                            <text x="135" y="142" fill="#2b6cb0" font-size="8.5" font-weight="bold">① 伸ばす</text>
+                            <text x="155" y="95" fill="#dd6b20" font-size="8.5" font-weight="bold">② 結ぶ</text>
+                            <text x="75" y="115" fill="#e53e3e" font-size="9" font-weight="bold">③ 塗る</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">この思考法のメリット</div>
+                <div style="font-size: 10pt;">
+                    複雑な式変形（$s' + t' \leqq 1$ など）で混乱したときでも、<b>「$s$ だけ・$t$ だけの限界点（角点）を求めて結ぶ」</b>という幾何的なアプローチをとることで、瞬時に領域の全貌と境界線をイメージできるようになります。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド10 (11/21)：円のベクトル方程式 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>円のベクトル方程式</h2>
+                <span class="badge">図形と方程式</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 10px;">円上の点 $\text{P}(\vec{p})$ が満たすべきベクトルの条件（2大基本型）。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <!-- 左側：解説テキスト -->
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="padding: 15px; font-weight: normal; font-size: 10.5pt; margin-bottom: 0;">
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">① 中心 $\text{C}(\vec{c})$・半径 $r$ の円（距離一定）</p>
+                            <div style="margin-bottom: 12px; font-size: 11pt;">
+                                $$|\vec{p} - \vec{c}| = r \quad \iff \quad |\vec{p} - \vec{c}|^2 = r^2$$
+                                <span style="font-size: 9.5pt; color: #718096;">（※ 原点中心なら $|\vec{p}| = r$）</span>
+                            </div>
+
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">② 2点 $\text{A}(\vec{a}), \text{B}(\vec{b})$ を直径の両端とする円</p>
+                            <div style="font-size: 11pt;">
+                                $$\overrightarrow{\text{AP}} \cdot \overrightarrow{\text{BP}} = 0 \quad \iff \quad (\vec{p} - \vec{a}) \cdot (\vec{p} - \vec{b}) = 0$$
+                                <span style="font-size: 9.5pt; color: #718096;">（※ 直径に対する円周角は $90^\circ \implies$ 内積 $0$）</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：SVG図解（中心・半径 ＆ 直径の両端） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="170" viewBox="0 0 220 170" style="max-width: 100%; height: auto;">
+                            <!-- 円①：中心 C, 半径 r -->
+                            <circle cx="70" cy="85" r="40" fill="none" stroke="#2b6cb0" stroke-width="2" />
+                            <line x1="70" y1="85" x2="105" y2="65" stroke="#2b6cb0" stroke-width="1.5" />
+                            
+                            <circle cx="70" cy="85" r="3" fill="#1a365d" />
+                            <text x="60" y="100" fill="#1a365d" font-size="9" font-weight="bold">C(c)</text>
+                            
+                            <circle cx="105" cy="65" r="3" fill="#e53e3e" />
+                            <text x="110" y="65" fill="#e53e3e" font-size="9" font-weight="bold">P(p)</text>
+                            <text x="83" y="70" fill="#2b6cb0" font-size="9" font-weight="bold">r</text>
+
+                            <!-- 円②：直径 AB (右側) -->
+                            <circle cx="165" cy="85" r="40" fill="none" stroke="#dd6b20" stroke-width="2" />
+                            <!-- 直径 AB -->
+                            <line x1="125" y1="85" x2="205" y2="85" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="2,2" />
+                            <!-- AP, BP -->
+                            <line x1="125" y1="85" x2="165" y2="45" stroke="#dd6b20" stroke-width="1.5" />
+                            <line x1="205" y1="85" x2="165" y2="45" stroke="#dd6b20" stroke-width="1.5" />
+
+                            <!-- 直角マーク -->
+                            <path d="M 160 50 L 165 55 L 170 50" fill="none" stroke="#dd6b20" stroke-width="1.2" />
+
+                            <!-- 点 A, B, P -->
+                            <circle cx="125" cy="85" r="3" fill="#1a365d" />
+                            <text x="115" y="98" fill="#1a365d" font-size="9" font-weight="bold">A</text>
+
+                            <circle cx="205" cy="85" r="3" fill="#1a365d" />
+                            <text x="205" y="98" fill="#1a365d" font-size="9" font-weight="bold">B</text>
+
+                            <circle cx="165" cy="45" r="3" fill="#e53e3e" />
+                            <text x="165" y="38" text-anchor="middle" fill="#e53e3e" font-size="9" font-weight="bold">P</text>
+
+                            <!-- 補足テキスト -->
+                            <text x="70" y="145" text-anchor="middle" fill="#2b6cb0" font-size="9" font-weight="bold">|p - c| = r</text>
+                            <text x="165" y="145" text-anchor="middle" fill="#dd6b20" font-size="9" font-weight="bold">AP・BP = 0</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">判別式・変形のコツ</div>
+                <div style="font-size: 10pt;">
+                    問題文で $2\vec{p} \cdot \vec{p} - 4\vec{a} \cdot \vec{p} = 0$ のような式が与えられた場合は、<b>両辺を係数で割り「平方完成（内積の因数分解）」の形をつくる</b>ことで、中心と半径（または直径の両端）を導き出すことができます。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド11 (12/21)：演習問題：ベクトルの等式と面積比 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題：ベクトルの等式と面積比</h2>
+                <span class="badge">平面ベクトル 典型</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $\triangle\text{ABC}$ の内部に点 $\text{P}$ があり、$2\overrightarrow{\text{PA}} + 3\overrightarrow{\text{PB}} + 4\overrightarrow{\text{PC}} = \vec{0}$ を満たしている。<br>
+                    (1) 点 $\text{P}$ の位置を求めよ。<br>
+                    (2) $\triangle\text{PAB} : \triangle\text{PBC} : \triangle\text{PCA}$ の面積比を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>(1) 点 $\text{A}$ を基準に変形する：</b><br>
+                    $-2\overrightarrow{\text{AP}} + 3(\overrightarrow{\text{AB}} - \overrightarrow{\text{AP}}) + 4(\overrightarrow{\text{AC}} - \overrightarrow{\text{AP}}) = \vec{0} \ \implies \ 9\overrightarrow{\text{AP}} = 3\overrightarrow{\text{AB}} + 4\overrightarrow{\text{AC}}$<br>
+                    $\overrightarrow{\text{AP}} = \frac{7}{9} \cdot \left(\frac{3\overrightarrow{\text{AB}} + 4\overrightarrow{\text{AC}}}{7}\right)$ と変形できる。<br>
+                    辺 $\text{BC}$ を $4:3$ に内分する点を $\text{D}$ とすると、点 $\text{P}$ は <b>線分 $\text{AD}$ を $7:2$ に内分する点</b> である。<br><br>
+                    <b>(2) 面積比（重み係数の比）：</b><br>
+                    $a\overrightarrow{\text{PA}} + b\overrightarrow{\text{PB}} + c\overrightarrow{\text{PC}} = \vec{0}$ のとき、対向する三角形の面積比は<br>
+                    $\triangle\text{PBC} : \triangle\text{PCA} : \triangle\text{PAB} = a : b : c$ となるため、<br>
+                    $\triangle\text{PAB} : \triangle\text{PBC} : \triangle\text{PCA} = \mathbf{4 : 2 : 3}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド12 (13/21)：演習問題：2直線の交点 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題：2直線の交点</h2>
+                <span class="badge">平面ベクトル 最重要</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $\triangle\text{OAB}$ において、辺 $\text{OA}$ を $3:1$ に内分する点を $\text{C}$、辺 $\text{OB}$ を $2:3$ に内分する点を $\text{D}$ とする。線分 $\text{AD}$ と線分 $\text{BC}$ の交点を $\text{P}$ とするとき、$\overrightarrow{\text{OP}}$ を $\vec{a}=\overrightarrow{\text{OA}}, \ \vec{b}=\overrightarrow{\text{OB}}$ を用いて表せ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    $\overrightarrow{\text{OC}} = \frac{3}{4}\vec{a}, \quad \overrightarrow{\text{OD}} = \frac{2}{5}\vec{b}$ である。<br>
+                    ・ 点 $\text{P}$ は線分 $\text{AD}$ 上にあるので（$s:1-s$ に内分）：<br>
+                    $\quad \overrightarrow{\text{OP}} = (1-s)\vec{a} + s\overrightarrow{\text{OD}} = (1-s)\vec{a} + \frac{2}{5}s\vec{b} \ \cdots \text{①}$<br>
+                    ・ 点 $\text{P}$ は線分 $\text{BC}$ 上にあるので（$t:1-t$ に内分）：<br>
+                    $\quad \overrightarrow{\text{OP}} = t\overrightarrow{\text{OC}} + (1-t)\vec{b} = \frac{3}{4}t\vec{a} + (1-t)\vec{b} \ \cdots \text{②}$<br>
+                    $\vec{a}, \vec{b}$ は一次独立なので係数を比較して：<br>
+                    $1-s = \frac{3}{4}t, \quad \frac{2}{5}s = 1-t \ \implies \ s = \frac{5}{13}, \ t = \frac{12}{13}$<br>
+                    ①に代入して： $\mathbf{\overrightarrow{\text{OP}} = \frac{8}{13}\vec{a} + \frac{2}{13}\vec{b}}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド13 (14/21)：演習問題：垂線の足と内積 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題：垂線の足と内積</h2>
+                <span class="badge">平面ベクトル 応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $|\vec{a}| = 2, \ |\vec{b}| = 3, \ \vec{a} \cdot \vec{b} = 4$ とする。点 $\text{O}$ を始点とし $\overrightarrow{\text{OA}}=\vec{a}, \overrightarrow{\text{OB}}=\vec{b}$ とする。点 $\text{A}$ から直線 $\text{OB}$ に下ろした垂線の足を $\text{H}$ とするとき、$\overrightarrow{\text{OH}}$ を $\vec{b}$ を用いて表せ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    点 $\text{H}$ は直線 $\text{OB}$ 上にあるため、実数 $k$ を用いて <b>$\overrightarrow{\text{OH}} = k\vec{b}$</b> と置ける。<br>
+                    このとき $\overrightarrow{\text{AH}} = \overrightarrow{\text{OH}} - \overrightarrow{\text{OA}} = k\vec{b} - \vec{a}$ である。<br>
+                    $\text{AH} \perp \text{OB}$ より、 $\overrightarrow{\text{AH}} \cdot \vec{b} = 0$ が成立する。<br>
+                    $$(k\vec{b} - \vec{a}) \cdot \vec{b} = 0 \ \implies \ k|\vec{b}|^2 - \vec{a} \cdot \vec{b} = 0$$
+                    代入して： $k \cdot 3^2 - 4 = 0 \ \implies \ 9k = 4 \ \implies \ k = \frac{4}{9}$<br>
+                    したがって、 $\mathbf{\overrightarrow{\text{OH}} = \frac{4}{9}\vec{b}}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド14 (15/21)：演習問題：角の二等分線と内心 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題：角の二等分線と内心</h2>
+                <span class="badge">平面ベクトル 頻出</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $\triangle\text{OAB}$ において、$|\overrightarrow{\text{OA}}| = 5, \ |\overrightarrow{\text{OB}}| = 3$ とする。$\angle\text{AOB}$ の二等分線と辺 $\text{AB}$ の交点を $\text{D}$ とするとき、$\overrightarrow{\text{OD}}$ を $\vec{a}=\overrightarrow{\text{OA}}, \ \vec{b}=\overrightarrow{\text{OB}}$ で表せ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>解法1：角の二等分線の定理（内分比）を利用する</b><br>
+                    角の二等分線の定理より、 $\text{AD} : \text{DB} = \text{OA} : \text{OB} = 5 : 3$ である。<br>
+                    したがって、点 $\text{D}$ は辺 $\text{AB}$ を $5 : 3$ に内分する点なので：<br>
+                    $$\overrightarrow{\text{OD}} = \frac{3\vec{a} + 5\vec{b}}{5 + 3} = \mathbf{\frac{3}{8}\vec{a} + \frac{5}{8}\vec{b}}$$
+                    <span style="color: #718096; font-size: 9.5pt;">（※ 補足：単位ベクトル $\frac{\vec{a}}{|\vec{a}|} + \frac{\vec{b}}{|\vec{b}|}$ を合成して定数倍する方法でも導出可能）</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド15 (16/21)：6. 空間ベクトルの基本・球面 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>6. 空間ベクトルの基本・球面</h2>
+                <span class="badge">3次元空間</span>
+            </div>
+            <div class="content-box">
+                <p>空間の点 $\text{P}(x, y, z)$ と位置ベクトル $\vec{p} = x\vec{i} + y\vec{j} + z\vec{k}$。</p>
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 2点間の距離・大きさ</b></p>
+                    $$|\vec{a}| = \sqrt{a_1^2 + a_2^2 + a_3^2}$$
+                    <p style="margin-top: 12px; margin-bottom: 8px;"><b>■ 球面の方程式（中心 $\text{C}(a,b,c)$、半径 $r$）</b></p>
+                    $$(x - a)^2 + (y - b)^2 + (z - c)^2 = r^2 \quad \iff \quad |\vec{p} - \vec{c}|^2 = r^2$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">空間での共面条件</div>
+                <div>4点 $\text{A}, \text{B}, \text{C}, \text{P}$ が同一平面上にある（共面） $\iff \mathbf{\overrightarrow{\text{AP}} = s\overrightarrow{\text{AB}} + t\overrightarrow{\text{AC}}}$</div>
+            </div>
+        </div>
+
+        <!-- スライド16 (17/21)：7. 空間における直線・平面方程式（図解付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>7. 空間における直線・平面方程式</h2>
+                <span class="badge">空間幾何</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 10px;">空間内の直線・平面はベクトルを用いることで明確に方程式化できる。</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <!-- 左側：公式解説 -->
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="padding: 12px 15px; font-weight: normal; font-size: 10pt; margin-bottom: 0;">
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 3px;">■ 直線の方程式（通過点 $\text{A}(\vec{a})$、方向ベクトル $\vec{d}=(l,m,n)$）</p>
+                            <div style="margin-bottom: 10px; font-size: 11pt;">
+                                $$\frac{x - x_1}{l} = \frac{y - y_1}{m} = \frac{z - z_1}{n} \quad (= t)$$
+                            </div>
+
+                            <p style="font-weight: bold; color: #1a365d; margin-bottom: 3px;">■ 平面の方程式（通過点 $\text{A}(\vec{a})$、法線ベクトル $\vec{n}=(a,b,c)$）</p>
+                            <div style="font-size: 10.5pt;">
+                                $$\vec{n} \cdot (\vec{p} - \vec{a}) = 0 \quad \iff \quad a(x - x_1) + b(y - y_1) + c(z - z_1) = 0$$
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：SVG図解 -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="230" height="180" viewBox="0 0 230 180" style="max-width: 100%; height: auto;">
+                            <defs>
+                                <marker id="arr-d" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#2b6cb0" />
+                                </marker>
+                                <marker id="arr-n" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#dd6b20" />
+                                </marker>
+                            </defs>
+
+                            <!-- 左側：空間直線のイメージ -->
+                            <line x1="20" y1="75" x2="105" y2="25" stroke="#1a365d" stroke-width="2" />
+                            <line x1="40" y1="63" x2="80" y2="40" stroke="#2b6cb0" stroke-width="2.5" marker-end="url(#arr-d)" />
+                            
+                            <circle cx="40" cy="63" r="3" fill="#1a365d" />
+                            <text x="32" y="77" fill="#1a365d" font-size="9" font-weight="bold">A(a)</text>
+                            <text x="55" y="42" fill="#2b6cb0" font-size="9" font-weight="bold">d</text>
+
+                            <!-- 境界区切り線 -->
+                            <line x1="115" y1="15" x2="115" y2="165" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="3,3" />
+
+                            <!-- 右側：空間平面のイメージ -->
+                            <polygon points="125,120 205,120 220,155 140,155" fill="#feefed" stroke="#dd6b20" stroke-width="1.5" />
+                            <text x="133" y="148" fill="#dd6b20" font-size="9.5" font-weight="bold">平面 α</text>
+
+                            <line x1="155" y1="138" x2="190" y2="132" stroke="#2b6cb0" stroke-width="1.5" />
+                            <circle cx="155" cy="138" r="3" fill="#1a365d" />
+                            <text x="146" y="150" fill="#1a365d" font-size="8.5" font-weight="bold">A</text>
+                            
+                            <circle cx="190" cy="132" r="3" fill="#2b6cb0" />
+                            <text x="195" y="140" fill="#2b6cb0" font-size="8.5" font-weight="bold">P</text>
+
+                            <line x1="155" y1="138" x2="155" y2="70" stroke="#dd6b20" stroke-width="2.5" marker-end="url(#arr-n)" />
+                            <text x="162" y="85" fill="#dd6b20" font-size="9.5" font-weight="bold">n (法線)</text>
+
+                            <path d="M 155 130 L 163 128 L 163 136" fill="none" stroke="#dd6b20" stroke-width="1.2" />
+
+                            <text x="62" y="170" text-anchor="middle" fill="#1a365d" font-size="9" font-weight="bold">直線の方向ベクトル</text>
+                            <text x="172" y="170" text-anchor="middle" fill="#dd6b20" font-size="9" font-weight="bold">平面の法線ベクトル</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">法線ベクトルの威力</div>
+                <div style="font-size: 10pt;">
+                    平面に垂直なベクトル $\vec{n}$（法線ベクトル）が分かれば、空間内の平面は一意に定まる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド17 (18/21)：演習問題：空間ベクトルの成分と距離 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題：空間ベクトルの成分と距離</h2>
+                <span class="badge">空間基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    空間の3点 $\text{A}(1, 2, 3), \text{B}(3, -1, 1), \text{C}(0, 4, 1)$ について、次の問に答えよ。<br>
+                    (1) ベクトル $\overrightarrow{\text{AB}}$ を成分で表せ。<br>
+                    (2) 2点 $\text{A}, \text{B}$ 間の距離 $|\overrightarrow{\text{AB}}|$ を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>(1) 成分の計算（終点 $-$ 始点）：</b><br>
+                    $$\overrightarrow{\text{AB}} = (3-1, \ -1-2, \ 1-3) = \mathbf{(2, -3, -2)}$$
+                    <b>(2) 2点間の距離（ベクトルの大きさ）：</b><br>
+                    $$|\overrightarrow{\text{AB}}| = \sqrt{2^2 + (-3)^2 + (-2)^2} = \sqrt{4 + 9 + 4} = \mathbf{\sqrt{17}}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド18 (19/21)：演習問題：空間ベクトルの内積 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題：空間ベクトルの内積</h2>
+                <span class="badge">空間基本</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    $\vec{a} = (1, 0, 1), \ \vec{b} = (-1, 2, 1)$ のとき、(1) 内積 $\vec{a} \cdot \vec{b}$、(2) $\vec{a}$ と $\vec{b}$ のなす角 $\theta$ を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>(1) 内積の計算：</b><br>
+                    $$\vec{a} \cdot \vec{b} = 1 \cdot (-1) + 0 \cdot 2 + 1 \cdot 1 = -1 + 0 + 1 = \mathbf{0}$$
+                    <br><b>(2) なす角 $\theta$：</b>
+                    $\vec{a} \cdot \vec{b} = 0$ かつ $\vec{a} \neq \vec{0}, \vec{b} \neq \vec{0}$ より、2つのベクトルは<b>垂直</b>である。<br>
+                    したがって、 $\mathbf{\theta = 90^\circ}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド19 (20/21)：演習問題：空間の共面条件 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題：空間の共面条件</h2>
+                <span class="badge">空間頻出・最重要</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    四面体 $\text{OABC}$ において、辺 $\text{OA}$ の中点を $\text{P}$、辺 $\text{AB}$ を $2:1$ に内分する点を $\text{Q}$ とする。直線 $\text{PQ}$ と平面 $\text{OBC}$ の交点を $\text{R}$ とするとき、$\overrightarrow{\text{OR}}$ を $\vec{a}=\overrightarrow{\text{OA}}, \vec{b}=\overrightarrow{\text{OB}}, \vec{c}=\overrightarrow{\text{OC}}$ を用いて表せ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    $\overrightarrow{\text{OP}} = \frac{1}{2}\vec{a}, \quad \overrightarrow{\text{OQ}} = \frac{\vec{a} + 2\vec{b}}{3}$ である。<br>
+                    点 $\text{R}$ は直線 $\text{PQ}$ 上にあるため、実数 $k$ を用いて：<br>
+                    $$\overrightarrow{\text{OR}} = (1-k)\overrightarrow{\text{OP}} + k\overrightarrow{\text{OQ}} = (1-k)\left(\frac{1}{2}\vec{a}\right) + k\left(\frac{\vec{a} + 2\vec{b}}{3}\right) = \left(\frac{1}{2} - \frac{1}{6}k\right)\vec{a} + \frac{2}{3}k\vec{b}$$
+                    点 $\text{R}$ は<b>平面 $\text{OBC}$ 上（$\vec{a}$ の成分が $0$）</b>にあるので：<br>
+                    $$\frac{1}{2} - \frac{1}{6}k = 0 \ \implies \ k = 3$$
+                    これを代入して： $\mathbf{\overrightarrow{\text{OR}} = 2\vec{b}}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド20 (21/21)：演習問題：平面に下ろした垂線の足 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題：平面に下ろした垂線の足</h2>
+                <span class="badge">空間頻出・応用</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    座標空間において、3点 $\text{A}(1, 0, 0), \text{B}(0, 2, 0), \text{C}(0, 0, 3)$ がある。原点 $\text{O}$ から平面 $\text{ABC}$ に下ろした垂線の足 $\text{H}$ の座標を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    平面 $\text{ABC}$ の方程式は $\frac{x}{1} + \frac{y}{2} + \frac{z}{3} = 1 \ \iff \ 6x + 3y + 2z - 6 = 0$。<br>
+                    この平面の法線ベクトルは $\vec{n} = (6, 3, 2)$ である。<br>
+                    直線 $\text{OH}$ は法線ベクトルに平行であるため、実数 $k$ を用いて $\text{H}(6k, 3k, 2k)$ と置ける。<br>
+                    点 $\text{H}$ は平面 $\text{ABC}$ 上にあるため代入して：<br>
+                    $$6(6k) + 3(3k) + 2(2k) - 6 = 0 \ \implies \ 49k = 6 \ \implies \ k = \frac{6}{49}$$
+                    よって、求める座標は $\mathbf{\text{H}\left(\frac{36}{49}, \frac{18}{49}, \frac{12}{49}\right)}$
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 21</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体（全21スライドの項目・インデックスに対応） -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 定義と分解の原理</button>
+            <button onclick="goToSlide(2)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. 内積・成分と条件式</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. 位置ベクトルと分点・重心</button>
+            <button onclick="goToSlide(4)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 三角形の五心</button>
+            <button onclick="goToSlide(5)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 直線のベクトル方程式</button>
+            <button onclick="goToSlide(6)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">7. 点の存在範囲［1］基礎</button>
+            <button onclick="goToSlide(7)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">8. 点の存在範囲［2］応用</button>
+            <button onclick="goToSlide(8)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">9. 点の存在範囲［3］台形</button>
+            <button onclick="goToSlide(9)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">10. 点の存在範囲 解き方フロー</button>
+            <button onclick="goToSlide(10)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">11. 円のベクトル方程式</button>
+            <button onclick="goToSlide(11)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">12. 演習［平面1］等式と面積比</button>
+            <button onclick="goToSlide(12)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">13. 演習［平面2］2直線の交点</button>
+            <button onclick="goToSlide(13)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">14. 演習［平面3］垂線の足と内積</button>
+            <button onclick="goToSlide(14)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">15. 演習［平面4］角の二等分線</button>
+            <button onclick="goToSlide(15)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">16. 空間ベクトル基本・球面</button>
+            <button onclick="goToSlide(16)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">17. 空間の直線・平面方程式</button>
+            <button onclick="goToSlide(17)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">18. 演習［空間基本1］成分・距離</button>
+            <button onclick="goToSlide(18)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">19. 演習［空間基本2］内積</button>
+            <button onclick="goToSlide(19)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">20. 演習［空間頻出1］共面条件</button>
+            <button onclick="goToSlide(20)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">21. 演習［空間頻出2］垂線の足</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
