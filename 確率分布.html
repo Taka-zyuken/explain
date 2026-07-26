@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学解説スライド 数学B 確率分布と期待値</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            overflow: hidden;
+            line-height: 1.8;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #2b6cb0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-header h2 {
+            font-size: 24pt;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 12pt;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+        }
+
+        .content-box {
+            font-size: 16pt;
+            margin-bottom: 25px;
+        }
+
+        .scrollable-box {
+            width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .scrollable-box.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scrollable-box::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #edf2f7;
+            border-radius: 3px;
+        }
+
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        mjx-container[display="true"] {
+            display: inline-block !important;
+            min-width: max-content;
+            margin: 0.5em 0 !important;
+        }
+
+        .problem-text {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        .answer-box {
+            background-color: #fffaf0;
+            border-left: 5px solid #dd6b20;
+            padding: 15px 25px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+        }
+
+        .answer-label {
+            color: #dd6b20;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .page-indicator {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        @media screen and (max-width: 768px) {
+            body { line-height: 1.6; }
+            .slide { width: 95%; height: 88vh; padding: 20px 20px; }
+            .slide-header h2 { font-size: 18pt; }
+            .badge { font-size: 10pt; padding: 2px 8px; }
+            .content-box { font-size: 12pt; margin-bottom: 15px; }
+            .problem-text { padding: 15px; font-size: 13pt; margin-bottom: 15px; }
+            .answer-box { padding: 10px 15px; margin-top: 15px; }
+            .nav-controls { bottom: 15px; gap: 20px; }
+            .nav-btn { padding: 8px 16px; font-size: 11pt; }
+            .page-indicator { font-size: 12pt; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slide-container">
+
+        <!-- スライド0 (1/12)：タイトル -->
+        <div class="slide active">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h1 style="font-size: 34pt; color: #1a365d; margin-bottom: 20px;">数学B_確率分布と統計的な推測</h1>
+                <p style="font-size: 18pt; color: #4a5568;">確率変数・期待値・分散・二項分布の基礎〜応用</p>
+                <div style="margin-top: 40px; font-size: 12pt; color: #718096;">
+                    キーボードの「→」キー、または画面下のボタンで進む仕様である。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド1 (2/12)：1. 確率変数と確率分布 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>1. 確率変数と確率分布</h2>
+                <span class="badge">基本概念</span>
+            </div>
+            <div class="content-box">
+                <p>試行の結果によってとる値が決まる変数を<b>確率変数 $X$</b> と呼ぶ。</p>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px;">
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 11pt; font-weight: normal; padding: 15px;">
+                            <ul>
+                                <li><b>確率分布：</b> $X$ のとる値 $x_i$ と、その確率 $p_i = P(X = x_i)$ の対応関係。</li>
+                                <li><b>確率の総和：</b> すべての確率の和は必ず $1$ になる。
+                                    $$p_1 + p_2 + \cdots + p_n = \sum_{i=1}^n p_i = 1$$
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SVG図解（確率分布表イメージ） -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 10px;">
+                        <svg width="220" height="130" viewBox="0 0 220 130" style="max-width: 100%; height: auto;">
+                            <!-- 表の枠線 -->
+                            <rect x="10" y="20" width="200" height="90" fill="none" stroke="#2b6cb0" stroke-width="2" rx="4" />
+                            <line x1="10" y1="50" x2="210" y2="50" stroke="#2b6cb0" stroke-width="1.5" />
+                            <line x1="10" y1="80" x2="210" y2="80" stroke="#2b6cb0" stroke-width="1.5" />
+                            <line x1="60" y1="20" x2="60" y2="110" stroke="#2b6cb0" stroke-width="1.5" />
+                            <line x1="160" y1="20" x2="160" y2="110" stroke="#2b6cb0" stroke-width="1.5" />
+
+                            <!-- ヘッダー・内容テキスト -->
+                            <text x="35" y="40" text-anchor="middle" fill="#1a365d" font-size="11" font-weight="bold">X</text>
+                            <text x="110" y="40" text-anchor="middle" fill="#1a365d" font-size="11">x₁ ,  x₂ ,  ... ,  xₙ</text>
+                            <text x="185" y="40" text-anchor="middle" fill="#1a365d" font-size="11" font-weight="bold">計</text>
+
+                            <text x="35" y="70" text-anchor="middle" fill="#2b6cb0" font-size="11" font-weight="bold">P(X)</text>
+                            <text x="110" y="70" text-anchor="middle" fill="#2b6cb0" font-size="11">p₁ ,  p₂ ,  ... ,  pₙ</text>
+                            <text x="185" y="70" text-anchor="middle" fill="#e53e3e" font-size="12" font-weight="bold">1</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解法の第一歩</div>
+                <div>統計の問題では、まず「<b>確率変数 $X$ のとり得る値をすべて書き出し、確率分布表を作成する</b>」ことがすべての計算の基本となる。</div>
+            </div>
+        </div>
+
+        <!-- スライド2 (3/12)：2. 期待値（平均）・分散・標準偏差 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>2. 期待値・分散・標準偏差</h2>
+                <span class="badge">代表値の計算</span>
+            </div>
+            <div class="content-box">
+                <p>確率変数 $X$ の平均的な値や、データの散らばり具合を表す指標。</p>
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 期待値（平均） $E(X)$ または $m$</b></p>
+                    $$E(X) = x_1 p_1 + x_2 p_2 + \cdots + x_n p_n = \sum_{i=1}^n x_i p_i$$
+                    <p style="margin-top: 10px; margin-bottom: 8px;"><b>■ 分散 $V(X)$（最重要公式）</b></p>
+                    $$V(X) = E(X^2) - \{E(X)\}^2 \quad \text{（「2乗の平均」$-$「平均の2乗」）}$$
+                    <p style="margin-top: 10px; margin-bottom: 8px;"><b>■ 標準偏差 $\sigma(X)$</b></p>
+                    $$\sigma(X) = \sqrt{V(X)}$$
+                </div>
+                <p style="margin-bottom: 10px;">分散の定義 $V(X) = E((X - m)^2)$ から計算用公式を導き出す。</p>
+
+                <!-- 証明ボックス -->
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #cbd5e0; padding: 15px; font-size: 10pt; font-weight: normal; margin-bottom: 12px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">【数学的証明】（$m = E(X)$ とする）</p>
+                    <div style="line-height: 1.8;">
+                        $$V(X) = E\big((X - m)^2\big) = E\big(X^2 - 2mX + m^2\big)$$
+                        期待値の線形性 $E(aX + b) = aE(X) + b$ を適用すると：
+                        $$V(X) = E(X^2) - 2m \cdot E(X) + m^2 = E(X^2) - 2m \cdot m + m^2 = \mathbf{E(X^2) - \{E(X)\}^2} \quad \blacksquare$$
+                    </div>
+                </div>
+
+                <!-- 具体的な数値例（さいころの目） -->
+                <div class="problem-text" style="background-color: #fffaf0; border: 1px solid #fbd38d; padding: 12px 15px; font-size: 11pt; font-weight: normal; margin-bottom: 0;">
+                    <p style="font-weight: bold; color: #dd6b20; margin-bottom: 5px;">💡 具体例： 1〜3の目が出る対等なカード（$X \in \{1, 2, 3\}$, 各確率 $1/3$）</p>
+                    <div style="line-height: 1.7;">
+                        ・ <b>平均：</b> $m = E(X) = \frac{1+2+3}{3} = \mathbf{2}$<br>
+                        ・ <b>定義通り計算：</b> $V(X) = \frac{(1-2)^2 + (2-2)^2 + (3-2)^2}{3} = \frac{1 + 0 + 1}{3} = \mathbf{\frac{2}{3}}$<br>
+                        ・ <b>公式で計算：</b> $E(X^2) = \frac{1^2+2^2+3^2}{3} = \frac{14}{3} \implies V(X) = \frac{14}{3} - 2^2 = \frac{14}{3} - 4 = \mathbf{\frac{2}{3}}$<br>
+                        <span style="color: #2b6cb0;">$\to$ どちらで計算しても完全に一致し、公式の方が展開が圧倒的に楽であることが分かる！</span>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">ポイント</div>
+                <div style="font-size: 10pt;">
+                    偏差 $(X-m)$ をそのまま平均すると $0$ になってしまうため、**2乗して平均**を取ったのが分散。展開整理することで「2乗の平均 $-$ 平均の2乗」が導かれます。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">分散計算のコツ</div>
+                <div>分散の定義式 $E((X-m)^2)$ で計算すると計算が煩雑になるため、大抵は計算用公式 $V(X) = E(X^2) - (m)^2$ を使用する。</div>
+            </div>
+        </div>
+
+        <!-- スライド3 (4/12)：3. 確率変数の変換（具体的な数値例付き） -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>3. 確率変数の変換（$aX + b$）</h2>
+                <span class="badge">計算の法則</span>
+            </div>
+            <div class="content-box">
+                <p style="margin-bottom: 10px;">確率変数 $X$ を $a$ 倍して $b$ 加えた変数 $Y = aX + b$ の指標の変化規則。</p>
+
+                <!-- 公式と図解の横並び -->
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 12px;">
+                    <!-- 左側：基本公式 -->
+                    <div style="flex: 1.2; min-width: 280px;">
+                        <div class="problem-text" style="font-size: 10.5pt; font-weight: normal; padding: 12px; margin-bottom: 0;">
+                            <ul>
+                                <li><b>期待値：</b> $E(aX + b) = \mathbf{a E(X) + b}$</li>
+                                <li><b>分 散：</b> $V(aX + b) = \mathbf{a^2 V(X)}$ <span style="font-size: 9pt; color: #718096;">（※ $b$ の平行移動は散らばりに無関係）</span></li>
+                                <li><b>標準偏差：</b> $\sigma(aX + b) = \mathbf{|a| \sigma(X)}$</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 右側：SVG図解 -->
+                    <div style="flex: 1; min-width: 220px; display: flex; justify-content: center; background: #fafafa; border: 1px solid #edf2f7; border-radius: 8px; padding: 8px;">
+                        <svg width="220" height="110" viewBox="0 0 220 110" style="max-width: 100%; height: auto;">
+                            <!-- X の分布 -->
+                            <path d="M 20 90 Q 40 20 60 90" fill="#ebf8ff" stroke="#2b6cb0" stroke-width="2" />
+                            <text x="40" y="103" text-anchor="middle" fill="#2b6cb0" font-size="9" font-weight="bold">X</text>
+
+                            <!-- 矢印 -->
+                            <path d="M 75 55 L 115 55" stroke="#dd6b20" stroke-width="2" stroke-dasharray="3,3" />
+                            <text x="95" y="45" text-anchor="middle" fill="#dd6b20" font-size="8.5" font-weight="bold">2X + 10</text>
+
+                            <!-- 2X+10 の分布（2倍に広がり、右へシフト） -->
+                            <path d="M 120 90 Q 160 40 200 90" fill="#feefed" stroke="#e53e3e" stroke-width="2" />
+                            <text x="160" y="103" text-anchor="middle" fill="#e53e3e" font-size="9" font-weight="bold">Y = 2X + 10</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 具体的な数値例による実証ボックス -->
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #cbd5e0; padding: 12px 18px; font-weight: normal; font-size: 10pt; margin-bottom: 10px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 5px;">💡 具体例： $E(X) = 5, \ V(X) = 4, \ \sigma(X) = 2$ のとき、 $\mathbf{Y = 2X + 10}$ を計算</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; line-height: 1.8;">
+                        <div style="flex: 1; min-width: 200px;">
+                            ・ <b>平均：</b> $E(Y) = 2 \times 5 + 10 = \mathbf{20}$<br>
+                            <span style="font-size: 9pt; color: #718096;">（中心が2倍に伸びて、右に10ズレる）</span>
+                        </div>
+                        <div style="flex: 1.2; min-width: 220px;">
+                            ・ <b>分散：</b> $V(Y) = 2^{\mathbf{2}} \times 4 = \mathbf{16}$<br>
+                            <span style="font-size: 9pt; color: #718096;">（横幅が2倍 $\to$ 2乗の散らばりは $2^2 = 4$ 倍。$+10$ は無視）</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 証明ボックス -->
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #cbd5e0; padding: 12px 15px; font-size: 9.5pt; font-weight: normal; margin-bottom: 10px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">【数学的証明】</p>
+                    <div style="line-height: 1.6;">
+                        ・ <b>期待値：</b> $E(aX+b) = \sum (ax_i + b)p_i = a\sum x_i p_i + b\sum p_i = \mathbf{a E(X) + b}$ $\quad (\text{※ }\sum p_i = 1)$<br>
+                        ・ <b>分 散：</b> $Y = aX+b$ の平均は $m_Y = am_X + b$ だから、偏差は $Y - m_Y = a(X - m_X)$<br>
+                        $\quad \implies V(aX+b) = E\big(\{a(X - m_X)\}^2\big) = E\big(a^2 (X - m_X)^2\big) = \mathbf{a^2 V(X)} \quad \blacksquare$
+                    </div>
+                </div>
+
+                <!-- 具体的な数値実証 -->
+                <div class="problem-text" style="background-color: #fffaf0; border: 1px solid #fbd38d; padding: 12px 15px; font-size: 9.5pt; font-weight: normal; margin-bottom: 0;">
+                    <p style="font-weight: bold; color: #dd6b20; margin-bottom: 4px;">💡 具体数値による検証： データ $X = \{1, 3, 5\}$（等確率 $1/3$）に対し $\mathbf{Y = 2X + 10}$</p>
+                    <div style="line-height: 1.7;">
+                        ・ <b>元データ $X$：</b> 平均 $E(X) = 3$、 分散 $V(X) = \frac{(1-3)^2 + (3-3)^2 + (5-3)^2}{3} = \mathbf{\frac{8}{3}}$<br>
+                        ・ <b>変換後のデータ $Y$：</b> $Y = \{12, 16, 20\}$<br>
+                        $\quad \to$ 平均 $E(Y) = \frac{12+16+20}{3} = \mathbf{16}$ $\quad (\text{公式: } 2 \times 3 + 10 = \mathbf{16}$ と一致！$)$<br>
+                        $\quad \to$ 分散 $V(Y) = \frac{(12-16)^2 + (16-16)^2 + (20-16)^2}{3} = \frac{16 + 0 + 16}{3} = \mathbf{\frac{32}{3}}$<br>
+                        $\quad \phantom{\to}$ （公式: $2^2 \times \frac{8}{3} = 4 \times \frac{8}{3} = \mathbf{\frac{32}{3}}$ と完全に一致！定数 $+10$ は散らばり幅に不与）
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">直感的な意味</div>
+                <div style="font-size: 10pt;">
+                    全体を $+10$ しても<b>データ同士の間隔（散らばり）は一切広がらない</b>ため分散に影響しません。一方、$2$倍するとデータ間隔も $2$倍になり、2乗して計算する分散は **$2^2 = 4$倍** に広がります。
+                </div>
+            </div>
+
+            <!-- 下部の強調ボックス（標準化への応用） -->
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">標準化（規格化）への応用例</div>
+                <div style="font-size: 9.5pt;">
+                    平均 $m=50$、標準偏差 $\sigma=10$ のデータも、 $Z = \frac{X - 50}{10} = \frac{1}{10}X - 5$ と変換すれば、<br>
+                    平均 $E(Z) = \frac{1}{10}(50) - 5 = \mathbf{0}$、 分散 $V(Z) = \left(\frac{1}{10}\right)^2 \times 10^2 = \mathbf{1}$ にピッタリ変換（標準化）できる。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド4 (5/12)：4. 二項分布 B(n, p) -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>4. 二項分布 $B(n, p)$</h2>
+                <span class="badge">最重要分布</span>
+            </div>
+            <div class="content-box">
+                <p>1回の試行で事象の起こる確率が $p$ である独立試行を $n$ 回行うときの確率分布。</p>
+                
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 確率質量関数</b></p>
+                    $$P(X = k) = {}_n\text{C}_k \, p^k (1-p)^{n-k} \quad (k = 0, 1, \dots, n)$$
+                    <p style="margin-top: 12px; margin-bottom: 8px;"><b>■ 二項分布 $B(n, p)$ の平均・分散公式（超頻出）</b></p>
+                    $$\text{期待値： } E(X) = \mathbf{np}$$
+                    $$\text{分 散： } V(X) = \mathbf{np(1-p)} \quad \left(\text{※ } q = 1-p \text{ とおくと } npq\right)$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">公式の威力</div>
+                <div>通常通り定義から計算すると複雑な和になるが、二項分布と見抜ければ $E(X)=np, V(X)=np(1-p)$ で一瞬で計算が完了する。</div>
+            </div>
+        </div>
+        <!-- スライド：二項分布の公式の導出と実証 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>二項分布 E(X)=np, V(X)=npq の導出</h2>
+                <span class="badge">最重要分布のからくり</span>
+            </div>
+            <div class="content-box">
+                <!-- 証明ボックス -->
+                <div class="problem-text" style="background-color: #f4f7f9; border: 1px solid #cbd5e0; padding: 12px 15px; font-size: 9.5pt; font-weight: normal; margin-bottom: 10px;">
+                    <p style="font-weight: bold; color: #1a365d; margin-bottom: 4px;">【導出の考え方】 1回の試行で成功なら1、失敗なら0をとる変数 $X_i$ の和と捉える</p>
+                    <div style="line-height: 1.6;">
+                        1回の試行 $X_i$ の平均 $E(X_i) = 1 \cdot p + 0 \cdot (1-p) = p$<br>
+                        1回の試行 $X_i$ の分散 $V(X_i) = E(X_i^2) - (E(X_i))^2 = p - p^2 = p(1-p)$<br>
+                        二項分布 $X$ は $n$ 回の独立な和 $X = X_1 + X_2 + \cdots + X_n$ だから：<br>
+                        ・ <b>期待値：</b> $E(X) = E(X_1) + \cdots + E(X_n) = p + \cdots + p = \mathbf{np}$<br>
+                        ・ <b>分 散：</b> 独立より $V(X) = V(X_1) + \cdots + V(X_n) = \mathbf{np(1-p)} \quad \blacksquare$
+                    </div>
+                </div>
+
+                <!-- 具体的な数値例（コイン3回投げ） -->
+                <div class="problem-text" style="background-color: #fffaf0; border: 1px solid #fbd38d; padding: 12px 15px; font-size: 9.5pt; font-weight: normal; margin-bottom: 0;">
+                    <p style="font-weight: bold; color: #dd6b20; margin-bottom: 4px;">💡 具体例： コインを 3回 投げて表が出る回数 $X \sim B\left(3, \frac{1}{2}\right)$</p>
+                    <div style="line-height: 1.7;">
+                        ・ <b>確率分布：</b> $P(X=0)=\frac{1}{8}, \ P(X=1)=\frac{3}{8}, \ P(X=2)=\frac{3}{8}, \ P(X=3)=\frac{1}{8}$<br>
+                        ・ <b>定義から計算した平均：</b> $E(X) = 0\cdot\frac{1}{8} + 1\cdot\frac{3}{8} + 2\cdot\frac{3}{8} + 3\cdot\frac{1}{8} = \frac{12}{8} = \mathbf{1.5}$<br>
+                        $\quad \to$ <b>公式：</b> $E(X) = np = 3 \times \frac{1}{2} = \mathbf{1.5}$ （一致！）<br>
+                        ・ <b>定義から計算した分散：</b> $E(X^2) = 0\cdot\frac{1}{8} + 1\cdot\frac{3}{8} + 4\cdot\frac{3}{8} + 9\cdot\frac{1}{8} = \frac{24}{8} = 3 \implies V(X) = 3 - (1.5)^2 = \mathbf{0.75}$<br>
+                        $\quad \to$ <b>公式：</b> $V(X) = np(1-p) = 3 \times \frac{1}{2} \times \frac{1}{2} = \mathbf{0.75}$ （一致！）
+                    </div>
+                </div>
+            </div>
+            <div class="answer-box" style="margin-top: 10px; padding: 10px 20px;">
+                <div class="answer-label" style="font-size: 11pt;">なぜこの証明が強力か</div>
+                <div>
+                    $\sum k {}_n\text{C}_k p^k q^{n-k}$ のような複雑なシグマ計算をしなくても、<b>「1回あたりの期待値 $p$ と分散 $pq$ を $n$ 個足し合わせる」</b>と捉えることで、一瞬で公式が導出できます。
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5 (6/12)：演習問題［1］基本の分布と期待値 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［1］：期待値と分散</h2>
+                <span class="badge">基本レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    1個のさいころを投げるとき、出る目を $X$ とする。$X$ の期待値 $E(X)$、分散 $V(X)$、標準偏差 $\sigma(X)$ を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    各目の確率はすべて $\frac{1}{6}$ である。<br>
+                    ・ <b>期待値：</b> $E(X) = (1+2+3+4+5+6) \times \frac{1}{6} = \frac{21}{6} = \mathbf{\frac{7}{2}}$<br>
+                    ・ <b>2乗の平均：</b> $E(X^2) = (1^2+2^2+3^2+4^2+5^2+6^2) \times \frac{1}{6} = \frac{91}{6}$<br>
+                    ・ <b>分散：</b> $V(X) = E(X^2) - \{E(X)\}^2 = \frac{91}{6} - \left(\frac{7}{2}\right)^2 = \frac{91}{6} - \frac{147}{12} = \mathbf{\frac{35}{12}}$<br>
+                    ・ <b>標準偏差：</b> $\sigma(X) = \sqrt{\frac{35}{12}} = \mathbf{\frac{\sqrt{105}}{6}}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド6 (7/12)：演習問題［2］確率変数の変換 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［2］：確率変数の変換</h2>
+                <span class="badge">標準レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    確率変数 $X$ の期待値が $E(X) = 3$、分散が $V(X) = 4$ であるとき、<br>
+                    $Y = 2X - 5$ についての期待値 $E(Y)$、分散 $V(Y)$、標準偏差 $\sigma(Y)$ を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    変換公式 $Y = aX + b$ を適用する。<br>
+                    ・ <b>期待値：</b> $E(Y) = 2 E(X) - 5 = 2(3) - 5 = \mathbf{1}$<br>
+                    ・ <b>分 散：</b> $V(Y) = 2^2 V(X) = 4 \times 4 = \mathbf{16}$<br>
+                    ・ <b>標準偏差：</b> $\sigma(Y) = \sqrt{V(Y)} = \sqrt{16} = \mathbf{4}$ <span style="color: #718096;">（または $|2| \sigma(X) = 2 \times 2 = 4$）</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド7 (8/12)：演習問題［3］二項分布の計算 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［3］：二項分布の応用</h2>
+                <span class="badge">頻出レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    1枚のコインを 100回 投げるとき、表が出る回数を $X$ とする。<br>
+                    (1) $X$ の期待値 $E(X)$、分散 $V(X)$ を求めよ。<br>
+                    (2) 表がちょうど 50回 出る確率 $P(X = 50)$ を式で表せ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    $X$ は二項分布 $B\left(100, \frac{1}{2}\right)$ に従う。<br>
+                    <b>(1) 期待値・分散：</b><br>
+                    ・ $E(X) = np = 100 \times \frac{1}{2} = \mathbf{50}$<br>
+                    ・ $V(X) = np(1-p) = 100 \times \frac{1}{2} \times \frac{1}{2} = \mathbf{25}$<br><br>
+                    <b>(2) 確立の式：</b><br>
+                    $$P(X = 50) = {}_{100}\text{C}_{50} \left(\frac{1}{2}\right)^{50} \left(\frac{1}{2}\right)^{50} = \mathbf{{}_{100}\text{C}_{50} \left(\frac{1}{2}\right)^{100}}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8 (9/12)：演習問題［4］確率分布表の作成と決定 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［4］：分布表の未定係数</h2>
+                <span class="badge">頻出レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    確率変数 $X$ のとる値が $1, 2, 3$ であり、それぞれの確率が $P(X = k) = c k^2 \ (k=1, 2, 3)$ で与えられている。<br>
+                    (1) 定数 $c$ の値を求めよ。<br>
+                    (2) $X$ の期待値 $E(X)$ を求めよ。
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>(1) 確率の総和 $= 1$ を利用：</b><br>
+                    $P(X=1) = c(1^2) = c, \quad P(X=2) = c(2^2) = 4c, \quad P(X=3) = c(3^2) = 9c$<br>
+                    確率の和は $1$ になるので： $c + 4c + 9c = 1 \implies 14c = 1 \implies \mathbf{c = \frac{1}{14}}$<br><br>
+                    <b>(2) 期待値の計算：</b><br>
+                    $$E(X) = 1 \cdot (c) + 2 \cdot (4c) + 3 \cdot (9c) = c + 8c + 27c = 36c$$
+                    $c = \frac{1}{14}$ を代入して： $E(X) = 36 \times \frac{1}{14} = \mathbf{\frac{18}{7}}$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9 (10/12)：5. 連続確率分布と正規分布 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>5. 連続確率変数と正規分布</h2>
+                <span class="badge">発展発展</span>
+            </div>
+            <div class="content-box">
+                <p>確率変数が連続的な値をとる場合、面積が確率を表す（<b>確率密度関数 $f(x)$</b>）。</p>
+                <div class="problem-text">
+                    <p style="margin-bottom: 8px;"><b>■ 確率と面積</b></p>
+                    $$P(a \leqq X \leqq b) = \text{（区間 }[a, b] \text{ における } y = f(x) \text{ と } x \text{ 軸の間の面積）}$$
+                    <p style="margin-top: 10px; margin-bottom: 8px;"><b>■ 正規分布 $N(m, \sigma^2)$ の標準化</b></p>
+                    $$X \sim N(m, \sigma^2) \text{ のとき、 } Z = \frac{X - m}{\sigma} \ \implies \ Z \sim N(0, 1) \text{ （標準正規分布）}$$
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">正規分布の着眼点</div>
+                <div>どんな平均 $m$ や標準偏差 $\sigma$ の正規分布でも、<b>$Z = \frac{X-m}{\sigma}$ により標準正規分布 $N(0,1)$ に変換すれば正規分布表から確率を読み取れる</b>ようになる。</div>
+            </div>
+        </div>
+
+        <!-- スライド10 (11/12)：演習問題［5］正規分布の標準化 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>演習問題［5］：正規分布の確率</h2>
+                <span class="badge">応用レベル</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text">
+                    <b>【問題】</b><br>
+                    ある試験の点数 $X$ が、平均 $60$、標準偏差 $10$ の正規分布 $N(60, 10^2)$ に従うとき、点数が $70$点以上となる確率 $P(X \geqq 70)$ を求めよ。<br>
+                    <span style="font-size: 10pt; color: #718096;">（※ ただし、標準正規分布 $N(0,1)$ において $P(0 \leqq Z \leqq 1) = 0.3413$ とする）</span>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">解答・解説</div>
+                <div style="font-size: 10.5pt; line-height: 1.8;">
+                    <b>標準化を行う：</b><br>
+                    $Z = \frac{X - 60}{10}$ と置くと、$Z$ は標準正規分布 $N(0, 1)$ に従う。<br>
+                    $X = 70$ のとき、 $Z = \frac{70 - 60}{10} = 1$ である。<br>
+                    求める確率は：<br>
+                    $$P(X \geqq 70) = P(Z \geqq 1) = 0.5 - P(0 \leqq Z \leqq 1) = 0.5 - 0.3413 = \mathbf{0.1587}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド11 (12/12)：まとめ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2>確率分布と期待値のまとめ</h2>
+                <span class="badge">総括</span>
+            </div>
+            <div class="content-box">
+                <div class="problem-text" style="font-weight: normal; font-size: 11pt;">
+                    <ol style="margin-left: 20px; line-height: 2;">
+                        <li><b>確率分布表の作成：</b> $\sum p_i = 1$ を最優先でチェックする。</li>
+                        <li><b>代表値の計算：</b> 分散は $V(X) = E(X^2) - (E(X))^2$ を使う。</li>
+                        <li><b>変数の変換：</b> $E(aX+b) = aE(X)+b$、 $V(aX+b) = a^2V(X)$。</li>
+                        <li><b>二項分布 $B(n, p)$：</b> $E(X) = np$, $V(X) = np(1-p)$。</li>
+                        <li><b>正規分布の活用：</b> $Z = \frac{X-m}{\sigma}$ で標準化して確率を求める。</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="answer-box">
+                <div class="answer-label">学習のアドバイス</div>
+                <div>統計分野は「<b>公式の成り立ち（確率分布の定義）</b>」と「<b>変換・標準化の手順</b>」さえマスターすれば、計算パターンが一定のため非常に得点源にしやすい分野です。</div>
+            </div>
+        </div>
+
+    </div><!-- /.slide-container -->
+
+    <!-- 操作用ナビゲーション -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">前へ</button>
+        <span class="page-indicator" id="pageIdx">1 / 12</span>
+        <button class="nav-btn" onclick="changeSlide(1)">次へ</button>
+    </div>
+
+    <!-- メニューボタン -->
+    <div id="menu-trigger" onclick="toggleMenu(event)"
+        style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; background-color: #1a365d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; font-weight: bold; user-select: none;">
+        ☰
+    </div>
+
+    <!-- ポップアップメニュー本体 -->
+    <div id="popup-menu"
+        style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; background-color: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 280px; max-height: 400px; overflow-y: auto; display: none; font-family: sans-serif;">
+        <div style="background-color: #1a365d; color: white; padding: 12px; font-weight: bold; font-size: 11pt; border-top-left-radius: 7px; border-top-right-radius: 7px; position: sticky; top: 0;">
+            章選択ナビゲーション
+        </div>
+        <div style="padding: 5px 0;">
+            <button onclick="goToSlide(0)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">1. タイトル</button>
+            <button onclick="goToSlide(1)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">2. 確率変数と確率分布</button>
+            <button onclick="goToSlide(2)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">3. 期待値・分散・標準偏差</button>
+            <button onclick="goToSlide(3)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">4. 確率変数の変換(aX+b)</button>
+            <button onclick="goToSlide(4)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">5. 二項分布 B(n, p)</button>
+            <button onclick="goToSlide(6)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">6. 演習</button>
+            <button onclick="goToSlide(12)" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; font-size: 10.5pt; cursor: pointer; border-bottom: 1px solid #edf2f7; color: #2d3748;">12. まとめ</button>
+        </div>
+    </div>
+
+    <!-- メインスクリプト -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            document.getElementById('pageIdx').innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('popup-menu');
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+            document.getElementById('popup-menu').style.display = 'none';
+        }
+
+        document.addEventListener('click', function () {
+            const menu = document.getElementById('popup-menu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        function initDragScroll() {
+            const targets = document.querySelectorAll('mjx-container[display="true"], .problem-text > div, .answer-box > div');
+
+            targets.forEach(target => {
+                if (target.parentElement.classList.contains('scrollable-box')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scrollable-box';
+                target.parentNode.insertBefore(wrapper, target);
+                wrapper.appendChild(target);
+            });
+
+            const scrollContainers = document.querySelectorAll('.scrollable-box');
+
+            scrollContainers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('is-dragging');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('is-dragging');
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDragScroll();
+            if (window.MathJax && window.MathJax.startup) {
+                window.MathJax.startup.promise.then(() => {
+                    initDragScroll();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
